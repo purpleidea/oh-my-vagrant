@@ -1,0 +1,7 @@
+This is vagrant-puppet-docker-template...
+
+It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things. There are still quite a lot of unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
+
+Cheers,
+James
+

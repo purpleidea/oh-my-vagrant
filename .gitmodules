@@ -1,0 +1,6 @@
+[submodule "vagrant/puppet/modules/module-data"]
+	path = vagrant/puppet/modules/module-data
+	url = https://github.com/ripienaar/puppet-module-data/
+[submodule "vagrant/puppet/modules/stdlib"]
+	path = vagrant/puppet/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib
