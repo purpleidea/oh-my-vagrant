@@ -112,11 +112,15 @@ while skip < ARGV.length
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
-		docker = v.to_s		# set puppet flag
-		if ['true', 'yes'].include?(docker.downcase)
-			docker = true
+		if v.is_a?(Array)
+			docker = v
 		else
-			docker = false
+			docker = v.to_s		# set puppet flag
+			if ['true', 'yes'].include?(docker.downcase)
+				docker = true
+			else
+				docker = false
+			end
 		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-cachier=')
@@ -422,9 +426,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			#	docker (in vm)
 			#
-			config.vm.provision :docker do |docker|
-				docker.pull_images 'fedora'
-				docker.build_dir = '.'	# look for Dockerfile
+			# FIXME: we can't do the importing of the images at the
+			# vm build time because we can't get the daemon to run!
+			if docker.is_a?(Array)
+				docker.each do |j|
+					# if there is a docker image already present, use that
+					# otherwise pull one down...
+					vm.vm.provision 'shell', inline: "if [ -e '/root/docker/#{j}.docker' ]; then docker load --input='/root/docker/#{j}.docker'; else docker pull '#{j}'; fi"
+				end
+
+			elsif docker
+				# pull in all the docker images that the vm has
+				vm.vm.provision 'shell', inline: 'for i in /root/docker/*.docker; do [ -e "$i" ] || continue; docker load --input="$i"; done'
+			end
+
+			if docker
+				config.vm.provision :docker do |docker|
+					docker.pull_images 'fedora'
+					docker.build_dir = '.'	# look for Dockerfile
+				end
 			end
 
 			#
