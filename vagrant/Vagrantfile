@@ -37,6 +37,23 @@ cidr2 = (32-(Math.log(range2.length)/Math.log(2))).to_i
 offset2 = 2
 netmask2 = IPAddr.new('255.255.255.255').mask(cidr2).to_s
 
+#
+#	vms
+#
+# NOTE: you can specify the list of vms here, or in the vagrant.yaml file...
+# NOTE: if you set the vagrant vms array to nil, you'll default to this list
+vms = [
+#	{:name => 'example1', :docker => true, :puppet => true, },	# example1
+#	{:name => 'example2', :docker => ['centos', 'fedora'], },	# example2
+#	{:name => 'example3', :docker =>
+#		[
+#			{:name => 'centos', },
+#			{:name => 'fedora', },
+#		],
+#	},								# example3
+#	{:name => 'example4', :image => 'centos-6', :puppet => true, },	# example4
+]
+
 # mutable by ARGV and settings file
 domain = 'example.com'		# demain domain to use (yes this *can* work)
 network = '192.168.123.0/24'	# default network to use
@@ -45,8 +62,19 @@ sync = 'rsync'			# default sync type
 puppet = false			# default use of puppet or not
 docker = false			# default use of docker or not
 cachier = false			# default cachier usage
+#vms = []			# default list of vms to build (special global)
 namespace = 'template'		# default namespace
 count = 1			# default number of hosts to build
+
+def array_values_to_array_of_hashes(l)
+	result = l
+	if l.is_a?(Array) and l.length > 0
+		if not l[0].is_a?(Hash)	# check the first value
+			result = l.each_with_object([]) { |x, a| a.push({:name => x}) }
+		end
+	end
+	return result
+end
 
 #
 #	ARGV parsing
@@ -64,6 +92,9 @@ if File.exist?(f)
 	puppet = settings[:puppet]
 	docker = settings[:docker]
 	cachier = settings[:cachier]
+	if settings[:vms].is_a?(Array)
+		vms = settings[:vms]
+	end
 	namespace = settings[:namespace]
 	count = settings[:count]
 end
@@ -112,8 +143,9 @@ while skip < ARGV.length
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
-		if v.is_a?(Array)
-			docker = v
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			v = v.split(',')
+			docker = array_values_to_array_of_hashes(v)
 		else
 			docker = v.to_s		# set puppet flag
 			if ['true', 'yes'].include?(docker.downcase)
@@ -132,6 +164,15 @@ while skip < ARGV.length
 			cachier = true
 		else
 			cachier = false
+		end
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-vms=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			v = v.split(',')
+			vms = array_values_to_array_of_hashes(v)
 		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-namespace=')
@@ -160,6 +201,7 @@ settings = {
 	:puppet => puppet,
 	:docker => docker,
 	:cachier => cachier,
+	:vms => vms,
 	:namespace => namespace,
 	:count => count,
 }
@@ -178,6 +220,18 @@ offset = 100		# start hosts after here
 #puts range[1].to_s	# router (reserved)
 #puts range[2].to_s	# puppetmaster
 #puts range[3].to_s	# vip
+
+# prepend $count vms onto the vms list...
+extra = []
+(1..count).each do |i|
+	h = "#{namespace}#{i}"
+	# generate names and add in the defaults
+	extra.push({:name => h, :docker => docker})
+end
+vms = extra.concat vms
+
+# transform docker value if necessary
+docker = array_values_to_array_of_hashes(docker)
 
 # erase host information from puppet so that the user can do partial rebuilds
 snoop = ARGV.select { |x| !x.start_with?('-') }
@@ -283,84 +337,83 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		end
 	end
 
-	#puppet_fqdn = "#{puppet_hostname}.#{domain}"
-	config.vm.define :puppet, :primary => true do |vm|
-		vm.vm.hostname = puppet_hostname
-		# red herring network so that management happens here...
-		vm.vm.network :private_network,
-		:ip => range2[2].to_s,
-		:libvirt__netmask => netmask2,
-		#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
-		:libvirt__network_name => 'default'
+	if puppet
+		#puppet_fqdn = "#{puppet_hostname}.#{domain}"
+		config.vm.define :puppet, :primary => true do |vm|
+			vm.vm.hostname = puppet_hostname
+			# red herring network so that management happens here...
+			vm.vm.network :private_network,
+			:ip => range2[2].to_s,
+			:libvirt__netmask => netmask2,
+			#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
+			:libvirt__network_name => 'default'
 
-		# this is the real network that we'll use...
-		vm.vm.network :private_network,
-		:ip => puppet_ip,
-		:libvirt__dhcp_enabled => false,
-		:libvirt__network_name => namespace
+			# this is the real network that we'll use...
+			vm.vm.network :private_network,
+			:ip => puppet_ip,
+			:libvirt__dhcp_enabled => false,
+			:libvirt__network_name => namespace
 
-		#vm.landrush.host puppet_hostname, puppet_ip	# TODO ?
+			#vm.landrush.host puppet_hostname, puppet_ip	# TODO ?
 
-		# ensure the $namespace module is present for provisioning...
-		if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(puppet_hostname))
-			cwd = `pwd`
-			mod = File.join(projectdir, 'puppet', 'modules')
-			#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
-		end
-
-		#
-		#	shell
-		#
-		if not File.exists?(fv)	# only modify /etc/hosts once
+			# ensure the $namespace module is present for provisioning...
 			if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(puppet_hostname))
-				File.open(fv, 'w') {}	# touch
-			end
-			vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
-			vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname} ensure=absent"	# so that fqdn works
-
-			vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
-			vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname}.#{domain} ip=#{puppet_ip} host_aliases=#{puppet_hostname} ensure=present"
-			(1..count).each do |i|
-				h = "namespace#{i}"
-				ip = range[offset+i].to_s
-				vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
+				cwd = `pwd`
+				mod = File.join(projectdir, 'puppet', 'modules')
+				#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
 			end
 
-#			# hosts entries for all clients
-#			(1..clients).each do |i|
-#				h = "client#{i}"
-#				ip = range[offset+count+i].to_s
-#				vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
-#			end
-		end
-		#
-		#	puppet (apply)
-		#
-		vm.vm.provision :puppet do |puppet|
-			puppet.module_path = 'puppet/modules'
-			puppet.manifests_path = 'puppet/manifests'
-			puppet.manifest_file = 'site.pp'
-			# custom fact
-			puppet.facter = {
-				'vagrant' => '1',
-				'vagrant_allow' => (1..count).map{|z| range[offset+z].to_s}.join(','),
-			}
-			puppet.synced_folder_type = sync
-		end
+			#
+			#	shell
+			#
+			if not File.exists?(fv)	# only modify /etc/hosts once
+				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(puppet_hostname))
+					File.open(fv, 'w') {}	# touch
+				end
+				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
+				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname} ensure=absent"	# so that fqdn works
 
-		vm.vm.provider :libvirt do |libvirt|
-			libvirt.cpus = 2
-			libvirt.memory = 1024
+				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
+				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname}.#{domain} ip=#{puppet_ip} host_aliases=#{puppet_hostname} ensure=present"
+				vms.each_with_index do |x, i|
+					h = x[:name]
+					ip = range[offset+i].to_s
+					vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
+				end
+			end
+			#
+			#	puppet (apply)
+			#
+			vm.vm.provision :puppet do |p|
+				p.module_path = 'puppet/modules'
+				p.manifests_path = 'puppet/manifests'
+				p.manifest_file = 'site.pp'
+				# custom fact
+				p.facter = {
+					'vagrant' => '1',
+					'vagrant_allow' => (1..vms.length).map{|z| range[offset+z].to_s}.join(','),
+				}
+				p.synced_folder_type = sync
+			end
+
+			vm.vm.provider :libvirt do |libvirt|
+				libvirt.cpus = 2
+				libvirt.memory = 1024
+			end
 		end
 	end
 
 	#
 	#	other hosts, et al...
 	#
-	(1..count).each do |i|
-		h = "#{namespace}#{i}"
+	vms.each_with_index do |x, i|
+		h = x[:name]
 		ip = range[offset+i].to_s
 		#fqdn = "#{h}.#{domain}"
+		vm_image = x.fetch(:image, image)	# get value
+		vm_docker = x.fetch(:docker, docker)	# get value
+		vm_docker = array_values_to_array_of_hashes(vm_docker)
+		vm_puppet = x.fetch(:puppet, puppet)	# get value
 		fvx = File.join(projectdir, '.vagrant', "#{h}-hosts.done")
 		if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
 			if File.exists?(fvx)	# safety
@@ -369,7 +422,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 		end
 
-		if snoop.include?(h)		# should we clean this machine?
+		if puppet and snoop.include?(h)		# should we clean this machine?
 			cmd = "puppet cert clean #{h}.#{domain}"
 			puts "Running 'puppet cert clean' for: #{h}..."
 			`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
@@ -392,10 +445,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			:libvirt__dhcp_enabled => false,
 			:libvirt__network_name => "#{namespace}"
 
+			vm.vm.box = vm_image	# set vm specific image
+
 			# use a specialized vagrant box if it exists :)
-			if docker
-				if `vagrant box list | grep -q '^#{image}-docker' && echo -n found` != ''
-					vm.vm.box = "#{image}-docker"
+			if vm_docker
+				if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
+					vm.vm.box = "#{vm_image}-docker"
 				end
 			end
 
@@ -415,8 +470,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname}.#{domain} ip=#{puppet_ip} host_aliases=#{puppet_hostname} ensure=present"
 				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' #{puppet_hostname} puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
 				# hosts entries for all hosts
-				(1..count).each do |j|
-					oh = "#{namespace}#{j}"
+				vms.each_with_index do |x, j|
+					oh = x[:name]
 					oip = range[offset+j].to_s	# eg: "192.168.142.#{100+i}"
 					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
 				end
@@ -426,38 +481,52 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			#	docker (in vm)
 			#
+			# TODO: do we need to start the docker daemon first ?
 			# FIXME: we can't do the importing of the images at the
 			# vm build time because we can't get the daemon to run!
-			if docker.is_a?(Array)
-				docker.each do |j|
+			if vm_docker.is_a?(Array)
+				vm_docker.each do |j|
 					# if there is a docker image already present, use that
 					# otherwise pull one down...
-					vm.vm.provision 'shell', inline: "if [ -e '/root/docker/#{j}.docker' ]; then docker load --input='/root/docker/#{j}.docker'; else docker pull '#{j}'; fi"
+					vm.vm.provision 'shell', inline: "if [ -e '/root/docker/#{j[:name]}.docker' ]; then docker load --input='/root/docker/#{j[:name]}.docker'; else docker pull '#{j[:name]}'; fi"
 				end
 
-			elsif docker
+			elsif vm_docker
 				# pull in all the docker images that the vm has
 				vm.vm.provision 'shell', inline: 'for i in /root/docker/*.docker; do [ -e "$i" ] || continue; docker load --input="$i"; done'
 			end
 
-			if docker
-				config.vm.provision :docker do |docker|
-					docker.pull_images 'fedora'
-					docker.build_dir = '.'	# look for Dockerfile
+			# TODO: should we run the docker pull with vagrant too?
+			if vm_docker.is_a?(Array)
+				vm.vm.provision :docker, images: vm_docker.map { |y| y.fetch(:name, nil)}.compact
+			end
+
+			if vm_docker.is_a?(Array)
+				vm_docker.each do |y|
+					vm.vm.provision :docker do |d|
+						# XXX y is now a hash to be used here...
+					end
+				end
+
+			elsif vm_docker
+				vm.vm.provision :docker do |d|
+					# XXX
+					#d.build_image '/vagrant/app'	# XXX: add a synced folder...
+					#d.run 'foo'	XXX
 				end
 			end
 
 			#
 			#	puppet (agent)
 			#
-			if puppet
-				vm.vm.provision :puppet_server do |puppet|
-					#puppet.puppet_node = "#{h}"	# redundant
-					#puppet.puppet_server = "#{puppet_hostname}.#{domain}"
-					puppet.puppet_server = puppet_hostname
-					#puppet.options = '--verbose --debug'
-					puppet.options = '--test'	# see the output
-					puppet.facter = {
+			if puppet and vm_puppet
+				vm.vm.provision :puppet_server do |p|
+					#p.puppet_node = "#{h}"	# redundant
+					#p.puppet_server = "#{puppet_hostname}.#{domain}"
+					p.puppet_server = puppet_hostname
+					#p.options = '--verbose --debug'
+					p.options = '--test'	# see the output
+					p.facter = {
 						'vagrant' => '1',
 						'vagrant_vip' => vip_ip,
 						'vagrant_vip_fqdn' => "#{vip_hostname}.#{domain}",
