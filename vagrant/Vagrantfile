@@ -293,7 +293,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#
 	#	sync type
 	#
-	config.vm.synced_folder './', '/vagrant', type: sync	# nfs, rsync
+	# config.vm.synced_folder './', '/vagrant', type: sync	# nfs, rsync
+	config.vm.synced_folder "./", "/vagrant", type: "rsync"
 
 	#
 	#	cache
