@@ -524,7 +524,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# ssh into itself and unregister
 						cmd = 'subscription-manager unregister'
 						puts "Running '#{cmd}' on: #{h}..."
-						`vagrant ssh #{h} -c 'sudo #{cmd}'`
+						puts `vagrant ssh #{h} -c 'sudo #{cmd}'`
 					end
 				end
 			end
