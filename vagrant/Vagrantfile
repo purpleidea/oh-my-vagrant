@@ -453,22 +453,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
-		fvx = File.join(projectdir, '.vagrant', "#{h}-hosts.done")
-		if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
-			if File.exists?(fvx)	# safety
-				puts "Unlocking shell provisioning for: #{h}..."
-				File.delete(fvx)	# delete hosts token
-			end
-		end
-
-		if puppet and snoop.include?(h)		# should we clean this machine?
-			cmd = "puppet cert clean #{h}.#{domain}"
-			puts "Running 'puppet cert clean' for: #{h}..."
-			`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
-			cmd = "puppet node deactivate #{h}.#{domain}"
-			puts "Running 'puppet node deactivate' for: #{h}..."
-			`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
-		end
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 
 		config.vm.define h.to_sym do |vm|
@@ -495,6 +479,36 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			#vm.landrush.host h, ip	# TODO ?
+
+			fvx = File.join(projectdir, '.vagrant', "#{h}-hosts.done")
+			if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
+				if File.exists?(fvx)	# safety
+					puts "Unlocking shell provisioning for: #{h}..."
+					File.delete(fvx)	# delete hosts token
+				end
+			end
+
+			if puppet and snoop.include?(h)		# should we clean this machine?
+				cmd = "puppet cert clean #{h}.#{domain}"
+				puts "Running 'puppet cert clean' for: #{h}..."
+				`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
+				cmd = "puppet node deactivate #{h}.#{domain}"
+				puts "Running 'puppet node deactivate' for: #{h}..."
+				`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
+			end
+
+			# unsubscribe rhel machines on destroy
+			if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
+				if vm.vm.box.start_with? 'rhel-'
+					# check these to know if we registered!
+					if username != '' and password != ''
+						# ssh into itself and unregister
+						cmd = 'subscription-manager unregister'
+						puts "Running '#{cmd}' on: #{h}..."
+						`vagrant ssh #{h} -c 'sudo #{cmd}'`
+					end
+				end
+			end
 
 			#
 			#	shell
