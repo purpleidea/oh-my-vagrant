@@ -52,6 +52,7 @@ vms = [
 #		],
 #	},								# example3
 #	{:name => 'example4', :image => 'centos-6', :puppet => true, },	# example4
+#	{:name => 'example5', :image => 'rhel-7.0', :poolid => true, },	# example5
 ]
 
 # mutable by ARGV and settings file
@@ -65,6 +66,11 @@ cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (special global)
 namespace = 'template'		# default namespace
 count = 1			# default number of hosts to build
+# TODO: subscription manager needs to grow a way to generate an 'API key' that
+# can be used instead of a password so that it can be safely used in scripts...
+username = ''			# default subscription manager username
+password = ''			# default subscription manager password
+poolid = []			# default list of poolid's (true to auto-attach)
 
 def array_values_to_array_of_hashes(l)
 	result = l
@@ -97,6 +103,9 @@ if File.exist?(f)
 	end
 	namespace = settings[:namespace]
 	count = settings[:count]
+	username = settings[:username]
+	password = settings[:password]
+	poolid = settings[:poolid]
 end
 
 # ARGV parser
@@ -187,6 +196,33 @@ while skip < ARGV.length
 
 		count = v.to_i		# set host count
 
+	elsif ARGV[skip].start_with?(arg='--vagrant-username=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		username = v.to_s	# set username
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-password=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		password = v.to_s	# set password
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-poolid=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			poolid = v.split(',')
+		else
+			poolid = v.to_s		# set poolid boolean flag
+			if ['true', 'auto'].include?(poolid.downcase)
+				poolid = true
+			else
+				poolid = false
+			end
+		end
+
 	else	# skip over "official" vagrant args
 		skip = skip + 1
 	end
@@ -204,6 +240,9 @@ settings = {
 	:vms => vms,
 	:namespace => namespace,
 	:count => count,
+	:username => username,
+	:password => password,
+	:poolid => poolid,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml
@@ -430,6 +469,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			puts "Running 'puppet node deactivate' for: #{h}..."
 			`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
 		end
+		vm_poolid = x.fetch(:poolid, poolid)	# get value
 
 		config.vm.define h.to_sym do |vm|
 			vm.vm.hostname = h
@@ -474,6 +514,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					oh = x[:name]
 					oip = range[offset+j].to_s	# eg: "192.168.142.#{100+i}"
 					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
+				end
+
+				# subscribe rhel machines
+				if vm.vm.box.start_with? 'rhel-'
+					if username != '' and password != ''
+						vm.vm.provision 'shell', inline: "subscription-manager register --username=#{username} --password=#{password}"
+					end
+
+					# attach correct pools
+					if vm_poolid.is_a?(Array)
+						vm_poolid.each do |j|
+							vm.vm.provision 'shell', inline: "subscription-manager attach --pool=#{j}"
+						end
+
+					elsif vm_poolid
+						# auto attach if value is true
+						vm.vm.provision 'shell', inline: 'subscription-manager attach --auto'
+					end
+
 				end
 
 			end
