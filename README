@@ -1,7 +1,9 @@
-This is vagrant-puppet-docker-template...
+This is: Oh My Vagrant!
+
+This was born as 'vagrant-puppet-docker-template', but when I decided it could be more useful as a general project, I renamed it because the original name was dumb. The current name is obviously a nod to the success of the 'oh-my-zsh' project, although I'm actually a bash user :)
 
 It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things. There are still quite a lot of unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
 
 Cheers,
-James
+James (@purpleidea)
 
