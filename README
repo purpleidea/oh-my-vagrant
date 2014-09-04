@@ -4,6 +4,9 @@ This was born as 'vagrant-puppet-docker-template', but when I decided it could b
 
 It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things. There are still quite a lot of unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
 
+An intro article about this environment is available here:
+https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/
+
 Cheers,
 James (@purpleidea)
 
