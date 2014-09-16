@@ -64,7 +64,7 @@ puppet = false			# default use of puppet or not
 docker = false			# default use of docker or not
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (special global)
-namespace = 'template'		# default namespace
+namespace = 'omv'		# default namespace
 count = 1			# default number of hosts to build
 # TODO: subscription manager needs to grow a way to generate an 'API key' that
 # can be used instead of a password so that it can be safely used in scripts...
