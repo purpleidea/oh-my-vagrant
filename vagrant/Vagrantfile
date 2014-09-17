@@ -287,6 +287,12 @@ extra = []
 end
 vms = extra.concat vms
 
+# add in puppet host if requested
+if puppet
+	extra = [{:name => 'puppet'}]
+	vms = extra.concat vms
+end
+
 # transform docker value if necessary
 docker = array_values_to_array_of_hashes(docker)
 
@@ -382,86 +388,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	vip_hostname = namespace
 
 	#
-	#	puppetmaster
-	#
-	puppet_ip = range[2].to_s
-	puppet_hostname = 'puppet'
-	fv = File.join(projectdir, '.vagrant', "#{puppet_hostname}-hosts.done")
-	if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(puppet_hostname))
-		if File.exists?(fv)	# safety
-			puts "Unlocking shell provisioning for: #{puppet_hostname}..."
-			File.delete(fv)	# delete hosts token
-		end
-	end
-
-	if puppet
-		#puppet_fqdn = "#{puppet_hostname}.#{domain}"
-		config.vm.define :puppet, :primary => true do |vm|
-			vm.vm.hostname = puppet_hostname
-			# red herring network so that management happens here...
-			vm.vm.network :private_network,
-			:ip => range2[2].to_s,
-			:libvirt__netmask => netmask2,
-			#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
-			:libvirt__network_name => 'default'
-
-			# this is the real network that we'll use...
-			vm.vm.network :private_network,
-			:ip => puppet_ip,
-			:libvirt__dhcp_enabled => false,
-			:libvirt__network_name => namespace
-
-			#vm.landrush.host puppet_hostname, puppet_ip	# TODO ?
-
-			# ensure the $namespace module is present for provisioning...
-			if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(puppet_hostname))
-				cwd = `pwd`
-				mod = File.join(projectdir, 'puppet', 'modules')
-				#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
-			end
-
-			#
-			#	shell
-			#
-			if not File.exists?(fv)	# only modify /etc/hosts once
-				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(puppet_hostname))
-					File.open(fv, 'w') {}	# touch
-				end
-				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
-				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname} ensure=absent"	# so that fqdn works
-
-				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
-				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname}.#{domain} ip=#{puppet_ip} host_aliases=#{puppet_hostname} ensure=present"
-				vms.each_with_index do |x, i|
-					h = x[:name]
-					ip = range[offset+i].to_s
-					vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
-				end
-			end
-			#
-			#	puppet (apply)
-			#
-			vm.vm.provision :puppet do |p|
-				p.module_path = 'puppet/modules'
-				p.manifests_path = 'puppet/manifests'
-				p.manifest_file = 'site.pp'
-				# custom fact
-				p.facter = {
-					'vagrant' => '1',
-					'vagrant_allow' => (1..vms.length).map{|z| range[offset+z].to_s}.join(','),
-				}
-				p.synced_folder_type = sync
-			end
-
-			vm.vm.provider :libvirt do |libvirt|
-				libvirt.cpus = 2
-				libvirt.memory = 1024
-			end
-		end
-	end
-
-	#
-	#	other hosts, et al...
+	#	vms mainloop to define all the machines
 	#
 	vms.each_with_index do |x, i|
 		h = x[:name]
@@ -480,6 +407,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vm.vm.network :private_network,
 			:ip => range2[offset2+i].to_s,
 			:libvirt__netmask => netmask2,
+			#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
 			:libvirt__network_name => 'default'
 
 			# this is the real network that we'll use...
@@ -499,21 +427,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			#vm.landrush.host h, ip	# TODO ?
 
-			fvx = File.join(projectdir, '.vagrant', "#{h}-hosts.done")
+			fv = File.join(projectdir, '.vagrant', "#{h}-hosts.done")
 			if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
-				if File.exists?(fvx)	# safety
+				if File.exists?(fv)	# safety
 					puts "Unlocking shell provisioning for: #{h}..."
-					File.delete(fvx)	# delete hosts token
+					File.delete(fv)	# delete hosts token
 				end
 			end
 
-			if puppet and snoop.include?(h)		# should we clean this machine?
+			# should we clean this puppet client machine?
+			if puppet and vm_puppet and h != 'puppet' and snoop.include?(h)
 				cmd = "puppet cert clean #{h}.#{domain}"
 				puts "Running 'puppet cert clean' for: #{h}..."
-				`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
+				`vagrant ssh puppet -c 'sudo #{cmd}'`
 				cmd = "puppet node deactivate #{h}.#{domain}"
 				puts "Running 'puppet node deactivate' for: #{h}..."
-				`vagrant ssh #{puppet_hostname} -c 'sudo #{cmd}'`
+				`vagrant ssh puppet -c 'sudo #{cmd}'`
 			end
 
 			# unsubscribe rhel machines on destroy
@@ -532,16 +461,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			#	shell
 			#
-			if not File.exists?(fvx)	# only modify /etc/hosts once
+			if not File.exists?(fv)	# only modify /etc/hosts once
 				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(h))
-					File.open(fvx, 'w') {}	# touch
+					File.open(fv, 'w') {}	# touch
 				end
 				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
 				vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
 
 				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
-				vm.vm.provision 'shell', inline: "puppet resource host #{puppet_hostname}.#{domain} ip=#{puppet_ip} host_aliases=#{puppet_hostname} ensure=present"
-				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' #{puppet_hostname} puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
+				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
 				# hosts entries for all hosts
 				vms.each_with_index do |x, j|
 					oh = x[:name]
@@ -578,6 +506,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						vm.vm.provision 'shell', inline: "for i in `subscription-manager repos --list | grep '^Repo ID:' | awk '{print $3}'`; do subscription-manager repos --enable=$i; done"
 					end
 				end
+			end
+
+			# ensure the $namespace module is present for provisioning...
+			if (puppet and vm_puppet and h == 'puppet') and (provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?('puppet')))
+				cwd = `pwd`
+				mod = File.join(projectdir, 'puppet', 'modules')
+				#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
 			end
 
 			#
@@ -619,13 +554,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			#
-			#	puppet (agent)
+			#	puppet agent - run on puppet client to set it up
 			#
-			if puppet and vm_puppet
+			if puppet and vm_puppet and h != 'puppet'
 				vm.vm.provision :puppet_server do |p|
 					#p.puppet_node = "#{h}"	# redundant
-					#p.puppet_server = "#{puppet_hostname}.#{domain}"
-					p.puppet_server = puppet_hostname
+					#p.puppet_server = "puppet.#{domain}"
+					p.puppet_server = 'puppet'
 					#p.options = '--verbose --debug'
 					p.options = '--test'	# see the output
 					p.facter = {
@@ -633,6 +568,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						'vagrant_vip' => vip_ip,
 						'vagrant_vip_fqdn' => "#{vip_hostname}.#{domain}",
 					}
+				end
+
+			#
+			#	puppet apply - run on puppet master to set it up
+			#
+			elsif puppet and vm_puppet and h == 'puppet'
+				vm.vm.provision :puppet do |p|
+					p.module_path = 'puppet/modules'
+					p.manifests_path = 'puppet/manifests'
+					p.manifest_file = 'site.pp'
+					# custom fact
+					p.facter = {
+						'vagrant' => '1',
+						'vagrant_allow' => (1..vms.length).map{|z| range[offset+z].to_s}.join(','),
+					}
+					p.synced_folder_type = sync
 				end
 			end
 
@@ -647,6 +598,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				#		:type => 'qcow2'
 				#
 				#end
+
+				# make puppet server a bit fatter by default :P
+				if puppet and vm_puppet and h == 'puppet'
+					libvirt.cpus = 2
+					libvirt.memory = 1024
+				end
 			end
 		end
 	end
