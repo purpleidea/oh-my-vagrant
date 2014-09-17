@@ -30,6 +30,9 @@ require 'yaml'
 #
 #	globals
 #
+# thanks to the gluster.org community for the public box hosting
+default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
+
 # XXX: eliminate network2 if possible...
 network2 = IPAddr.new '192.168.145.0/24'
 range2 = network2.to_range.to_a
@@ -59,6 +62,7 @@ vms = [
 domain = 'example.com'		# demain domain to use (yes this *can* work)
 network = '192.168.123.0/24'	# default network to use
 image = 'centos-7.0'		# default image name
+boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 puppet = false			# default use of puppet or not
 docker = false			# default use of docker or not
@@ -95,6 +99,7 @@ if File.exist?(f)
 	domain = settings[:domain]
 	network = settings[:network]
 	image = settings[:image]
+	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
 	puppet = settings[:puppet]
 	docker = settings[:docker]
@@ -132,6 +137,12 @@ while skip < ARGV.length
 		v.slice! arg
 
 		image = v.to_s	# set base image
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-boxurlprefix=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		boxurlprefix = v.to_s	# set box url prefix
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-sync=')
 		v = ARGV.delete_at(skip).dup
@@ -250,6 +261,7 @@ settings = {
 	:domain => domain,
 	:network => network,
 	:image => image,
+	:boxurlprefix => boxurlprefix,
 	:sync => sync,
 	:puppet => puppet,
 	:docker => docker,
@@ -345,15 +357,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#config.landrush.enable	# TODO ?
 
 	#
-	#	box (pre-built base image)
-	#
-	config.vm.box = image		# i built it
-
-	# box source url
-	# TODO: this box should be GPG signed
-	config.vm.box_url = "https://download.gluster.org/pub/gluster/purpleidea/vagrant/#{image}/#{image}.box"
-
-	#
 	#	sync type
 	#
 	config.vm.synced_folder './', '/vagrant', type: sync	# nfs, rsync
@@ -416,6 +419,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			:libvirt__dhcp_enabled => false,
 			:libvirt__network_name => "#{namespace}"
 
+			#
+			#	box (pre-built base image)
+			#
 			vm.vm.box = vm_image	# set vm specific image
 
 			# use a specialized vagrant box if it exists :)
@@ -423,6 +429,27 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
 					vm.vm.box = "#{vm_image}-docker"
 				end
+			end
+
+			# box source url's
+			# FIXME: boxes should be GPG signed and verified on dl!
+			if "#{boxurlprefix}" != ''
+				vm.vm.box_url = "#{boxurlprefix}#{vm.vm.box}/#{vm.vm.box}.box"
+			end
+
+			# FIXME: speed up or cache (memoize) this check...
+			if `vagrant box list | grep -q '^#{vm.vm.box}' && echo -n found` != ''
+				exists = true
+			else
+				if vm.vm.box_url.is_a?(String)
+					puts "Running wget check on: '#{vm.vm.box_url}'"
+					exists = `wget -q --spider #{vm.vm.box_url}`
+				else
+					exists = false
+				end
+			end
+			if not(exists) and not vm.vm.box.start_with? 'rhel-'
+				vm.vm.box_url = "#{default_boxurlprefix}/#{vm.vm.box}/#{vm.vm.box}.box"
 			end
 
 			#vm.landrush.host h, ip	# TODO ?
