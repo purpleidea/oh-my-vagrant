@@ -169,7 +169,7 @@ while skip < ARGV.length
 			v = v.split(',')
 			docker = array_values_to_array_of_hashes(v)
 		else
-			docker = v.to_s		# set puppet flag
+			docker = v.to_s		# set docker flag
 			if ['true', 'yes'].include?(docker.downcase)
 				docker = true
 			else
