@@ -88,6 +88,28 @@ def array_values_to_array_of_hashes(l)
 end
 
 #
+#	~/.config/oh-my-vagrant/ parsing
+#
+# FIXME: can't seem to load xdg inside this Vagrantfile... Why?
+begin
+	require 'xdg'
+	auth_config = File.join("#{XDG['CONFIG']}/oh-my-vagrant/", 'auth.yaml')
+
+rescue LoadError
+	puts 'Warning: xdg gem is not installed.'
+	puts "Run: 'gem install xdg', or use your package manager."
+	auth_config = File.join("#{Dir.home}/.oh-my-vagrant/", 'auth.yaml')
+	if not File.exist?(auth_config)
+		auth_config = File.join("#{Dir.home}/.oh-my-vagrant.yaml")
+	end
+end
+if File.exist?(auth_config)
+	settings = YAML::load_file auth_config
+	global_username = settings[:username]
+	global_password = settings[:password]
+end
+
+#
 #	ARGV parsing
 #
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
@@ -278,6 +300,8 @@ File.open(f, 'w') do |file|
 	file.write settings.to_yaml
 end
 
+username = global_username if "#{username}" == ''
+password = global_password if "#{password}" == ''
 #puts "ARGV: #{ARGV}"	# debug
 
 # networking
