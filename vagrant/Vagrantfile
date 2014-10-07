@@ -96,8 +96,9 @@ begin
 	auth_config = File.join("#{XDG['CONFIG']}/oh-my-vagrant/", 'auth.yaml')
 
 rescue LoadError
-	puts 'Warning: xdg gem is not installed.'
-	puts "Run: 'gem install xdg', or use your package manager."
+	# TODO: can't print warnings, because it messes up ssh config files...
+	#puts 'Warning: xdg gem is not installed.'
+	#puts "Run: 'gem install xdg', or use your package manager."
 	auth_config = File.join("#{Dir.home}/.oh-my-vagrant/", 'auth.yaml')
 	if not File.exist?(auth_config)
 		auth_config = File.join("#{Dir.home}/.oh-my-vagrant.yaml")
