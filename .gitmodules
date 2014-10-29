@@ -4,3 +4,9 @@
 [submodule "vagrant/puppet/modules/stdlib"]
 	path = vagrant/puppet/modules/stdlib
 	url = https://github.com/puppetlabs/puppetlabs-stdlib
+[submodule "vagrant/puppet/modules/yum"]
+	path = vagrant/puppet/modules/yum
+	url = https://github.com/purpleidea/puppet-yum
+[submodule "vagrant/puppet/modules/puppet"]
+	path = vagrant/puppet/modules/puppet
+	url = https://github.com/purpleidea/puppet-puppet
