@@ -1,4 +1,4 @@
-node motd {
+class motd {
 	# this will get put on every host...
 	$url = 'https://ttboj.wordpress.com/'
 	file { '/etc/motd':
@@ -7,7 +7,9 @@ node motd {
 }
 
 # puppetmaster
-node puppet inherits motd {
+node puppet {
+
+	include ::motd
 
 	class { '::puppet::server':
 		pluginsync => true,	# do we want to enable pluginsync?
