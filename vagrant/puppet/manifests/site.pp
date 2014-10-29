@@ -32,6 +32,8 @@ node puppet {
 
 node default {	# all the other hosts
 
+	include ::motd
+
 	class { '::puppet::client':
 		#start => true,
 		start => false,			# useful for testing manually...
