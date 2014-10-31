@@ -56,6 +56,15 @@ vms = [
 #	},								# example3
 #	{:name => 'example4', :image => 'centos-6', :puppet => true, },	# example4
 #	{:name => 'example5', :image => 'rhel-7.0', :poolid => true, },	# example5
+#	{:name => 'example6', :puppet => true, :classes =>		# example6
+#		['module1', 'module2', 'module3'],
+#	},
+#	{:name => 'example7', :puppet => true, :classes =>		# example7
+#		{
+#			'module1' => {'arg1' => 'val1', 'arg2' => 'val2'},
+#			'module2' => nil,
+#		},
+#	},
 ]
 
 # mutable by ARGV and settings file
@@ -65,6 +74,7 @@ image = 'centos-7.0'		# default image name
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 puppet = false			# default use of puppet or not
+classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (special global)
@@ -125,6 +135,7 @@ if File.exist?(f)
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
 	puppet = settings[:puppet]
+	classes = settings[:classes]
 	docker = settings[:docker]
 	cachier = settings[:cachier]
 	if settings[:vms].is_a?(Array)
@@ -182,6 +193,16 @@ while skip < ARGV.length
 			puppet = true
 		else
 			puppet = false
+		end
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-puppet-classes=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			classes = v.split(',')
+		else
+			classes = []
 		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-docker=')
@@ -287,6 +308,7 @@ settings = {
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
 	:puppet => puppet,
+	:classes => classes,
 	:docker => docker,
 	:cachier => cachier,
 	:vms => vms,
@@ -328,6 +350,10 @@ vms = extra.concat vms
 if puppet
 	extra = [{:name => 'puppet'}]
 	vms = extra.concat vms
+
+	if not(classes.is_a?(Hash)) and not(classes.is_a?(Array))
+		classes = []
+	end
 end
 
 # transform docker value if necessary
@@ -426,6 +452,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
+		vm_classes = x.fetch(:classes, classes)
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 
@@ -622,11 +649,40 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					p.puppet_server = 'puppet'
 					#p.options = '--verbose --debug'
 					p.options = '--test'	# see the output
-					p.facter = {
+
+					# extract a list of puppet classes...
+					dynamic = {}
+					if vm_classes.is_a?(Array)
+						puppet_classes = vm_classes
+
+					elsif vm_classes.is_a?(Hash)
+						# here we act as a cheap enc...
+						puppet_classes = vm_classes.keys
+						puppet_classes.each do |name|
+							params = vm_classes.fetch(name, {})
+							if params.is_a?(Hash)
+								keys = []
+								params.keys.sort.each do |key|
+									dynamic["vagrant_puppet_classes_values_#{name}_#{key}"] = params[key]
+									keys.push(key)
+								end
+								if keys.length > 0
+									dynamic["vagrant_puppet_classes_params_#{name}"] = keys.join(',')
+								end
+							end
+						end
+					else
+						puppet_classes = []
+					end
+
+					facter = {
 						'vagrant' => '1',
 						'vagrant_vip' => vip_ip,
 						'vagrant_vip_fqdn' => "#{vip_hostname}.#{domain}",
+						'vagrant_puppet_classes' => puppet_classes.join(','),
 					}
+					facter = facter.merge(dynamic)
+					p.facter = facter
 				end
 
 			#
