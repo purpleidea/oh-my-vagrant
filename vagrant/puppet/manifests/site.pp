@@ -1,5 +1,4 @@
-class motd {
-	# this will get put on every host...
+class motd {	# this will get put on every host...
 	$url = 'https://ttboj.wordpress.com/'
 	file { '/etc/motd':
 		content => "This is: Oh My Vagrant! (${url})\n",

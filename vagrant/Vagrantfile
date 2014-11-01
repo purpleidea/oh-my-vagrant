@@ -594,6 +594,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 			end
 
+			# TODO: remove this chunk?
 			# ensure the $namespace module is present for provisioning...
 			if (puppet and vm_puppet and h == 'puppet') and (provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?('puppet')))
 				cwd = `pwd`

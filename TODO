@@ -1,0 +1,11 @@
+TODO
+
+* Replace old style /etc/hosts with vagrant-hostmanager once it's all fixed up.
+* Find an elegant way to decide what to do to each docker container after pull.
+* Figure out what to do about DNS and networking issues in the containers.
+* Have a way to pass structured or non-string facts into the vms.
+** Puppet could support a B64FACTER_name=... where the data is a base64 yaml.
+*** This would be useful anyways, but isn't the ideal approach for vagrant.
+** One way could be to write to /etc/facter/facts.d/ before each puppet run.
+*** https://github.com/mitchellh/vagrant/issues/4762
+
