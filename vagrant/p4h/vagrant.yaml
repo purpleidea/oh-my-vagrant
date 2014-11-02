@@ -12,6 +12,7 @@
 :cachier: false
 :vms:
 - :name: prep1
+- :name: prep2
 :namespace: p4h
 :count: 0
 :username: ''
