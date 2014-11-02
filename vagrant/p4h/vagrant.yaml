@@ -1,0 +1,20 @@
+---
+:domain: example.com
+:network: 192.168.124.0/24
+:image: centos-7.0
+:boxurlprefix: ''
+:sync: rsync
+:folder: p4h
+:puppet: true
+:classes:
+- '::p4h'
+:docker: false
+:cachier: false
+:vms:
+- :name: prep1
+:namespace: p4h
+:count: 0
+:username: ''
+:password: ''
+:poolid: []
+:repos: []
