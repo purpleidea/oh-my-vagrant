@@ -44,8 +44,9 @@ node puppet {
 		start => true,
 	}
 
+	$folder = "${::vagrant_puppet_folder}"
 	class { '::puppet::deploy':
-		path => '/vagrant/puppet/',	# puppet folder is put here...
+		path => "/vagrant/${folder}puppet/",	# puppet folder is put here...
 		backup => false,		# don't use puppet to backup...
 	}
 

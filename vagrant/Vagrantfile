@@ -73,6 +73,7 @@ network = '192.168.123.0/24'	# default network to use
 image = 'centos-7.0'		# default image name
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
+folder = ''			# default folder prefix
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
@@ -124,7 +125,29 @@ end
 #	ARGV parsing
 #
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
-f = File.join(projectdir, 'vagrant.yaml')
+f = g = File.join(projectdir, 'vagrant.yaml')
+# check for vagrant.yaml in folder subdirectory
+load_folder = false
+if File.exist?(f)
+	settings = YAML::load_file f
+	folder = settings[:folder]
+
+	(0..ARGV.length-1).each do |i|
+		if ARGV[i].start_with?(arg='--vagrant-folder=')
+			v = ARGV.delete_at(i).dup
+			v.slice! arg
+			folder = v.to_s		# set folder prefix
+			load_folder = true
+			break
+		end
+	end
+
+	# if folder is '', then this doesn't do any different from the original
+	ff = File.join(projectdir, folder, 'vagrant.yaml')
+	if File.exist?(ff)
+		f = ff
+	end
+end
 
 # load settings
 if File.exist?(f)
@@ -134,6 +157,7 @@ if File.exist?(f)
 	image = settings[:image]
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
+	folder = settings[:folder] if not(load_folder)
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	docker = settings[:docker]
@@ -183,6 +207,12 @@ while skip < ARGV.length
 		v.slice! arg
 
 		sync = v.to_s		# set sync type
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-folder=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		folder = v.to_s		# set folder prefix
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-puppet=')
 		v = ARGV.delete_at(skip).dup
@@ -307,6 +337,7 @@ settings = {
 	:image => image,
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
+	:folder => folder,
 	:puppet => puppet,
 	:classes => classes,
 	:docker => docker,
@@ -320,6 +351,9 @@ settings = {
 	:repos => repos,
 }
 File.open(f, 'w') do |file|
+	file.write settings.to_yaml
+end
+File.open(g, 'w') do |file|
 	file.write settings.to_yaml
 end
 
@@ -345,6 +379,9 @@ extra = []
 	extra.push({:name => h, :docker => docker})
 end
 vms = extra.concat vms
+
+folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
+folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 
 # add in puppet host if requested
 if puppet
@@ -691,13 +728,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			elsif puppet and vm_puppet and h == 'puppet'
 				vm.vm.provision :puppet do |p|
-					p.module_path = 'puppet/modules'
-					p.manifests_path = 'puppet/manifests'
+					p.module_path = folder+'puppet/modules'
+					p.manifests_path = folder+'puppet/manifests'
 					p.manifest_file = 'site.pp'
+					p.hiera_config_path = folder+'puppet/hiera.yaml'
 					# custom fact
 					p.facter = {
 						'vagrant' => '1',
 						'vagrant_allow' => (1..vms.length).map{|z| range[offset+z].to_s}.join(','),
+						'vagrant_puppet_folder' => folder,
 					}
 					p.synced_folder_type = sync
 				end
