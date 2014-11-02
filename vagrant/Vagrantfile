@@ -587,8 +587,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
 				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
 				# hosts entries for all hosts
-				vms.each_with_index do |x, j|
-					oh = x[:name]
+				vms.each_with_index do |xx, j|
+					oh = xx[:name]
 					oip = range[offset+j].to_s	# eg: "192.168.142.#{100+i}"
 					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
 				end
