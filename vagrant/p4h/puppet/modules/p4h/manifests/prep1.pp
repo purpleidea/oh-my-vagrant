@@ -32,6 +32,9 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  # cowsay fails because the package doesn't exist
+  # package  { 'cowsay': ensure => 'installed'}
+  package  { ['golang-vim', 'mock', 'tito']: ensure => 'installed'}
 
 }
 
