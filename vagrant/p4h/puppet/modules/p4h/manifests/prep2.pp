@@ -32,7 +32,20 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	# Create a new user
+        user { 'epoe':
+            ensure => 'present',
+            home => '/home/epoe',
+            managehome => true,
+        }
+
+        # Create a file for new user
+        file { '/home/epoe/quote.txt':
+            require => [ User['epoe'] ],
+            owner => 'epoe',
+            mode => '0644',
+            content => "Those who dream by day are cognizant of many things that escape those who dream only at night.",
+        }
 
 }
 
