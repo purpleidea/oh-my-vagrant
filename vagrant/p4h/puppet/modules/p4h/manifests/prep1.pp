@@ -19,8 +19,8 @@
 
 class p4h::prep1() {
 
-	file { '/root/README':
-		content => "##prep1
+        file { '/root/README':
+                content => "##prep1
 For this lesson, please do the following:
 * should try installing the 'cowsay' package with puppet.
 
@@ -29,10 +29,21 @@ Bonus:
 * Install three different packages, in one line of code
 
 Happy hacking!\n",
-	}
+        }
 
-	# XXX: write your code here...
+        # Part 1
+        package { 'emacs':
+          ensure => 'installed',
+          }
 
+        # Bonus 1
+        package { 'python-pip': ensure => 'installed' }
+        package { 'strace': ensure => 'installed' }
+        package { 'nano': ensure => 'installed' }
+
+        # Bonus 2
+        $musthaves = [ 'mutt', 'tig', 'xedit' ]
+        package { $musthaves: ensure => 'installed' }
 }
 
 # vim: ts=8
