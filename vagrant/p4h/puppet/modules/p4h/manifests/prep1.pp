@@ -33,6 +33,16 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+  package { "tig":
+      ensure => "installed"
+  }
+
+  package { "nano": ensure => "installed" }
+  package { "strace": ensure => "installed" }
+  package { "bison":   ensure => "installed" }
+
+
+  package {["ack", "mlocate", "hub"]: ensure => "installed"}
 }
 
 # vim: ts=8
