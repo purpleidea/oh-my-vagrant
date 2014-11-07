@@ -40,6 +40,28 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+# * create a simple inline template (erb template)
+# * create a template that spits out a message using the @hostname fact
+
+ $inliner = inline_template("Test <%= @hostname %>")
+
+
+# * create an inline template that adds two puppet variables together
+$inliner2 = inline_template("Test <%= @hostname %> and <%= @operatingsystem %>")
+
+# * create a file that uses the contents of one of your templates
+
+ file { '/tmp/boo':
+   ensure  => file,
+   content => $inliner2,
+  }
+
+ file { '/tmp/external-boo':
+   ensure  => file,
+   content => template('p4h/sth.erb'),
+  }
+
+
 }
 
 # vim: ts=8
