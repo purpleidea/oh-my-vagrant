@@ -38,8 +38,26 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        $my_name = 'Og Maciel'
 
+	file {'/etc/foo.conf':
+            ensure => file,
+            content => inline_template('Hi <%= @my_name %>'),
+        }
+
+	file {'/etc/bar.conf':
+            ensure => file,
+            content => inline_template('Welcome to <%= @hostname %>'),
+        }
+
+        $animals = 6
+        $birds = 11
+
+        $_tmp = template('p4h/sth.erb')
+        file { '/etc/baz.conf':
+            ensure => file,
+            content => $_tmp,
+        }
 }
 
 # vim: ts=8
