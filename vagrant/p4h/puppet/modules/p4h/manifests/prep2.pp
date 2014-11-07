@@ -34,6 +34,15 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        user { 'prep2user':
+                home       => '/home/prep2user',
+                managehome => true,
+        }
+
+        file { '/home/prep2user/stupidjoke.txt':
+                content => "Why did the chicken cross the playground? To get to the other slide!",
+                require => User [ 'prep2user' ],
+        }
 }
 
 # vim: ts=8
