@@ -19,20 +19,43 @@
 
 class p4h::prep2() {
 
-	file { '/root/README':
-		content => "##prep2
-For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+    file { '/root/README':
+        content => "##prep2
+            For this lesson, please do the following:
+            * create a user (name it what you want) with the puppet user type
+            * create a file that contains a short poem or a joke
+            * ensure that the file gets created after the user does
 
-Bonus:
-* create the file in the new home directory of the new created user
+            Bonus:
+            * create the file in the new home directory of the new created user
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
+    # XXX: write your code here...
+
+    user { 
+        'fred':
+            ensure => 'present',
+            managehome => true,
+            home => '/home/fred'
+
+    }
+
+    file { '/home/fred/poem.txt':
+        content => "
+        \"Hope\" is the thing with feathers
+        That perches in the soul
+        And sings the tune without the words\n
+        And never stops at all,
+
+        - Emily Dickinson
+        ",
+        require => [ User['fred'] ],
+        owner => 'fred',
+        mode => '0644',
+    }
+
 
 }
 
