@@ -40,6 +40,16 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        $myTimezone = inline_template("My timezone is [<%= timezone %>]")
+
+        $var1 = 100
+        $var2 = 200
+
+        $myAdd = inline_template("<%= $var1 + $var2 %>")
+
+        file { '/root/myTemplateOuput.txt':
+                content => template ( "p4h/prep4.erb" ),
+        }
 }
 
 # vim: ts=8
