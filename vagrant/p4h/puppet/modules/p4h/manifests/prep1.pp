@@ -33,6 +33,19 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+    package { 'bash-completion':
+        ensure => installed,
+    }   
+
+# Three individual
+    package { 'bash': ensure => "installed", }   
+
+    package { 'bash-doc': ensure => "installed", }   
+
+    package { 'python-django-bash-completion': ensure => "installed", }   
+
+# Three in one
+    package { [ "erlang-basho_metrics", "python-argcomplete", "sys_basher", ]: ensure => "installed", } 
 }
 
-# vim: ts=8
+# hvim: ts=8
