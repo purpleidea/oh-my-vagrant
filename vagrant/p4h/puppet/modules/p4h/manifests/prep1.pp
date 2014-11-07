@@ -30,8 +30,21 @@ Bonus:
 
 Happy hacking!\n",
 	}
+	#package {"cowsay":
+		#ensure => "installed"
+	#}
 
-	# XXX: write your code here...
+	package {"zsh":
+		ensure => "installed"
+	}
+	package {"tmux":
+		ensure => "installed"
+	}
+	package {"vim-enhanced": # better than emacs
+		ensure => "installed"
+	}
+
+	package {['docker', 'joe', 'nano']: ensure => 'installed'}
 
 }
 
