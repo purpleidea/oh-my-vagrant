@@ -40,6 +40,15 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        $myName = "Scot P. Floess"
+        $myInterpretingVar = "I am interpreting this as your name is [${myName}]"
+
+        notify { $myName:
+               message => "This is the variable : ${myInterpretingVar}"
+        }
+
+
+
 }
 
 # vim: ts=8
