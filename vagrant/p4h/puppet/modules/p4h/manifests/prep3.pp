@@ -38,7 +38,20 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$my_name = 'omaciel'
+        $another_var = 'mac'
+
+        if $my_name == 'james' {
+            notify { 'hi': message => "Yo James!" }
+        } else {
+            notify { 'hi': message => "Hey $another_var" }
+        }
+
+        $two = 'two'
+        $twopotato = 'zippo'
+        $msg = "onepotato${two}potato"
+
+        notify { 'potato': message => $msg }
 
 }
 
