@@ -38,7 +38,30 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	notify { 'Hostname':
+    message => inline_template('You are currently on <%= @hostname %>')
+  }
+
+  $one = 1
+  $twentyone = 21
+  $twentytwo = inline_template('<%= one.to_i %> + <%= twentyone.to_i %> = <%= one.to_i + twentyone.to_i %>')
+
+  notify { 'twentytwo':
+    message => $twentytwo
+  }
+
+  file { '/root/math':
+    content => $twentytwo
+  }
+
+  file { '/root/math_template':
+    content => template('p4h/sth.erb'),
+    require => File['/root/math']
+  }
+
+  notify { 'hostname-call':
+    message => inline_template('From hostname system call: <%= %x( /usr/bin/hostname ) %>')
+  }
 
 }
 
