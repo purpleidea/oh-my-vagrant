@@ -42,6 +42,11 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        include prep5class1
+
+        class { 'flossy':
+        }
+
 
 }
 
