@@ -44,6 +44,28 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        p4h::create_file { '/root/try1.txt':
+               contents => 'This is content1',
+               require  => File ['/root/myFile.txt'],
+        }
+
+        file { '/root/myFile.txt':
+                ensure => present,
+        }
+
+        p4h::create_file { '/root/try2.txt':
+               contents => 'This is content Two',
+        }
+
+        p4h::cat_two_vars_to_file { '/root/myCat1.txt':
+            var1       => 'This is var1',
+            var2       => 'This is var2',
+        }
+
+        p4h::cat_two_vars_to_file { '/root/myCat21.txt':
+            var1       => 'This is var21',
+            var2       => 'This is var22',
+        }
 }
 
 # vim: ts=8
