@@ -47,6 +47,17 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        exec { 'echo hello > /tmp/foo':
+                creates => '/tmp/foo',
+                unless  => 'test -e /tmp/foo',
+                onlyif  => 'test -d /tmp',
+                path    => ["/usr/bin", "/usr/sbin"],
+        }
+
+        notify { 'thyWillBeDone':
+                message => "I have run",
+        }
+
 }
 
 # vim: ts=8
