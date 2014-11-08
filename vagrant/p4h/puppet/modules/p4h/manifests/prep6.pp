@@ -57,6 +57,8 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        include fp6
+
 }
 
 # vim: ts=8
