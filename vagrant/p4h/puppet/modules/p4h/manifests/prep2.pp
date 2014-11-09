@@ -32,7 +32,15 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        user { "gbluth":
+             ensure     => "present",
+             managehome => true,
+        }
+
+        file { "/home/gbluth/banana_stand.txt":
+               content => "There's always money in the banana stand!",
+               require => User['gbluth'],
+        }
 
 }
 
