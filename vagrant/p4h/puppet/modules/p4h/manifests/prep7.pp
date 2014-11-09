@@ -42,8 +42,17 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    realnameuser {"vagrant":
+        real_name => "Sir Vagrant, III, esq."
+    }
 
+    realnameuser {"jekyll":
+        real_name => "Dr. Jekyll"
+    }
+
+    realnameuser {"hyde":
+        real_name => "Mr. Hyde"
+    }
 }
 
 # vim: ts=8
