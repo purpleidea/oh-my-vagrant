@@ -45,8 +45,12 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-
+	exec { 'touch /tmp/foo.txt':
+        creates => '/tmp/foo.txt',
+        onlyif => 'test -d /tmp',
+        unless => 'test -e /tmp/foo.txt',
+        path => ['/usr/bin', '/usr/sbin',]
+    }
 }
 
 # vim: ts=8
