@@ -19,8 +19,8 @@
 
 class p4h::prep1() {
 
-	file { '/root/README':
-		content => "##prep1
+        file { '/root/README':
+                content => "##prep1
 For this lesson, please do the following:
 * should try installing the 'cowsay' package with puppet.
 
@@ -31,7 +31,13 @@ Bonus:
 Happy hacking!\n",
 	}
 
+        package { 'figlet':
+                  ensure => installed
+        }
 	# XXX: write your code here...
+
+        package { ['aalib', 'caca-utils', 'liberation-mono-fonts']: ensure => 'installed'}
+
 
 }
 
