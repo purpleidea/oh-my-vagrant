@@ -38,8 +38,21 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+       $my_num = 1
+       $my_other_num = 2
 
+       $my_template = inline_template("My hostname is something")
+       $my_fact_template = inline_template('My hostname is <%= @hostname %>')
+       $my_added_template = inline_template('<%= @my_num + @my_other_num %>')
+       file { '/etc/p4config.conf':
+              content => $my_added_template,
+       }
+       file { '/etc/p4config2.conf':
+              content => template('p4h/sth.erb'),
+       }
+
+       file { '/etc/p4config4.conf':
+              content => template('p4h/hostname.erb'),
+       }
 }
-
 # vim: ts=8
