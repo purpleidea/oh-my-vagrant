@@ -38,7 +38,11 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+       $my_name = "justin"
+       $longer_name = "${my_name} sherrill"
+       notify {$my_name: 
+         message => $longer_name,
+       } 
 
 }
 
