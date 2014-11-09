@@ -31,8 +31,18 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        # Since cowsay isn't available in CentOS 7, I included sl, an even sillier program
+        package { 'sl':
+              ensure => present,
+        }
 
+        # Install three packages in three lines of code
+        package { 'byobu': ensure => present,}
+        package { 'httpd': ensure => present,}
+        package { 'postgresql-server': ensure => present,}
+
+        # Install three packages in one line of code
+        package { ['mongodb-server', 'python-pymongo', 'mongodb']: ensure => present,}
 }
 
 # vim: ts=8
