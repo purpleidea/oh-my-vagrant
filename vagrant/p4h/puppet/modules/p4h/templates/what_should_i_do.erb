@@ -1,0 +1,10 @@
+#!/usr/bin/python
+import random
+
+
+THINGS = ['WORK!', 'go outside.', 'have a cup of coffee.', 'clean the dishes.']
+
+
+with open('what_should_i_do.txt', 'w') as todo:
+    todo.write('<%= hello %>! You should: %s\n' % random.choice(THINGS))
+
