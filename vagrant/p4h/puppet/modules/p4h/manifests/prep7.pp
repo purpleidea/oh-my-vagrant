@@ -42,8 +42,8 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-
+	p4h::cheer{ 'shout': loudness => 'loud', team => 'Devils!'}
+    p4h::want{ 'want': trophy => 'CUP'}
 }
 
 # vim: ts=8
