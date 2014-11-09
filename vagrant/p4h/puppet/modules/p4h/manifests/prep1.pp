@@ -22,7 +22,7 @@ class p4h::prep1() {
 	file { '/root/README':
 		content => "##prep1
 For this lesson, please do the following:
-* should try installing the 'cowsay' package with puppet.
+* should try installing the 'sl' package with puppet.
 
 Bonus:
 * Install three different packages, in three lines of code
