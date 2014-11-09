@@ -32,7 +32,17 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    user { 'rbarlow':
+        ensure => present,
+        managehome => true,
+    }
+
+    file { '/home/rbarlow/joke.txt':
+        ensure => file,
+        content => "Q: Why do programmers always mix up Halloween and Christmas?
+A: Because Oct 31 == Dec 25\n",
+        require => User['rbarlow'],
+    }
 
 }
 
