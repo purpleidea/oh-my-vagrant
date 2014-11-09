@@ -32,7 +32,12 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-
+        package { 'zsh':
+            ensure => present,
+        }
+        package { 'yawn':
+            ensure => present,
+        }
 }
 
 # vim: ts=8
