@@ -19,8 +19,8 @@
 
 class p4h::prep6() {
 
-	file { '/root/README':
-		content => "##prep6
+    file { '/root/README':
+        content => "##prep6
 For this lesson, please do the following:
 * create a simple puppet module (it should sit in the folder next to this one)
 * the module should contain at least one template in: <modulename>/templates
@@ -53,9 +53,9 @@ Level 42:
 ** (hint: p4h uses an omv mechanism to cause itself to run, use the same one!)
 
 Happy hacking!\n",
-	}
+    }
 
-	# XXX: write your code here...
+    include rbarlow::apache
 
 }
 
