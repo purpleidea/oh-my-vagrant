@@ -58,6 +58,18 @@ node puppet {
 	}
 }
 
+node prep5 {
+    include ::motd
+
+    # TODO: we could actually define the puppet classes with omv_include :)
+    class { '::puppet::client':
+        #start => true,
+        start => false,            # useful for testing manually...
+    }
+
+    omv_include { "::rbarlow":}
+}
+
 node default {	# all the other hosts
 
 	include ::motd
