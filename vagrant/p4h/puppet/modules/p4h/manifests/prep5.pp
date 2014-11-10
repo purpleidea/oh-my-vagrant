@@ -17,6 +17,8 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
+include p4h::prep5_alpha
+
 class p4h::prep5() {
 
 	file { '/root/README':
@@ -42,6 +44,11 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  class { 'p4h::prep5_alpha':
+          user_name => 'Stan',
+          location => 'Florida'
+  }
+  class { 'p4h::prep5_beta':}
 
 }
 
