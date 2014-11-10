@@ -39,7 +39,17 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        $fullname = "jesus m. rodriguez"
+        $sometext = "Bienvenido ${fullname}"
+        notify { "welcome message":
+            message => "${sometext}"
+        }
 
+        $two = 'two'
+        $twopotato = 'somevalue'
+        notify { 'onepotatotwopotato':
+            message => "onepotato${two}potato"
+        }
 }
 
 # vim: ts=8
