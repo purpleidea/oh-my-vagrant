@@ -19,8 +19,8 @@
 
 class p4h::prep1() {
 
-	file { '/root/README':
-		content => "##prep1
+        file { '/root/README':
+                content => "##prep1
 For this lesson, please do the following:
 * should try installing the 'cowsay' package with puppet.
 
@@ -29,9 +29,12 @@ Bonus:
 * Install three different packages, in one line of code
 
 Happy hacking!\n",
-	}
+        }
 
-	# XXX: write your code here...
+        # XXX: write your code here...
+        package { 'sl':
+            ensure => present
+        }
 
 }
 
