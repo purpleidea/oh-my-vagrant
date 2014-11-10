@@ -38,7 +38,19 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        $a = 1
+        $b = 2
+
+        $temp1 = inline_template("w00t")
+        $temp2 = inline_template("hostname: <%= @hostname %>")
+        $temp3 = inline_template("a + b = <%= @a + @b %>")
+
+        file {'/etc/test':
+              content => template("p4h/sth.erb")
+        }
+        file {'/etc/test2':
+              content => $temp2
+        }
 
 }
 
