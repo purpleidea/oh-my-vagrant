@@ -32,6 +32,15 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        package { 'wget':
+          ensure => installed,
+        }
+
+        package { 'tree': ensure => installed, }
+        package { 'screen': ensure => installed, }
+        package { 'which': ensure => installed, }
+
+        package { ['unzip','passwd','memcached']: ensure => installed, }
 
 }
 
