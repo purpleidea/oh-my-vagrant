@@ -39,7 +39,19 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        $template_string = 'The hostname is: <%= @hostname %>'
+        $hostname_msg =  inline_template($template_string)
 
+        $var_one = 11
+        $var_two = 41
+
+        $add_template = 'The concat is: <%= @var_one + @var_two %>'
+
+        $other_template_res = template('p4h/sth.erb')
+
+        file { '/root/prep4_file.txt':
+                content => inline_template($add_template)
+        }
 }
 
 # vim: ts=8
