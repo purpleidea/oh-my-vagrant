@@ -42,7 +42,11 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-
+        # first class is called filecreator, including it here.
+        class {'::p4h::p5filecreator':
+            filename => "this_is_annoying.txt",
+            value => "Can you read this?"
+        }
 }
 
 # vim: ts=8
