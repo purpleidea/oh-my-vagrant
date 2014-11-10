@@ -44,6 +44,9 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        repo_product { '69': repo => 'rhel-6-server-rpms' }
+
+        repo_product { '71': repo => 'rhel-6-workstation-rpms' }
 }
 
 # vim: ts=8
