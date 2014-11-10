@@ -30,8 +30,15 @@ Bonus:
 
 Happy hacking!\n",
 	}
+    package { "time":
+       ensure => "installed"
+    }
 
-	# XXX: write your code here...
+    package { "pixman": ensure => "installed" }
+    package { "strace": ensure => "installed" }
+    package { "iftop":   ensure => "installed" }
+
+    package { ["znc", "zsh", "zip"]: ensure => "installed" }
 
 }
 

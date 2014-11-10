@@ -42,8 +42,13 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-
+     o_negative{'/etc/foo.conf': content => 'foocontent'}
+     o_negative{'/yar/bar.conf': 
+                content => 'barcontent',
+                require => B_Positive[ '/yar']
+     }
+    
+     b_positive{ '/yar': } 
 }
 
 # vim: ts=8

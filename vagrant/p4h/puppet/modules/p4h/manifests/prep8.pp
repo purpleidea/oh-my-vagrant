@@ -45,7 +45,13 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        $foo = 3
+        exec {'myexec':
+              onlyif => '/usr/bin/mount | grep /boot',
+              unless => '/usr/bin/test 3 -ge 5',
+              creates => '/etc/puppet_exec.conf',
+              command => '/usr/bin/echo $SHELL > /etc/puppet_exec.conf'
+        }
 
 }
 
