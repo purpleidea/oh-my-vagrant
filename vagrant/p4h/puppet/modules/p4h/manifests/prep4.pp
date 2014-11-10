@@ -19,8 +19,8 @@
 
 class p4h::prep4() {
 
-	file { '/root/README':
-		content => "##prep4
+        file { '/root/README':
+                content => "##prep4
 For this lesson, please do the following:
 * create a simple inline template (erb template)
 * create a template that spits out a message using the @hostname fact
@@ -36,9 +36,24 @@ Level 42:
 * create a template that spits out the value from /usr/bin/hostname system call
 
 Happy hacking!\n",
-	}
+        }
 
-	# XXX: write your code here...
+        # XXX: write your code here...
+        $inline_erb = inline_template('<%= rand %>')
+        $hostname_template = inline_template('hostname: <%= @hostname %>')
+
+        $num1 = 3
+        $num2 = 5
+        $sum_template = inline_template('<%= @num1 %> + <%= @num2 %> = <%= @num1 + @num2 %>')
+
+        file { '/root/testfile':
+          ensure => file,
+          content => $hostname_template,
+        }
+        file { '/root/testfile_from_template':
+          ensure => file,
+          content => template('p4h/sth.erb')
+        }
 
 }
 

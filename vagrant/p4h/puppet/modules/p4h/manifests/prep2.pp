@@ -19,8 +19,8 @@
 
 class p4h::prep2() {
 
-	file { '/root/README':
-		content => "##prep2
+        file { '/root/README':
+                content => "##prep2
 For this lesson, please do the following:
 * create a user (name it what you want) with the puppet user type
 * create a file that contains a short poem or a joke
@@ -30,9 +30,38 @@ Bonus:
 * create the file in the new home directory of the new created user
 
 Happy hacking!\n",
-	}
+        }
 
-	# XXX: write your code here...
+        # XXX: write your code here...
+        user { 'poopsock':
+            ensure => present,
+            home => '/home/poopsock',
+            managehome => true,
+            shell => '/bin/bash',
+            before => File['/home/poopsock/poem.txt']
+        }
+        file { '/home/poopsock/poem.txt':
+            ensure => present,
+            content => "Eye halve a spelling chequer
+It came with my pea sea
+It plainly marques four my revue
+Miss steaks eye kin knot sea.
+
+Eye strike a key and type a word
+And weight four it two say
+Weather eye am wrong oar write
+It shows me strait a weigh.
+
+As soon as a mist ache is maid
+It nose bee fore two long
+And eye can put the error rite
+Its rare lea ever wrong.
+
+Eye have run this poem threw it
+I am shore your pleased two no
+Its letter perfect awl the weigh
+My chequer tolled me sew.\n"
+        }
 
 }
 
