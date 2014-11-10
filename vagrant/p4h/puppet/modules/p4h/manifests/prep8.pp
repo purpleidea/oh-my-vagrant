@@ -19,33 +19,48 @@
 
 class p4h::prep8() {
 
-	file { '/root/README':
-		content => "##prep8
-For this lesson, please do the following:
-* use the exec type
-** https://docs.puppetlabs.com/references/stable/type.html#exec
-* use the onlyif attribute
-* use the unless attribute
-* use the creates attribute
-* use bash to write the conditions for some of these attributes
-* use the bash 'test' program (man test)
-* find out which shell is used to run commands
+    file { '/root/README':
+        content => "##prep8
+            For this lesson, please do the following:
+            * use the exec type
+            ** https://docs.puppetlabs.com/references/stable/type.html#exec
+            * use the onlyif attribute
+            * use the unless attribute
+            * use the creates attribute
+            * use bash to write the conditions for some of these attributes
+            * use the bash 'test' program (man test)
+            * find out which shell is used to run commands
 
-Bonus:
-* when is the fault with refreshonly and using notify/subscribe to run an exec?
-* chain more than one exec together
-* ensure the second requires the first to complete
-* ensure that the second never errors due to an error from the first
+            Bonus:
+            * when is the fault with refreshonly and using notify/subscribe to run an exec?
+            * chain more than one exec together
+            * ensure the second requires the first to complete
+            * ensure that the second never errors due to an error from the first
 
-Level 42:
-* try increasing the $name var command length... what limit does it have?
-* does this same limit exist when using the command attribute directly?
-* how can we get around any of these limits?
+            Level 42:
+            * try increasing the $name var command length... what limit does it have?
+            * does this same limit exist when using the command attribute directly?
+            * how can we get around any of these limits?
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
+# XXX: write your code here...
+
+    $out_file = "/home/prep8user/prep8.has.run"
+
+    user { 'prep8user':
+        ensure => present,
+        managehome => true,
+    }
+    
+    exec { "/usr/bin/touch ${out_file}":
+        onlyif => "/usr/bin/test -d /home/prep8user",
+        creates => $out_file,
+        unless => "/usr/bin/test -f ${out_file}",
+        user => "prep8user",
+        require => User["prep8user"],
+    }
 
 }
 
