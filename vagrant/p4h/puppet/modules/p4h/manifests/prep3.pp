@@ -38,7 +38,22 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$myname = ""
+	$hello = "${myname} say hello world"
+	$two = 'two'
+	$twopotato = 'yummy potatoes'
+
+	if $myname == "james" {
+	  notify {"i don't like jameses":}
+	}
+	elsif $myname == "" {
+	  notify {"hello world":}
+	}
+	else {
+	  notify {$hello:}
+	}
+
+	notify {"onepotato${two}potato":}
 
 }
 

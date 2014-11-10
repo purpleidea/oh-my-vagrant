@@ -42,7 +42,16 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	notify { "about to say hello world!": }
+
+	p4h::say_hello { "bob": hiname => "bob" }
+
+	p4h::say_hello { "world":
+		filepath => "/hello_world",
+		require => Notify["about to say hello world!"]
+	}
+
+	p4h::say_goodbye { "world": byename => "world" }
 
 }
 
