@@ -39,7 +39,36 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        # simple inline templte
+        # template that uses 2 puppet variables
+        $conn_class = "jpa.config.hibernate.connection.driver_class="
+        $driver_class = "org.postgresql.Driver"
+        $cpconf = inline_template("<%= @conn_class %><%= @driver_class %>\n")
+        notify {'template message':
+            message => "${cpconf}"
+        }
 
+        # inline template that spits out the hostname
+        notify {'hostname':
+            message => inline_template("Name this host is [<%= @hostname %>]")
+        }
+
+        # create a file using my template above
+        file { "/etc/candlepin":
+            ensure => directory
+        }
+
+        file { "/etc/candlepin/candlepin.conf":
+            ensure => file,
+            content => "${cpconf}"
+        }
+
+        # create a template named sth.erb
+
+        file { "/etc/sth.conf":
+            ensure => file,
+            content => template("p4h/sth.erb")
+        }
 }
 
 # vim: ts=8
