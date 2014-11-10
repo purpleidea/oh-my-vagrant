@@ -44,6 +44,16 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
-}
+  notify {'purpleidea has been created':}
 
-# vim: ts=8
+  write_to_file { 'purpleidea':
+  content => "Interesting name",
+  before  => Notify['purpleidea has been created'],
+  }
+
+  write_to_file { 'theintern':
+  content => "Is a Genius"
+  }
+
+  create_user {'purpled':}
+}
