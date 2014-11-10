@@ -19,30 +19,30 @@
 
 class p4h::prep5() {
 
-	file { '/root/README':
-		content => "##prep5
-For this lesson, please do the following:
-* create a simple class that creates a file, and include it here
-** it will need to go in a separate file because you can't nest classes
-* create a second class and include it from the first (is this ever useful?)
-* include a class twice in the manifest
-* one of the classes should have two parameters with default values too
-** use those parameters in the text of the file that your class creates
+    file { '/root/README':
+        content => "##prep5
+            For this lesson, please do the following:
+            * create a simple class that creates a file, and include it here
+            ** it will need to go in a separate file because you can't nest classes
+            * create a second class and include it from the first (is this ever useful?)
+            * include a class twice in the manifest
+            * one of the classes should have two parameters with default values too
+            ** use those parameters in the text of the file that your class creates
 
-Hint:
-* the class will have to have the same module prefix as this class (p4h)
-* if the class is named p4h::foo, it should exist in a foo.pp file in this dir
-* remember that classes are singletons, design with that in mind
+            Hint:
+            * the class will have to have the same module prefix as this class (p4h)
+            * if the class is named p4h::foo, it should exist in a foo.pp file in this dir
+            * remember that classes are singletons, design with that in mind
 
-Bonus:
-* include a class using the 'resource-like' definition
-* create the class as part of a separate module, and include it here
+            Bonus:
+            * include a class using the 'resource-like' definition
+            * create the class as part of a separate module, and include it here
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
-
+# XXX: write your code here...
+    include "prep5_parent"
 }
 
 # vim: ts=8
