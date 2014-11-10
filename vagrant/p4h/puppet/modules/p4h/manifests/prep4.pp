@@ -39,6 +39,22 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  $foo = template('p4h/hostname.erb')
+  notify { $foo: }
+
+  $apple = 1
+  $pear = 2
+
+  $template_2 = inline_template("Vars: <%= @apple.to_i + @pear.to_i %>")
+  notify { $template_2: }
+
+  $flux = 'qux'
+  $bar = inline_template("flux: <%= @flux %>")
+  notify { $bar: }
+
+  file { '/root/hostname':
+    content => $foo
+  }
 
 }
 
