@@ -33,6 +33,10 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  user {'bob': ensure=> 'present', managehome => True}
+  ->
+  file {'/home/bob/POEM': content => 'In the canopy of the night heaven the stars are tiptoeing.'}
+
 
 }
 
