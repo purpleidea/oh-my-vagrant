@@ -38,7 +38,13 @@ Bonus:
 Happy hacking!\n",
 	}
 
+        $my_name = "Adrian Likins"
 	# XXX: write your code here...
+        $my_name_statement = "My name is ${my_name}, or so I claim."
+
+        notify { $my_name:
+                name => $my_name,
+                message => $my_name_statement}
 
 }
 
