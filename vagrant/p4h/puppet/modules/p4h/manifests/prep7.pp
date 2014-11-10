@@ -42,7 +42,33 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+  package {'docker':}
+  service {'docker':
+    ensure => running,
+  }
+
+  file {'/root/docker':
+    ensure => directory,
+  }
+
+
+	dockerfile {'yumclean':
+    content => "FROM centos:centos6
+    RUN yum clean all"
+  }
+
+  dockerbuild{'yumclean':
+    require => Dockerfile['yumclean'],
+  }
+
+  dockerfile {'yuminstallwget':
+    content => "FROM centos:centos6
+    RUN yum install -y wget"
+  }
+
+  dockerbuild{'yuminstallwget':
+    require => Dockerfile['yuminstallwget'],
+  }
 
 }
 
