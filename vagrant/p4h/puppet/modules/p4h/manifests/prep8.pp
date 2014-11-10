@@ -46,6 +46,27 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  file { '/home/vagrant/foo':
+    content => "##prep8 foo"
+  }
+  ->
+  exec { "cat foo >> bar":
+    cwd     => "/home/vagrant",
+    path    => ["/usr/bin", "/usr/sbin"],
+    creates => '/home/vagrant/bar'
+  }
+  ->
+  exec { "cat foo >> baz":
+    cwd     => "/home/vagrant",
+    path    => ["/usr/bin", "/usr/sbin"],
+    onlyif => 'test -f /home/vagrant/bar'
+  }
+  ->
+  exec { "cat foo >> qux":
+    cwd     => "/home/vagrant",
+    path    => ["/usr/bin", "/usr/sbin"],
+    unless => 'test ! -f /home/vagrant/baz'
+  }
 
 }
 
