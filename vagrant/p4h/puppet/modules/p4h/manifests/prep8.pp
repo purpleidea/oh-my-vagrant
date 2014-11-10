@@ -45,7 +45,11 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	exec {"/usr/bin/echo 'helloworld' > /root/helloworld":
+    onlyif => "/usr/bin/test -f /root/README",
+    unless => "/usr/bin/test ! -d /root",
+    creates => "/root/helloworld",
+  }
 
 }
 
