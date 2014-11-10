@@ -33,6 +33,16 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        user { 'ken_uber':
+                ensure => present,
+                shell  => '/bin/bash',
+                home   => '/home/ken_uber',
+                managehome => true }
+
+        file { '/etc/remote_control.conf':
+                content => "All's well that ends. Well...",
+                require => User['ken_uber'],
+        }
 
 }
 
