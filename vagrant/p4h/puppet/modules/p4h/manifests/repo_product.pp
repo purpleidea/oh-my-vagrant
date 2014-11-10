@@ -1,7 +1,9 @@
 
-define repo_product ($product = $title) {
+define p4h::repo_product ($product = $title, $repo) {
     
-    file { '/root/product_${title}.txt':
-            content => 'nothing yet' }
+    file { "/root/product_${product}.txt":
+            content => 'cam from repo ${repo}',
+            #require => Package['yum'],
+    }
 
 }

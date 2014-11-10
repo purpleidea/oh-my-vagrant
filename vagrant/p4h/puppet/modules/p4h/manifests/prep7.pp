@@ -43,11 +43,10 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-        include p4h::repo_product
 
-        repo_product { '69': product => '69' }
+        repo_product { '69': repo => 'rhel-6-server-rpms' }
 
-        repo_product { '71': product => '71' }
+        repo_product { '71': repo => 'rhel-6-workstation-rpms' }
 }
 
 # vim: ts=8
