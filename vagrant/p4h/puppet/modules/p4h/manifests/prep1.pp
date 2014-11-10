@@ -33,6 +33,10 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+    package { "httpd":
+        ensure => present
+    }
+
 }
 
 # vim: ts=8

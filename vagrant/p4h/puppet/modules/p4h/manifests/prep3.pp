@@ -19,26 +19,30 @@
 
 class p4h::prep3() {
 
-	file { '/root/README':
-		content => "##prep3
-For this lesson, please do the following:
-* create a variable that holds your name
-* create a second variable with some text that interpolates the first variable
-* notify the user of the longer message, using the short variable as the name
+    file { '/root/README':
+        content => "##prep3
+            For this lesson, please do the following:
+            * create a variable that holds your name
+            * create a second variable with some text that interpolates the first variable
+            * notify the user of the longer message, using the short variable as the name
 
-Bonus:
-* show a different message if the first variable has the name 'james'
-* test your code to ensure it works if the first variable is the empty string
-* lastly:
-** define the variable $two = 'two'
-** define the variable $twopotato to contain some value
-** 'notify' out the string: 'onepotatotwopotato'
-** ensure where the 'two' portion of the above string comes from the $two var
+            Bonus:
+            * show a different message if the first variable has the name 'james'
+            * test your code to ensure it works if the first variable is the empty string
+            * lastly:
+            ** define the variable $two = 'two'
+            ** define the variable $twopotato to contain some value
+            ** 'notify' out the string: 'onepotatotwopotato'
+            ** ensure where the 'two' portion of the above string comes from the $two var
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
+    $lastname = "Matthews"
+    $greeting = "Hello Mr. ${lastname}"
+    notify { 'test_notify': message => $greeting }
+
+# XXX: write your code here...
 
 }
 

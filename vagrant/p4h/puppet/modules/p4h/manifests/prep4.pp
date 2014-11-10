@@ -19,26 +19,34 @@
 
 class p4h::prep4() {
 
-	file { '/root/README':
-		content => "##prep4
-For this lesson, please do the following:
-* create a simple inline template (erb template)
-* create a template that spits out a message using the @hostname fact
-* create an inline template that adds two puppet variables together
-* create a file that uses the contents of one of your templates
-* create one of the templates in the p4h/templates/ directory (name it sth.erb)
+    file { '/root/README':
+        content => "##prep4
+            For this lesson, please do the following:
+            * create a simple inline template (erb template)
+            * create a template that spits out a message using the @hostname fact
+            * create an inline template that adds two puppet variables together
+            * create a file that uses the contents of one of your templates
+            * create one of the templates in the p4h/templates/ directory (name it sth.erb)
 
-Bonus:
-* create a template that has some light programming contained (ruby code)
+            Bonus:
+            * create a template that has some light programming contained (ruby code)
 
-Level 42:
-* create a template that writes a file to the file system (is this useful?)
-* create a template that spits out the value from /usr/bin/hostname system call
+            Level 42:
+            * create a template that writes a file to the file system (is this useful?)
+            * create a template that spits out the value from /usr/bin/hostname system call
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
+    # XXX: write your code here...
 
-	# XXX: write your code here...
+    $msg = inline_template("You are working on: <%= hostname %>")
+    notify { 'display hostname': message => $msg }
+
+    file {'/etc/sth':
+        ensure  => file,
+        content => template('p4h/sth.erb'),
+    }
+
 
 }
 

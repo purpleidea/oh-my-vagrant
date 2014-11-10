@@ -19,44 +19,44 @@
 
 class p4h::prep6() {
 
-	file { '/root/README':
-		content => "##prep6
-For this lesson, please do the following:
-* create a simple puppet module (it should sit in the folder next to this one)
-* the module should contain at least one template in: <modulename>/templates
-* the module should contain a conditional statement based on the template value
-* include a class from the module in this class along with another type
+    file { '/root/README':
+        content => "##prep6
+            For this lesson, please do the following:
+            * create a simple puppet module (it should sit in the folder next to this one)
+            * the module should contain at least one template in: <modulename>/templates
+            * the module should contain a conditional statement based on the template value
+            * include a class from the module in this class along with another type
 
-Hint:
-* to easily start a module, put all your code in <modulename>/manifests/init.pp
-* this code is actually in a module! the structure looks something like this:
-$ james@p4h:~/code/oh-my-vagrant/vagrant/p4h/puppet/modules (p4h)$ tree p4h/
-p4h/
-`-- manifests
-    |-- init.pp
-    |-- prep1.pp
-    |-- prep2.pp
-    |-- prep3.pp
-    |-- prep4.pp
-    |-- prep5.pp
-    |-- prep6.pp
-    `-- template.pp
+            Hint:
+            * to easily start a module, put all your code in <modulename>/manifests/init.pp
+            * this code is actually in a module! the structure looks something like this:
+            $ james@p4h:~/code/oh-my-vagrant/vagrant/p4h/puppet/modules (p4h)$ tree p4h/
+            p4h/
+            `-- manifests
+            |-- init.pp
+            |-- prep1.pp
+            |-- prep2.pp
+            |-- prep3.pp
+            |-- prep4.pp
+            |-- prep5.pp
+            |-- prep6.pp
+            `-- template.pp
 
-1 directory, 8 files
+            1 directory, 8 files
 
-Bonus:
-* the module should use some of the techniques from each previous lesson
-* the module should actually do something useful
+            Bonus:
+            * the module should use some of the techniques from each previous lesson
+            * the module should actually do something useful
 
-Level 42:
-* have the module run on a single vm in omv without the use of the p4h module
-** (hint: p4h uses an omv mechanism to cause itself to run, use the same one!)
+            Level 42:
+            * have the module run on a single vm in omv without the use of the p4h module
+            ** (hint: p4h uses an omv mechanism to cause itself to run, use the same one!)
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
-
+# XXX: write your code here...
+    include "::prep6_mod"
 }
 
 # vim: ts=8

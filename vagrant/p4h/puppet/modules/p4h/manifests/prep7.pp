@@ -19,30 +19,40 @@
 
 class p4h::prep7() {
 
-	file { '/root/README':
-		content => "##prep7
-For this lesson, please do the following:
-* create two 'defined types' (aka a type)
-* types can't be nested inside classes, so create them in separate files
-* your types should create a file and perhaps do something else as well
-* use the types twice, and make sure there's no conflict (duplicate definition)
-* create a before/require dependency between a type and something else
+    file { '/root/README':
+        content => "##prep7
+            For this lesson, please do the following:
+            * create two 'defined types' (aka a type)
+            * types can't be nested inside classes, so create them in separate files
+            * your types should create a file and perhaps do something else as well
+            * use the types twice, and make sure there's no conflict (duplicate definition)
+            * create a before/require dependency between a type and something else
 
-Hint:
-* remember, types aren't singletons, but their names must be unique!
-* remember, types aren't functions as they don't return values
-* remember, types should use their name as the point of uniqueness
-** if other parameters should be unique, use them in an alias metaparam
-* for a type named: p4h::bar, it will have to exist in bar.pp in this dir
+            Hint:
+            * remember, types aren't singletons, but their names must be unique!
+            * remember, types aren't functions as they don't return values
+            * remember, types should use their name as the point of uniqueness
+            ** if other parameters should be unique, use them in an alias metaparam
+            * for a type named: p4h::bar, it will have to exist in bar.pp in this dir
 
-Bonus:
-* create some types as part of your module, which should also have classes
-* explain and demonstrate (by example) why before/require are both needed
+            Bonus:
+            * create some types as part of your module, which should also have classes
+            * explain and demonstrate (by example) why before/require are both needed
 
-Happy hacking!\n",
-	}
+            Happy hacking!\n",
+    }
 
-	# XXX: write your code here...
+# XXX: write your code here...
+    user { 'prep7user':
+        ensure => present,
+        managehome => true,
+    }
+
+    prep7_foo {'prep7user': 
+        content => "This is the first usage"
+    } -> prep7_bar {'prep7user': 
+        content => "This is the second usage"
+    }
 
 }
 
