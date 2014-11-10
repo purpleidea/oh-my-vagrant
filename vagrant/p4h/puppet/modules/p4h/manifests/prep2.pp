@@ -32,7 +32,21 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+  $my_user = 'ben'
+
+	user {$my_user:
+    ensure     => 'present',
+    managehome => true
+  }
+
+  file { "/home/$my_user/a-poem": 
+    content => "A programming genius called Gertie
+Had a penchant for graphics so dirty
+No computer she knew
+Would accept what she drew
+Until she had tickled its QWERTY.\n",
+    require => User[$my_user]
+  }
 
 }
 

@@ -38,7 +38,22 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$my_name = 'james'
+  $my_message = $my_name ? {
+    'james'   => "You're crazy $my_name, real crazy",
+    default => "You're cool $my_name, real cool"
+  }
+  
+  notify { $my_name:
+    message => $my_message
+  }
+
+  $two = 'two'
+  $twopotato = 'some value'
+
+  notify { 'potatoes':
+    message => "onepotato${two}potato"
+  }
 
 }
 

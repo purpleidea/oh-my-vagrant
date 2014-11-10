@@ -31,7 +31,9 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+  $my_packages = [ 'mine_detector', 'mup', 'qstat' ]
+
+	package { $my_packages: }
 
 }
 

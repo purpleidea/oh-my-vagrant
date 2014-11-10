@@ -55,8 +55,7 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-
+	include bensmodule
 }
 
 # vim: ts=8
