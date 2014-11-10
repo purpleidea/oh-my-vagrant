@@ -47,6 +47,30 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        exec { "cook_meth":
+            creates => "/tmp/blue_meth",
+            path => "/usr/bin/",
+            command => "touch /tmp/blue_meth"
+        }
+
+        exec { "sell_only_if_cooked":
+            path => "/usr/bin/",
+            command => "touch /tmp/sell_meth",
+            onlyif => "test -f /tmp/blue_meth",
+            require => Exec["cook_meth"]
+        }
+
+        exec { "unless_cooked_dont_launder":
+            path => "/usr/bin/",
+            command => "touch /tmp/launder_money",
+            unless => "test -f /tmp/launder_money",
+            require => Exec["sell_only_if_cooked"]
+        }
+
+        exec { "theshell":
+            path => "/bin/:/usr/bin/",
+            command => 'echo $SHELL > /tmp/theshell'
+        }
 }
 
 # vim: ts=8
