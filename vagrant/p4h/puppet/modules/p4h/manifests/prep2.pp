@@ -33,7 +33,23 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        user { "wwhite":
+                ensure => present,
+                shell => "/bin/bash",
+                managehome => true,
+                home => "/home/wwhite"
+        }
 
+        file { "/home/wwhite/gliding_over_all.txt":
+                content => "GLIDING o’er all, through all,
+                Through Nature, Time, and Space,
+                As a ship on the waters advancing,
+                The voyage of the soul—not life alone,
+                Death, many deaths I’ll sing.\n",
+                require => User["wwhite"],
+                owner => "wwhite",
+                group => "wwhite"
+        }
 }
 
 # vim: ts=8
