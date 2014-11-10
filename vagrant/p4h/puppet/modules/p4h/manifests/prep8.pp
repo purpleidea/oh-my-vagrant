@@ -47,6 +47,17 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        exec { 'ls_lart_root':
+            command     => '/bin/ls -lart /root > /root/ls_lart_root.txt',
+            cwd         => '/root',
+            logoutput   => true,
+            creates     => '/root/ls_lart_root.txt',
+            provider    => shell,
+            # exec default is direct exec,
+            # shell is bash
+            unless      => 'test -f /DONTLS',
+            onlyif      => '/bin/stat /root',
+        }
 }
 
 # vim: ts=8
