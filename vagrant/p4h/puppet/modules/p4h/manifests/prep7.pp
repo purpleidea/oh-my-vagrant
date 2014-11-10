@@ -17,6 +17,8 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
+include p4h::prep7_foo
+
 class p4h::prep7() {
 
 	file { '/root/README':
@@ -43,6 +45,16 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  p4h::prep7_foo { 'applecore':
+      filename => 'apple',
+      user =>'vagrant',
+      content => 'Hello Vagrant'
+  }
+  p4h::prep7_foo { 'pear':
+      filename => 'pear',
+      user =>'vagrant',
+      content => 'We like using edible names'
+  }
 
 }
 
