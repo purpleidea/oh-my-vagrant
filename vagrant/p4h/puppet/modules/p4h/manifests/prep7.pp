@@ -44,6 +44,20 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+        p7breakingbad { "jpinkman":
+        }
+
+        p7planfile {'jpinkman':
+            content => "Cookin' some meth b***h!"
+        }
+
+        p7breakingbad { "wwhite":
+        }
+
+        p7planfile {'wwhite':
+            content => "I am the one who knocks!"
+        }
+
 }
 
 # vim: ts=8
