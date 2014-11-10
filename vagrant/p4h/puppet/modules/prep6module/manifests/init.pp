@@ -17,32 +17,28 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep1() {
 
-	file { '/root/README':
-		content => "##prep1
-For this lesson, please do the following:
-* should try installing the 'cowsay' package with puppet.
+class prep6module() {
+  $maxNumber = 1000
 
-Bonus:
-* Install three different packages, in three lines of code
-* Install three different packages, in one line of code
+  $moneyIWon = template('prep6module/cool_template.erb')
 
-Happy hacking!\n",
-	}
-
-	# XXX: write your code here...
-
-  package { "tig":
-      ensure => "installed"
+  notify { 'sweet_message':
+    message => "I won $${moneyIWon}",
   }
 
-  package { "nano": ensure => "installed" }
-  package { "strace": ensure => "installed" }
-  package { "bison":   ensure => "installed" }
+  if ($moneyIWon > ($maxNumber/2)) {
+    notify { 'sweeter_message':
+      message => "More than ${($maxNumber/2)} :))) !!",
+    }
+  }
+  else {
+    notify { 'sweeter_message':
+      message => "Less than ${($maxNumber/2)} :((((",
+    }
 
+  }
 
-  package {["ack", "mlocate", "hub"]: ensure => "installed"}
 }
 
 # vim: ts=8

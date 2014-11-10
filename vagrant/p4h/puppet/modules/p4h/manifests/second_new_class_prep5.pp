@@ -17,32 +17,11 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep1() {
+class p4h::second_new_class_prep5() {
 
-	file { '/root/README':
-		content => "##prep1
-For this lesson, please do the following:
-* should try installing the 'cowsay' package with puppet.
-
-Bonus:
-* Install three different packages, in three lines of code
-* Install three different packages, in one line of code
-
-Happy hacking!\n",
-	}
-
-	# XXX: write your code here...
-
-  package { "tig":
-      ensure => "installed"
+  file { '/root/README-Second-Santa':
+    content => "
+Happy Thanksgiving!\n",
   }
 
-  package { "nano": ensure => "installed" }
-  package { "strace": ensure => "installed" }
-  package { "bison":   ensure => "installed" }
-
-
-  package {["ack", "mlocate", "hub"]: ensure => "installed"}
 }
-
-# vim: ts=8

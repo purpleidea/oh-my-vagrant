@@ -45,7 +45,49 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+  exec { "touch_foo":
+    creates => '/tmp/foo/grep_idea',
+    path    => "/usr/local/bin/:/bin/",
+    command => 'echo `expr $RANDOM % 2` >  /tmp/foo/grep_idea',
+    require => Exec["md_foo"]
+
+  }
+
+  exec { "md_foo":
+    creates => '/tmp/foo',
+    command => 'mkdir /tmp/foo',
+    path    => "/usr/local/bin/:/bin/"
+  }
+
+  exec { "only_if":
+    path    => "/usr/local/bin/:/bin/",
+    command => 'touch /tmp/only_if',
+    onlyif => "grep 0 /tmp/foo/grep_idea",
+    require => Exec["touch_foo"]
+  }
+
+  exec { "unless":
+    path    => "/usr/local/bin/:/bin/",
+    command => 'touch /tmp/unless',
+    unless => "grep 0 /tmp/foo/grep_idea",
+    require => Exec["touch_foo"]
+  }
+
+  exec { "tester":
+    path    => "/usr/local/bin/:/bin/",
+    command => 'touch /tmp/unless-test',
+    unless => "test [`expr 5 % 3` -eq 1]"
+  }
+
+
+
+
+
+  exec { "shell":
+    path    => "/usr/local/bin/:/bin/",
+    command => 'echo $SHELL > /tmp/shell',
+  }
+
 
 }
 

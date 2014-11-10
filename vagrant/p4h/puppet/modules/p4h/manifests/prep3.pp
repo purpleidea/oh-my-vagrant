@@ -39,7 +39,11 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+  $my_name = "Partha"
 
+ $interpolator = "Saving ${my_name}"
+
+ notify {$interpolator:}
 }
 
 # vim: ts=8
