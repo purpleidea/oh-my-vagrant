@@ -38,14 +38,24 @@ Bonus:
 Happy hacking!\n",
 	}
 
-        $my_name = "Adrian Likins"
+        $my_name = 'Adrian Likins'
 	# XXX: write your code here...
         $my_name_statement = "My name is ${my_name}, or so I claim."
+        $im_nick_james = "I'm nick, James"
 
-        notify { $my_name:
-                name => $my_name,
-                message => $my_name_statement}
+        if $my_name =~ /james/ {
+                notify { $my_name:
+                        name => $my_name,
+                        message => $im_nick_statement}
+        } else {
+                notify { $my_name:
+                        name => $my_name,
+                        message => $my_name_statement}
+        }
 
+        $two = 'two'
+        $twopotato = '42'
+        notify { "onepotatio${two}potato": }
 }
 
 # vim: ts=8
