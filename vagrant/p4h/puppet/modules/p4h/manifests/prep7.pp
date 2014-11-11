@@ -42,7 +42,25 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	p4h::p7type1 { "type1-1":
+        path    => "/tmp/typeout_1",
+        content => "This is the content of the first declaration of p7type1."
+    }
+
+    p4h::p7type2 { "type2-1":
+        message => "Message number 1",
+        require => P4h::P7type1["type1-1"]
+    }
+
+    p4h::p7type1 { "type1-2":
+        path    => "/tmp/typeout_2",
+        require => P4h::P7type2["type2-1"]
+    }
+
+    p4h::p7type2 { "type2-2":
+        message => "Message number 2",
+        require => P4h::P7type1["type1-2"]
+    }
 
 }
 
