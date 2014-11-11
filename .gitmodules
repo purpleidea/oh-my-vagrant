@@ -10,3 +10,6 @@
 [submodule "vagrant/puppet/modules/puppet"]
 	path = vagrant/puppet/modules/puppet
 	url = https://github.com/purpleidea/puppet-puppet
+[submodule "vagrant/p4h"]
+	path = vagrant/p4h
+	url = https://github.com/purpleidea/p4h

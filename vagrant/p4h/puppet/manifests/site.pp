@@ -1,1 +1,0 @@
-../../../puppet/manifests/site.pp
