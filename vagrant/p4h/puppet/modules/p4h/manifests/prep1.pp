@@ -31,7 +31,13 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	package { 'cowsay':
+    ensure => "installed"
+  }
+
+	package { 'sl':
+    ensure => "installed"
+  }
 
 }
 

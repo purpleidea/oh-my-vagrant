@@ -41,7 +41,9 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+        class {'p4h::makenewfile':
+            filename => 'asdf'
+        }
 
 }
 
