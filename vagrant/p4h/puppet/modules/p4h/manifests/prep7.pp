@@ -43,6 +43,33 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+	P4h::Prep6::Typeone {
+          before => Notify['last'],
+        }
+
+        P4h::Prep6::Typetwo {
+          before => Notify['last'],
+        }
+
+	p4h::prep6::typeone { 'first':
+          content => 'ooooh yeah!',
+        }
+
+        p4h::prep6::typeone { 'second':
+          content => 'aaaah, still good!',
+        }
+
+        p4h::prep6::typetwo { 'typetwo':
+          content => 'here we go...',
+        }
+
+        p4h::prep6::typetwo { 'second':
+          content => 'what next???',
+        }
+
+        notify { 'last':
+          message => 'this should appear last',
+        }
 
 }
 

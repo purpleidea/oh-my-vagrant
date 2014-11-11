@@ -42,6 +42,9 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+	include p4h::simpleklass
+
+        include p4h::simpleklass
 
 }
 
