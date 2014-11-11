@@ -36,12 +36,15 @@ Hint:
 
 Bonus:
 * include a class using the 'resource-like' definition
+^ Done. See p5classA
 * create the class as part of a separate module, and include it here
+^ Nope. But, to do: New directory, follow common naming scheme, include as before.
 
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    include "::p4h::p5classa"
+    include "::p4h::p5classa"
 
 }
 
