@@ -28,6 +28,7 @@ For this lesson, please do the following:
 * use the unless attribute
 * use the creates attribute
 * use bash to write the conditions for some of these attributes
+^ ...? What?
 * use the bash 'test' program (man test)
 * find out which shell is used to run commands
 
@@ -45,7 +46,28 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    exec { "clear_time":
+        command => "/usr/bin/rm /tmp/time",
+        onlyif  => "/usr/bin/test -f /tmp/time"
+    }
+
+	exec { "tell_time":
+        command => "/usr/bin/echo \"Hello. The current time is\" `date +\"%I:%M %p\"` > /tmp/time",
+        onlyif  => "/usr/bin/test ! -f /tmp/silence",
+        require => Exec["clear_time"]
+    }
+
+    exec { "create_order":
+        creates => "/tmp/silence",
+        command => "/usr/bin/touch /tmp/silence",
+        require => Exec["tell_time"]
+    }
+
+    exec { "reset":
+        command => "/usr/bin/rm /tmp/silence",
+        unless  => "/usr/bin/test -f /tmp/time",
+        require => Exec["create_order"]
+    }
 
 }
 

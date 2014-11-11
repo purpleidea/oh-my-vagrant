@@ -38,7 +38,27 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    $my_name = "crog"
+
+    if $my_name == "james" {
+        $welcome_msg = "${my_name} gets a different message."
+    } else {
+        $welcome_msg = "Welcome, ${my_name}"
+    }
+
+    notify { "vars":
+        name    => $my_name,
+        message => $welcome_msg
+    }
+
+    $two = "two"
+    $twopotato = 5
+
+    notify { "potato":
+        name        => "Potato message",
+        message     => "onepotato${two}potato",
+        require     => Notify["vars"]
+    }
 
 }
 
