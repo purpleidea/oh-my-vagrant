@@ -38,7 +38,14 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$my_name = "brian"
+  $second_variable = "My name is: ${my_name}"
+
+  if $my_name == "james" {
+    notify {'Thanks!':}
+  } else {
+    notify {$second_variable:}
+  }
 
 }
 

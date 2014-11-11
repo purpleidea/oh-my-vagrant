@@ -45,8 +45,13 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-
+        exec { "already_run":
+            command => "touch /root/already_run.txt",
+            path    => "/usr/local/bin/:/bin/",
+            creates => "/root/already_run.txt",
+            unless  => "test -f /root/already_run.txt",
+            onlyif  => "test -f /root/already_run.txt",
+        }
 }
 
 # vim: ts=8

@@ -42,7 +42,7 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	type_a {'asdf':}->type_b {'rrr':}
 
 }
 

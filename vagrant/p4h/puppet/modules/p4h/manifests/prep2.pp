@@ -32,8 +32,26 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+  user { "asdf":
+    ensure     => "present",
+    managehome => true,
+  }
+
+	file { '/home/asdf/poem':
+		content => "Act without doing;
+work without effort.
+Think of the small as large
+and the few as many.
+Confront the difficult
+while it is still easy;
+accomplish the great task
+by a series of small acts.
+ -- Lao Tzu\n",
+	}
+
+  User['asdf'] -> File['/home/asdf/poem']
 
 }
+
 
 # vim: ts=8

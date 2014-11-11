@@ -38,7 +38,22 @@ Level 42:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$simple_inline = inline_template("Now you see me<%# Now You Dont. %>")
+        notify {$simple_inline:}
+
+	$hostname_fact = inline_template("Hostname is: <%= @hostname %>")
+        notify {$hostname_fact:}
+
+        $puppet_var_one = 2
+        $puppet_var_two = 2
+	$quick_math = inline_template("2 + 2 = <%= @puppet_var_one.to_i  + @puppet_var_two.to_i  + 1 %>")
+        notify {$quick_math:}
+        file { '/root/quick_math':
+          content => $quick_math,
+        }
+
+        $sth_template = template('p4h/sth.erb')
+        notify {$sth_template:}
 
 }
 
