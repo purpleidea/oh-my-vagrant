@@ -33,6 +33,19 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+    user { 'crog':
+        name        => 'crog',
+        ensure      => present,
+        home        => '/home/crog',
+        managehome  => true
+    }
+
+    file { 'joke':
+        path        => '/home/crog/joke.txt',
+        ensure      => file,
+        content     => '# TODO: Write joke.',
+        require     => User['crog']
+    }
 
 }
 
