@@ -19,8 +19,8 @@
 
 class p4h::prep8() {
 
-	file { '/root/README':
-		content => "##prep8
+    file { '/root/README':
+        content => "##prep8
 For this lesson, please do the following:
 * use the exec type
 ** https://docs.puppetlabs.com/references/stable/type.html#exec
@@ -43,10 +43,31 @@ Level 42:
 * how can we get around any of these limits?
 
 Happy hacking!\n",
-	}
+    }
 
-	# XXX: write your code here...
+    # Do a yum update, but only once a day.
+    exec { "yum update -y":
+        onlyif => "test $(expr $(date +%s) - $(stat -c %Y /var/cache/yum/x86_64/7/)) -gt 86400",
+        path => "/usr/bin/",
+    }
 
+    # Add a warning to the user not to do anything dumb while logged in, but only if the warning
+    # isn't already present.
+    exec { "echo \"echo \\\"Don't do anything stupid that you might regret...\\\"\" >> /home/vagrant/.bashrc":
+        path => "/usr/bin/",
+        unless => "grep stupid /home/vagrant/.bashrc 2> /dev/null",
+    }
+
+    # Download some funny headlines for the user to read in their home folder, but only if they
+    # aren't already present.
+    exec { "wget http://theonion.com -O /home/vagrant/index.html":
+        creates => "/home/vagrant/index.html",
+        path => "/usr/bin/",
+    }
+
+    exec { "echo \"The shell is: $(ps -p $$ | tail -n 1 | sed -e 's/\s\+/\t/g' | cut -f5 -)\" > /home/vagrant/shell.txt":
+        path => "/usr/bin",
+    }
 }
 
 # vim: ts=8
