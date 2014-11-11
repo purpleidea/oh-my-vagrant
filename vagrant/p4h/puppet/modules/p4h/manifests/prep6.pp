@@ -56,6 +56,9 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+	include jchristi::gerber
+
+        notify { 'this is another type': }
 
 }
 
