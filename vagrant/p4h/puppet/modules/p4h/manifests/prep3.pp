@@ -39,6 +39,18 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+	$my_name = 'jeremy'
+        $text = "Hi, my name is ${my_name}"
+
+        if $my_name == 'james' {
+          notify { 'this is not my name..': }
+        } else {
+          notify { $text: }
+        }
+
+        $two = 'two'
+        $twopotato = 'gerber'
+        notify { "onepotato${two}potato": }
 
 }
 
