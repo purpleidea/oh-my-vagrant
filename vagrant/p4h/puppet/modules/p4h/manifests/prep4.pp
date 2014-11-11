@@ -39,6 +39,21 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+        $inline_templ = inline_template("hi there!")
+
+        notify { 'hostname':
+          message => template('p4h/sth.erb')
+        }
+
+        $foo = 'foo'
+        $bar = 'bar'
+        notify { 'adding two variables together':
+          message => inline_template('<%= foo %><%= bar %>')
+        }
+
+        file { '/root/template-contents':
+          content => $inline_templ,
+        }
 
 }
 
