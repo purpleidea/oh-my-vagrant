@@ -19,8 +19,8 @@
 
 class p4h::prep4() {
 
-	file { '/root/README':
-		content => "##prep4
+    file { '/root/README':
+        content => "##prep4
 For this lesson, please do the following:
 * create a simple inline template (erb template)
 * create a template that spits out a message using the @hostname fact
@@ -36,10 +36,47 @@ Level 42:
 * create a template that spits out the value from /usr/bin/hostname system call
 
 Happy hacking!\n",
-	}
+    }
 
-	# XXX: write your code here...
+    $hello = "Hello"
+    $world = "World"
 
+    $it = inline_template("Here is a message:\n\t<%= hello %>, <%= world %>!
+That is all.\n")
+
+    file { '/root/hello_world.txt':
+        ensure => file,
+        content => $it,
+    }
+
+    file { '/root/hostname.txt':
+        ensure => file,
+        content => template("p4h/hostname.erb"),
+    }
+
+    file { '/home/vagrant/hello.rb':
+        ensure => file,
+        content => template("p4h/hello_world.erb"),
+        mode => 755,
+        owner => "vagrant",
+        group => "vagrant",
+    }
+
+    file { '/home/vagrant/what_should_i_do.py':
+        ensure => file,
+        content => template("p4h/what_should_i_do.erb"),
+        mode => 755,
+        owner => "vagrant",
+        group => "vagrant",
+    }
+
+    file { '/home/vagrant/executable_hostname.sh':
+        ensure => file,
+        content => template("p4h/executable_hostname.erb"),
+        mode => 755,
+        owner => "vagrant",
+        group => "vagrant",
+    }
 }
 
 # vim: ts=8

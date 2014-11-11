@@ -17,10 +17,11 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
+
 class p4h::prep5() {
 
-	file { '/root/README':
-		content => "##prep5
+    file { '/root/README':
+        content => "##prep5
 For this lesson, please do the following:
 * create a simple class that creates a file, and include it here
 ** it will need to go in a separate file because you can't nest classes
@@ -39,9 +40,13 @@ Bonus:
 * create the class as part of a separate module, and include it here
 
 Happy hacking!\n",
-	}
+    }
 
-	# XXX: write your code here...
+    include simple
+
+    class { 'resource_like':
+        path => '/home/vagrant/resource_like.txt',
+    }
 
 }
 
