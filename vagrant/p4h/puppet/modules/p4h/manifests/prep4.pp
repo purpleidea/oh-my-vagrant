@@ -34,11 +34,24 @@ Bonus:
 Level 42:
 * create a template that writes a file to the file system (is this useful?)
 * create a template that spits out the value from /usr/bin/hostname system call
+^ I would, but it's already 6:15 pm. Just throw the ruby code in the tags, using auto-trim tags as
+  necessary. Also, the `` execution pseudo-operator/function thing.
 
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	$hostname = inline_template("<%= @hostname %>")
+    $hn_from_template = template("p4h/sth.erb")
+
+    $var1 = 5
+    $var2 = 10
+    $result = inline_template("<%= @var1 + @var2 %>")
+
+    file { "template_file":
+        path        => "/tmp/template_out",
+        content     => template("p4h/sth.erb"),
+        ensure      => file
+    }
 
 }
 
