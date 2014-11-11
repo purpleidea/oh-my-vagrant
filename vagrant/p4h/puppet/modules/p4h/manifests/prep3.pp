@@ -38,8 +38,20 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    $my_name = "Randy"
 
+    if downcase($my_name) == "james" {
+        $some_text = "Hello ${my_name}, thanks for organizing this course!"
+    } else {
+        $some_text = "Hello ${my_name}, what do you want to do today?"
+    }
+
+    notify {$some_text:}
+
+    $two = "two"
+    $twopotatoe = "some value"
+
+    notify {"onepotatoe${two}potatoe":}
 }
 
 # vim: ts=8
