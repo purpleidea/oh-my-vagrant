@@ -17,26 +17,31 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson12() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson12
+For this lesson, please do the following:
+* Name two uses (specific pieces of software) for a 'fact exchange'
+* Implement a simple fact exchange
+** The code must be the same for all hosts that use it
+** It should work for N different hosts
+** Be sure that it does some parameter validation
+*** Remember: data from the host must be validated before it goes into a fact!
+
+Bonus:
+* Implement a fact exchange that can generate a unique (UUID) default
+* What happens if a node goes down without saying goodbye?
+** What are some workarounds to deal with this scenario?
+
+Level 42:
+* Generalize the fact exchange process into a ruby library / function
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+	# XXX: write your code here...
+
 }
 
 # vim: ts=8

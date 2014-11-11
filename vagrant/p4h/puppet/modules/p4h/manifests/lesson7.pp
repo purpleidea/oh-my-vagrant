@@ -17,26 +17,34 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson7() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson7
+For this lesson, please do the following:
+* Read and fool around with hiera briefly
+** We'll cover this again in the data-in-modules section where it's easy to use
+*** Try and pass some data into a class and have it picked up
+**** Think about what constitues a sane hierarchy and what's insane...
+
+Bonus:
+* Can you think of a security issue involving using facts in your hierarchy ?
+** Hint: it's disclosed in the puppet labs documentation
+
+Level 42:
+* Feel free to try out data-in-modules if you're already proficient at hiera
+** And then move on to OS independent puppet
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+	# XXX: write your code here...
+    $data = hiera("test_val")
+
+    notify { "msg1":
+        message => "Test value ${data}"
+    }
+
 }
 
 # vim: ts=8

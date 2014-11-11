@@ -17,26 +17,28 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson20() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson20
+For this lesson, please do the following:
+* Collect duplicate resources in puppet
+** This means you'll need three machines
+** Of course you'll also need to be comfortable with exported resources
+* Don't misuse this technique
+** It's typically useful to provide 'highly available' exported types
+*** It happens when you have dual primary clusters that export to a third party
+**** It can also happen with N-ary clusters too :)
+
+Bonus:
+* Check that your example still works when you have three identical exports
+* Make sure you wrap the exported defintions in 'plain' types where appropriate
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+	# XXX: write your code here...
+
 }
 
 # vim: ts=8

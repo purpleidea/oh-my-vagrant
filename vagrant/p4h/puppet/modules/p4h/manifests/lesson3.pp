@@ -17,26 +17,28 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson3() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson3
+For this lesson, please do the following:
+* Know about the `concat`, `count`, `delete`, `flatten`, `getvar`, `has_key`,
+`join`, `keys`, `member`, `merge`, `parseyaml` and `type` functions from stdlib
+
+Bonus:
+* Can you think about what `getvar` is useful for ?
+* Can you think about what `parseyaml` could be useful for ?
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+    $arr1 = ["a", "b", "c"]
+    $arr2 = ["d", "e", "f"]
+    $arrC = concat($arr1, $arr2)
+
+	notify { "notice1":
+        message => sprintf("Concat test: %s", $arrC)
+    }
 }
 
 # vim: ts=8

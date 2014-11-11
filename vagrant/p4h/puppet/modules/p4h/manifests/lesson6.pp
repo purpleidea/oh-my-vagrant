@@ -17,26 +17,28 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson6() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson6
+For this lesson, please do the following:
+* Write a custom function
+* Use it from inside of your module
+
+Bonus:
+* Write a second custom function that calls the first one
+* Use a fact from within your function
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+	# XXX: write your code here...
+    $sel = rand(5)
+
+    notify { "msg1":
+        message => "Random number: ${sel}"
+    }
+
 }
 
 # vim: ts=8

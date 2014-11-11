@@ -17,26 +17,32 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h() {
+class p4h::lesson9() {
 
-	$message = 'Welcome to the Puppet for Hackers course!'
-	notify { 'welcome':
-		message => "${message}",
-	}
-	file { '/root/WELCOME':
-		content => "${message}\n",
+	file { '/root/README':
+		content => "##lesson9
+For this lesson, please do the following:
+* Explain/understand the reason we need the clean.sh.erb technique
+* When is 'ensure => absent' preferable? When is it not preferable?
+** (in your own words, to yourself)
+* Simulate this technique, but using a directory of files in /tmp/clean/
+** You can use the following interfaces
+** Exists (ls_cmd): `ls /tmp/clean/$element`
+** Delete (rm_cmd): `rm /tmp/clean/$element`
+* Remember that you can use external languages for doing local work
+** Python is recommended
+*** Be careful not to metaprogram!
+
+Bonus:
+* Name three different pieces of software which probably require this technique
+
+Happy hacking!\n",
 	}
 
-	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)$/ {
-		include "::p4h::${::hostname}"
-	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
-		include "::p4h::${::hostname}"
-	# is there something trailing after the lesson, eg: lesson12-a
-	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
-	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
-		include "::p4h::${match}"
-	}
+    # Was a discussion...?
+
+
+
 }
 
 # vim: ts=8
