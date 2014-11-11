@@ -46,6 +46,12 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+	exec { 'touch /tmp/touchme':
+          onlyif  => "test prep8 == prep8",
+          unless  => 'test -e /tmp/touchme',
+          creates => '/tmp/touchme',
+          path    => '/usr/bin:/usr/sbin',
+        }
 
 }
 
