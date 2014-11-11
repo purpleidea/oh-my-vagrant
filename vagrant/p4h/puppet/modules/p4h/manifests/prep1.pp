@@ -31,7 +31,14 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+	package { "cowsay": ensure => "installed", allow_virtual => true }
+
+    # Package { ensure => "installed" }
+    # package { "package1": }
+    # package { "package2": }
+    # package { "package3": }
+
+    # package { ["package1", "package2", "package3"]: ensure => "installed" }
 
 }
 
