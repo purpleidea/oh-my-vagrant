@@ -11,25 +11,6 @@
 :docker: false
 :cachier: false
 :vms:
-- :name: prep1
-- :name: prep2
-- :name: prep3
-- :name: prep4
-- :name: prep5
-- :name: prep6
-- :name: prep7
-- :name: prep8
-- :name: lesson1
-- :name: lesson2
-- :name: lesson3
-- :name: lesson4
-- :name: lesson5
-- :name: lesson6
-- :name: lesson7
-- :name: lesson8
-- :name: lesson9
-- :name: lesson10
-- :name: lesson11
 - :name: lesson12
 - :name: lesson13
 - :name: lesson14

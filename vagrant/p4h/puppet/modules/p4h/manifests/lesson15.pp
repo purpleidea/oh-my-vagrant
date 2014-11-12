@@ -48,6 +48,8 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
+    # Required reading & discussion
+
 }
 
 # vim: ts=8

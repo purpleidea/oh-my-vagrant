@@ -41,7 +41,22 @@ Level 42:
 Happy hacking!\n",
 	}
 
+    common::again::delta { "restart":
+        delta => 120,
+    }
+
 	# XXX: write your code here...
+    exec { "exec1":
+        command => "/bin/true",
+        unless => "/usr/bin/test -f /tmp/complete",
+        notify => Common::Again::Delta['restart'],
+    }
+
+    file { "completed":
+        path => "/tmp/completed",
+        ensure => file,
+        require => Exec["exec1"],
+    }
 
 }
 

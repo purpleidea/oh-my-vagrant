@@ -37,7 +37,33 @@ Bonus:
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
+    # The collection below causes a "duplicate resource" error.
+    # file { "file1":
+    #     path => "/tmp/typecollisiontest",
+    #     content => "file content",
+    #     ensure => file
+    # }
+
+    # File <<| tag == "exported_file" |>> {
+    #     path => "/tmp/${hostname}-testfile",
+    #     content => "imported-1"
+    # }
+
+
+    # This, however, will cause the 2nd collection to be ignored.
+    # No error occurs here.
+    File <<| tag == "exported_file" |>> {
+        path => "/tmp/${hostname}-testfile",
+        content => "imported-1"
+    }
+
+    File <<| tag == "exported_file" |>> {
+        path => "/tmp/${hostname}-testfile",
+        content => "imported-2"
+    }
+
+
+    # Lesson 14 stuff here.
 
 }
 

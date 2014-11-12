@@ -17,7 +17,7 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::lesson13() {
+class p4h::lesson13-b() {
 
 	file { '/root/README':
 		content => "##lesson13
@@ -48,11 +48,8 @@ Happy hacking!\n",
 
 	# XXX: write your code here...
 
-    @@file { "file1":
-        path => "/tmp/${hostname}-testfile",
-        content => "exported",
-        ensure => file,
-        tag => "exported_file",
+    File <<| tag == "exported_file" |>> {
+        content => "imported"
     }
 
 

@@ -17,7 +17,9 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::lesson17() {
+class p4h::lesson17(
+    $comment = ''
+    ) {
 
 	file { '/root/README':
 		content => "##lesson17
@@ -46,6 +48,9 @@ Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
+    notify { "test":
+        message => "Comment: ${comment}",
+    }
 
 }
 
