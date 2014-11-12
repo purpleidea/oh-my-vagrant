@@ -17,36 +17,52 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson1() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson1
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Use the `cron` type
+* Use the `file` type to create a folder with another file inside
+* Use the `host` type to create an /etc/hosts entry
+* Use the `mount` type (a bind mount is okay)
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Use the `augeas` type		# to be used in emergencies or special cases!
+** Name one use for the `augeas` type...
+
+Level 42:
+* Learn what the resources type is for -- use with caution
 
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
+    cron { "cron1":
+        command => "/usr/bin/echo \"hello world\" >> \"/tmp/hello\"",
+        user => root,
+        minute => 1
     }
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
+    file { "dir1":
+        path => "/tmp/dir",
+        ensure => directory
     }
 
+    file { "file1":
+        path => "/tmp/dir/file",
+        ensure => file,
+        require => File["dir1"]
+    }
+
+    host { "testhost":
+        ip => "127.0.0.1"
+    }
+
+    # mount { "mount1":
+    #     ensure => mounted,
+
+
+    # }
 }
 
 # vim: ts=8

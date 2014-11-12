@@ -17,35 +17,32 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson16() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson16
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Read the 'Secure Secrets' blog post I wrote about this subject
+** https://ttboj.wordpress.com/2014/06/06/securely-managing-secrets-for-freeipa-with-puppet/
+*** Remember that friends don't let friends store secrets in puppet (or eyaml)
+**** Try this out if you can, or, pull out some of my code and do a POC run
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Libify this technique for SSH keys
+* Libify this technique for FreeIPA DM/admin password (sorry, it's built-in!)
+* Integrate this with LDAP+Kerberos
+
+Level 42:
+* Libify this technique for SSL certs
+** Find an 'official' CA that lets you use an API to get your cert signed!
+* Convince the FreeIPA guys to finish multi-master so that it works with this!
+** I forget where the RFE is or if it's only verbal, but this might be related
+*** https://fedorahosted.org/freeipa/ticket/4302
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
-
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
-    }
 
 }
 

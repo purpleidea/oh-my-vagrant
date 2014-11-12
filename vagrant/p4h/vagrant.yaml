@@ -11,14 +11,17 @@
 :docker: false
 :cachier: false
 :vms:
-- :name: prep1
-- :name: prep2
-- :name: prep3
-- :name: prep4
-- :name: prep5
-- :name: prep6
-- :name: prep7
-- :name: prep8
+- :name: lesson12
+- :name: lesson13
+- :name: lesson14
+- :name: lesson15
+- :name: lesson16
+- :name: lesson17
+- :name: lesson18
+- :name: lesson19
+- :name: lesson20
+- :name: lesson21
+- :name: lesson22
 :namespace: p4h
 :count: 0
 :username: ''

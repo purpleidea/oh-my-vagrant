@@ -28,8 +28,14 @@ class p4h() {
 	}
 
 	# pull in the class that you want based on hostname...
-	if "${::hostname}" =~ /^prep(\d+)/ {
+	if "${::hostname}" =~ /^prep(\d+)$/ {
 		include "::p4h::${::hostname}"
+	} elsif "${::hostname}" =~ /^lesson(\d+)$/ {
+		include "::p4h::${::hostname}"
+	# is there something trailing after the lesson, eg: lesson12-a
+	} elsif "${::hostname}" =~ /^lesson(\d+)/ {
+	        $match = regsubst("${::hostname}", '^(lesson(\d+))([a-z\-]*)$', '\1')
+		include "::p4h::${match}"
 	}
 }
 

@@ -17,34 +17,32 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson7() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson7
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Read and fool around with hiera briefly
+** We'll cover this again in the data-in-modules section where it's easy to use
+*** Try and pass some data into a class and have it picked up
+**** Think about what constitues a sane hierarchy and what's insane...
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Can you think of a security issue involving using facts in your hierarchy ?
+** Hint: it's disclosed in the puppet labs documentation
+
+Level 42:
+* Feel free to try out data-in-modules if you're already proficient at hiera
+** And then move on to OS independent puppet
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
+    $data = hiera("test_val")
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
+    notify { "msg1":
+        message => "Test value ${data}"
     }
 
 }

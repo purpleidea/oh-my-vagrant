@@ -17,34 +17,50 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson10() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson10
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Build a file with whole/frag
+* Name at least one piece of software that requires this technique
 
 Bonus:
-* create the file in the new home directory of the new created user
+* File a bug against a piece of software that would require this technique
+** (it's usually a bug or iow, the lack of an include.d/ style feature)
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
+    $target = "/tmp/concat"
+
+    concat { $target:
+        ensure => present
     }
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
+    concat::fragment { "fragA":
+        target => $target,
+        content => "Part A",
+        order => "01"
+    }
+
+    concat::fragment { "fragB":
+        target => $target,
+        content => "Part B",
+        order => "10"
+    }
+
+    $alt_target = "/tmp/concat-2"
+    $alt_frags = "/tmp/concat-2.d/"
+
+    file { $alt_frags
+        ensure => directory
+    }
+
+    whole { $alt_target:
+        dir => $alt_frags,
+        require => File[$alt_frags]
     }
 
 }

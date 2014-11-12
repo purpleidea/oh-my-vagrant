@@ -17,35 +17,30 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson12() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson12
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Name two uses (specific pieces of software) for a 'fact exchange'
+* Implement a simple fact exchange
+** The code must be the same for all hosts that use it
+** It should work for N different hosts
+** Be sure that it does some parameter validation
+*** Remember: data from the host must be validated before it goes into a fact!
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Implement a fact exchange that can generate a unique (UUID) default
+* What happens if a node goes down without saying goodbye?
+** What are some workarounds to deal with this scenario?
+
+Level 42:
+* Generalize the fact exchange process into a ruby library / function
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
-
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
-    }
 
 }
 

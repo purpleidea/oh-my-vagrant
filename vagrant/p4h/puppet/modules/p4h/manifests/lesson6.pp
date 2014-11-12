@@ -17,34 +17,26 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson6() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson6
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Write a custom function
+* Use it from inside of your module
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Write a second custom function that calls the first one
+* Use a fact from within your function
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
+    $sel = rand(5)
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
+    notify { "msg1":
+        message => "Random number: ${sel}"
     }
 
 }

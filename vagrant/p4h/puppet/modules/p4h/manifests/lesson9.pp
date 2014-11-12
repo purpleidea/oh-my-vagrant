@@ -17,35 +17,31 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson9() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson9
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Explain/understand the reason we need the clean.sh.erb technique
+* When is 'ensure => absent' preferable? When is it not preferable?
+** (in your own words, to yourself)
+* Simulate this technique, but using a directory of files in /tmp/clean/
+** You can use the following interfaces
+** Exists (ls_cmd): `ls /tmp/clean/$element`
+** Delete (rm_cmd): `rm /tmp/clean/$element`
+* Remember that you can use external languages for doing local work
+** Python is recommended
+*** Be careful not to metaprogram!
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Name three different pieces of software which probably require this technique
 
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
+    # Was a discussion...?
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
-    }
+
 
 }
 

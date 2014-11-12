@@ -17,35 +17,27 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson20() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson20
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Collect duplicate resources in puppet
+** This means you'll need three machines
+** Of course you'll also need to be comfortable with exported resources
+* Don't misuse this technique
+** It's typically useful to provide 'highly available' exported types
+*** It happens when you have dual primary clusters that export to a third party
+**** It can also happen with N-ary clusters too :)
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Check that your example still works when you have three identical exports
+* Make sure you wrap the exported defintions in 'plain' types where appropriate
 
 Happy hacking!\n",
 	}
 
 	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
-
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
-    }
 
 }
 

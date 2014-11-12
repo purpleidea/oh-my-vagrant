@@ -17,36 +17,28 @@
 
 # README: this is a module built for use with: Oh My Vagrant!
 
-class p4h::prep2() {
+class p4h::lesson3() {
 
 	file { '/root/README':
-		content => "##prep2
+		content => "##lesson3
 For this lesson, please do the following:
-* create a user (name it what you want) with the puppet user type
-* create a file that contains a short poem or a joke
-* ensure that the file gets created after the user does
+* Know about the `concat`, `count`, `delete`, `flatten`, `getvar`, `has_key`,
+`join`, `keys`, `member`, `merge`, `parseyaml` and `type` functions from stdlib
 
 Bonus:
-* create the file in the new home directory of the new created user
+* Can you think about what `getvar` is useful for ?
+* Can you think about what `parseyaml` could be useful for ?
 
 Happy hacking!\n",
 	}
 
-	# XXX: write your code here...
-    user { 'crog':
-        name        => 'crog',
-        ensure      => present,
-        home        => '/home/crog',
-        managehome  => true
-    }
+    $arr1 = ["a", "b", "c"]
+    $arr2 = ["d", "e", "f"]
+    $arrC = concat($arr1, $arr2)
 
-    file { 'joke':
-        path        => '/home/crog/joke.txt',
-        ensure      => file,
-        content     => '# TODO: Write joke.',
-        require     => User['crog']
+	notify { "notice1":
+        message => sprintf("Concat test: %s", $arrC)
     }
-
 }
 
 # vim: ts=8
