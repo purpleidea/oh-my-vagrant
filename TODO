@@ -8,4 +8,6 @@ TODO
 *** This would be useful anyways, but isn't the ideal approach for vagrant.
 ** One way could be to write to /etc/facter/facts.d/ before each puppet run.
 *** https://github.com/mitchellh/vagrant/issues/4762
+* Provide a way to add parameters to the classes we include.
+* Add some documentation.
 
