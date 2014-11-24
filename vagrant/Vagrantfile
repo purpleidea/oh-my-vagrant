@@ -500,7 +500,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			:ip => range2[offset2+i].to_s,
 			:libvirt__netmask => netmask2,
 			#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
-			:libvirt__network_name => 'default'
+			:libvirt__network_name => 'omv-default'
 
 			# this is the real network that we'll use...
 			vm.vm.network :private_network,
