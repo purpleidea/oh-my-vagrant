@@ -33,13 +33,6 @@ require 'yaml'
 # thanks to the gluster.org community for the public box hosting
 default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
 
-# XXX: eliminate network2 if possible...
-network2 = IPAddr.new '192.168.145.0/24'
-range2 = network2.to_range.to_a
-cidr2 = (32-(Math.log(range2.length)/Math.log(2))).to_i
-offset2 = 2
-netmask2 = IPAddr.new('255.255.255.255').mask(cidr2).to_s
-
 #
 #	vms
 #
@@ -65,6 +58,7 @@ vms = [
 #			'module2' => nil,
 #		},
 #	},
+#	{:name => 'example8', :puppet => true, :ip => '192.168.123.3' }
 ]
 
 # mutable by ARGV and settings file
@@ -78,8 +72,8 @@ puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
 cachier = false			# default cachier usage
-#vms = []			# default list of vms to build (special global)
-namespace = 'omv'		# default namespace
+#vms = []			# default list of vms to build (special global), see above
+namespace = 'omv'		# default namespace (also used as libvirt network name)
 count = 1			# default number of hosts to build
 # TODO: subscription manager needs to grow a way to generate an 'API key' that
 # can be used instead of a password so that it can be safely used in scripts...
@@ -364,12 +358,11 @@ password = global_password if "#{password}" == ''
 # networking
 network_obj = IPAddr.new network
 range = network_obj.to_range.to_a
-cidr = (32-(Math.log(range.length)/Math.log(2))).to_i
 offset = 100		# start hosts after here
-#puts range[0].to_s	# network
-#puts range[1].to_s	# router (reserved)
-#puts range[2].to_s	# puppetmaster
-#puts range[3].to_s	# vip
+# Remove reserved values
+range[0] = '__reserved_network_addr'
+range[1] = '__reserved_router_addr'
+#puts range[2].to_s	# puppetmaster, will be cleared later
 
 # prepend $count vms onto the vms list...
 extra = []
@@ -385,7 +378,8 @@ folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 
 # add in puppet host if requested
 if puppet
-	extra = [{:name => 'puppet'}]
+	extra = [{:name => 'puppet', :ip => range[2].to_s}]
+    range[2] = '__reserved_puppet_addr'
 	vms = extra.concat vms
 
 	if not(classes.is_a?(Hash)) and not(classes.is_a?(Array))
@@ -473,18 +467,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 
 	#
-	#	vip
-	#
-	vip_ip = range[3].to_s
-	vip_hostname = namespace
-
-	#
 	#	vms mainloop to define all the machines
 	#
 	vms.each_with_index do |x, i|
 		h = x[:name]
-		ip = range[offset+i].to_s
-		#fqdn = "#{h}.#{domain}"
+		ip = x.fetch(:ip) {|ip| x[:ip] = range[offset+i].to_s; x[:ip]} # IP of the VM (if not set in vagrant.yaml - it will be generated)
 		vm_image = x.fetch(:image, image)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
@@ -493,14 +480,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 
+        # Sanity check the user-supplied IP addresses and gracefully fail
+        # Puppet server is special, so we skip it here
+        if h != 'puppet' then
+          error_check = range.include? IPAddr.new ip
+          message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
+          message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP addres from the range above"
+          raise Vagrant::Errors::VagrantError.new, message unless error_check
+        end
+
 		config.vm.define h.to_sym do |vm|
 			vm.vm.hostname = h
-			# red herring network so that management happens here...
-			vm.vm.network :private_network,
-			:ip => range2[offset2+i].to_s,
-			:libvirt__netmask => netmask2,
-			#:libvirt__dhcp_enabled => false,	# XXX: not allowed here
-			:libvirt__network_name => 'default'
 
 			# this is the real network that we'll use...
 			vm.vm.network :private_network,
@@ -584,12 +574,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
 				vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
 
-				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
+				vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
 				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
-				# hosts entries for all hosts
-				vms.each_with_index do |xx, j|
+				# /etc/hosts entries for all hosts
+				vms.each do |xx|
 					oh = xx[:name]
-					oip = range[offset+j].to_s	# eg: "192.168.142.#{100+i}"
+					oip = xx[:ip] # This will be set at this point
 					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
 				end
 
@@ -715,8 +705,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 					facter = {
 						'vagrant' => '1',
-						'vagrant_vip' => vip_ip,
-						'vagrant_vip_fqdn' => "#{vip_hostname}.#{domain}",
+						'vagrant_vip' => ip,
+						'vagrant_vip_fqdn' => "#{h}.#{domain}",
 						'vagrant_puppet_classes' => puppet_classes.join(','),
 					}
 					facter = facter.merge(dynamic)
@@ -735,7 +725,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					# custom fact
 					p.facter = {
 						'vagrant' => '1',
-						'vagrant_allow' => (1..vms.length).map{|z| range[offset+z].to_s}.join(','),
+						'vagrant_allow' => vms.each{|z| z[:ip] },
 						'vagrant_puppet_folder' => folder,
 					}
 					p.synced_folder_type = sync
