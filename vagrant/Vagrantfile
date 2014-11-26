@@ -1,5 +1,5 @@
 # -*- mode: ruby -*-
-# vi: set ft=ruby noet ts=4 :
+# vi: set ft=ruby noet :
 
 # This is: Oh My Vagrant!
 # Copyright (C) 2012-2013+ James Shubin
@@ -363,6 +363,7 @@ offset = 100		# start hosts after here
 range[0] = '__reserved_network_addr'
 range[1] = '__reserved_router_addr'
 #puts range[2].to_s	# puppetmaster, will be cleared later
+#puts range[3].to_s	# vip, will be cleared later
 
 # prepend $count vms onto the vms list...
 extra = []
@@ -465,6 +466,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			config.cache.mount_options = ['rw', 'vers=3', 'tcp', 'nolock']
 		end
 	end
+
+	#
+	#	vip
+	#
+	vip_ip = range[3].to_s
+	vip_hostname = namespace
+	range[3] = '__reserved_vip_addr'
 
 	#
 	#	vms mainloop to define all the machines
@@ -574,7 +582,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
 				vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
 
-				vm.vm.provision 'shell', inline: "puppet resource host #{h}.#{domain} ip=#{ip} host_aliases=#{h} ensure=present"
+				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
 				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
 				# /etc/hosts entries for all hosts
 				vms.each do |xx|
@@ -705,8 +713,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 					facter = {
 						'vagrant' => '1',
-						'vagrant_vip' => ip,
-						'vagrant_vip_fqdn' => "#{h}.#{domain}",
+						'vagrant_vip' => vip_ip,
+						'vagrant_vip_fqdn' => "#{vip_hostname}.#{domain}",
 						'vagrant_puppet_classes' => puppet_classes.join(','),
 					}
 					facter = facter.merge(dynamic)
