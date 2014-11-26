@@ -1,5 +1,5 @@
 # -*- mode: ruby -*-
-# vi: set ft=ruby :
+# vi: set ft=ruby noet ts=4 :
 
 # This is: Oh My Vagrant!
 # Copyright (C) 2012-2013+ James Shubin
@@ -382,7 +382,7 @@ folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 # add in puppet host if requested
 if puppet
 	extra = [{:name => 'puppet', :ip => range[2].to_s}]
-    range[2] = '__reserved_puppet_addr'
+	range[2] = '__reserved_puppet_addr'
 	vms = extra.concat vms
 
 	if not(classes.is_a?(Hash)) and not(classes.is_a?(Array))
@@ -483,14 +483,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 
-        # Sanity check the user-supplied IP addresses and gracefully fail
-        # Puppet server is special, so we skip it here
-        if h != 'puppet' then
-          error_check = range.include? IPAddr.new ip
-          message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
-          message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP addres from the range above"
-          raise Vagrant::Errors::VagrantError.new, message unless error_check
-        end
+		# Sanity check the user-supplied IP addresses and gracefully fail
+		# Puppet server is special, so we skip it here
+		if h != 'puppet' then
+		  error_check = range.include? IPAddr.new ip
+		  message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
+		  message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP addres from the range above"
+		  raise Vagrant::Errors::VagrantError.new, message unless error_check
+		end
 
 		config.vm.define h.to_sym do |vm|
 			vm.vm.hostname = h
