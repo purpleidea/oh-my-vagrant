@@ -13,3 +13,6 @@
 [submodule "vagrant/p4h"]
 	path = vagrant/p4h
 	url = https://github.com/purpleidea/p4h
+[submodule "vagrant/xdg"]
+	path = vagrant/gems/xdg
+	url = https://github.com/rubyworks/xdg
