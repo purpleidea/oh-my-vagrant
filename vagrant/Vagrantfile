@@ -98,13 +98,16 @@ def array_values_to_array_of_hashes(l)
 	return result
 end
 
+projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
+
 #
 #	~/.config/oh-my-vagrant/ parsing
 #
 # Vagrant is using it's own gem path. Using local xdg gem
 # Another option could be adding xdg gem directly to vagrant
 begin
-	$:.unshift('./gems/xdg/lib') #add local path for gems
+	gemlibdir = File.join(projectdir, 'gems/xdg/lib')
+	$:.unshift(gemlibdir)	# add local path for gems
 	require 'xdg'
 	auth_config = File.join("#{XDG['CONFIG']}/oh-my-vagrant/", 'auth.yaml')
 
@@ -127,7 +130,6 @@ end
 #
 #	ARGV parsing
 #
-projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
 f = g = File.join(projectdir, 'vagrant.yaml')
 # check for vagrant.yaml in folder subdirectory
 load_folder = false
