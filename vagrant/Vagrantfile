@@ -111,7 +111,7 @@ begin
 rescue LoadError
 	# TODO: can't print warnings, because it messes up ssh config files...
 	# stderr output should be safe (not mess up anything) - test it
-	$stderr.puts 'Warning: xdg gem is not installed.' 
+	$stderr.puts 'Warning: xdg gem is not installed.'
 	$stderr.puts "Run: 'gem install xdg', or use your package manager."
 	auth_config = File.join("#{Dir.home}/.oh-my-vagrant/", 'auth.yaml')
 	if not File.exist?(auth_config)
