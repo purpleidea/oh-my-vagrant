@@ -478,11 +478,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	range[3] = '__reserved_vip_addr'
 
 	#
+	# all vms ips are set here
+	#
+	vms.each_with_index do |x, i|
+		if not x.fetch(:ip, nil) # if vm ip was not set in vagrant.yaml...
+		  x[:ip] = range[offset+i].to_s # ...generate it, and set vm ip
+		end
+	end
+
+	#
 	#	vms mainloop to define all the machines
 	#
 	vms.each_with_index do |x, i|
 		h = x[:name]
-		ip = x.fetch(:ip) {|ip| x[:ip] = range[offset+i].to_s; x[:ip]} # IP of the VM (if not set in vagrant.yaml - it will be generated)
+		ip = x.fetch(:ip) # get value
 		vm_image = x.fetch(:image, image)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
