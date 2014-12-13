@@ -58,7 +58,7 @@ vms = [
 #			'module2' => nil,
 #		},
 #	},
-#	{:name => 'example8', :puppet => true, :ip => '192.168.123.3' }
+#	{:name => 'example8', :puppet => true, :ip => '192.168.123.3'},
 ]
 
 # mutable by ARGV and settings file
@@ -72,8 +72,8 @@ puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
 cachier = false			# default cachier usage
-#vms = []			# default list of vms to build (special global), see above
-namespace = 'omv'		# default namespace (also used as libvirt network name)
+#vms = []			# default list of vms to build (defaults above)
+namespace = 'omv'		# default namespace (also used as network name)
 count = 1			# default number of hosts to build
 # TODO: subscription manager needs to grow a way to generate an 'API key' that
 # can be used instead of a password so that it can be safely used in scripts...
@@ -361,12 +361,13 @@ password = global_password if "#{password}" == ''
 # networking
 network_obj = IPAddr.new network
 range = network_obj.to_range.to_a
+cidr = (32-(Math.log(range.length)/Math.log(2))).to_i
 offset = 100		# start hosts after here
-# Remove reserved values
-range[0] = '__reserved_network_addr'
-range[1] = '__reserved_router_addr'
-#puts range[2].to_s	# puppetmaster, will be cleared later
-#puts range[3].to_s	# vip, will be cleared later
+# remove reserved values
+range[0] = '__reserved_network_addr'	# network
+range[1] = '__reserved_router_addr'	# router (reserved)
+#puts range[2].to_s	# puppetmaster
+#puts range[3].to_s	# vip
 
 # prepend $count vms onto the vms list...
 extra = []
@@ -478,11 +479,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	range[3] = '__reserved_vip_addr'
 
 	#
-	# all vms ips are set here
+	#	set vms ips
 	#
 	vms.each_with_index do |x, i|
 		if not x.fetch(:ip, nil) # if vm ip was not set in vagrant.yaml...
-		  x[:ip] = range[offset+i].to_s # ...generate it, and set vm ip
+			x[:ip] = range[offset+i].to_s # ...generate it, and set vm ip
+			#vms[i][:ip] = range[offset+i].to_s	# equivalent!
 		end
 	end
 
@@ -500,13 +502,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 
-		# Sanity check the user-supplied IP addresses and gracefully fail
-		# Puppet server is special, so we skip it here
+		# sanity check the user-supplied IP addresses and gracefully fail
+		# puppet server is special, so we skip it here
 		if h != 'puppet' then
-		  error_check = range.include? IPAddr.new ip
-		  message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
-		  message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP addres from the range above"
-		  raise Vagrant::Errors::VagrantError.new, message unless error_check
+			error_check = range.include? IPAddr.new ip
+			message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
+			message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP address from the range above!"
+			raise Vagrant::Errors::VagrantError.new, message unless error_check
 		end
 
 		config.vm.define h.to_sym do |vm|
