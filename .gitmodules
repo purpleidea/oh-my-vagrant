@@ -16,3 +16,6 @@
 [submodule "vagrant/xdg"]
 	path = vagrant/gems/xdg
 	url = https://github.com/rubyworks/xdg
+[submodule "vagrant/pushing"]
+	path = vagrant/pushing
+	url = https://github.com/purpleidea/puppet-pushing
