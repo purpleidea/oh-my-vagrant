@@ -1,0 +1,12 @@
+Won't someone contribute a good vagrant+vagrant-libvirt installation guide?
+For two (original, and out of date) articles on the subject, please read:
+
+https://ttboj.wordpress.com/2013/12/09/vagrant-on-fedora-with-libvirt/
+https://ttboj.wordpress.com/2014/05/13/vagrant-on-fedora-with-libvirt-reprise/
+
+(The second one is more up to date, and mostly replaces the first...)
+
+In Fedora 22+ Vagrant and Vagrant-Libvirt should be included in the distro.
+
+Happy Hacking!
+
