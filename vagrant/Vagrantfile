@@ -752,6 +752,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					}
 					p.synced_folder_type = sync
 				end
+
+				# the puppetlabs RPM mistakenly starts the
+				# service on installation/upgrade. this is a
+				# bug, and it causes our server to break,
+				# because we want puppet to run with our
+				# environment variables, which it doesn't when
+				# started by itself! puppetlabs, fix your RPM
+				# already!
+				# https://tickets.puppetlabs.com/browse/CPR-128
+				vm.vm.provision 'shell', inline: 'service puppet stop'
 			end
 
 			vm.vm.provider :libvirt do |libvirt|
