@@ -32,6 +32,7 @@ require 'yaml'
 #
 # thanks to the gluster.org community for the public box hosting
 default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
+really_use_rm = false	# this causes the rm -rf to actually happen
 
 #
 #	vms
@@ -68,6 +69,7 @@ image = 'centos-7.0'		# default image name
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 folder = ''			# default folder prefix
+extern = []			# default external module definitions
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
@@ -155,6 +157,7 @@ if File.exist?(f)
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
 	folder = settings[:folder] if not(load_folder)
+	extern = settings[:extern]
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	docker = settings[:docker]
@@ -210,6 +213,17 @@ while skip < ARGV.length
 		v.slice! arg
 
 		folder = v.to_s		# set folder prefix
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-extern=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			extern = v.split(',')
+			# FIXME: further parse the chunks into hashes...
+		else
+			extern = []
+		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-puppet=')
 		v = ARGV.delete_at(skip).dup
@@ -335,6 +349,7 @@ settings = {
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
 	:folder => folder,
+	:extern => extern,
 	:puppet => puppet,
 	:classes => classes,
 	:docker => docker,
@@ -380,6 +395,64 @@ vms = extra.concat vms
 
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
+
+if load_folder
+	basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
+else
+	basedir = File.join(projectdir, 'puppet/', 'modules/')
+end
+#puts basedir
+native = `cd "#{basedir}" && git ls-files`.strip.split("\n")	# native files
+
+if extern.length > 0
+	extern.each do |i|
+		t = i.fetch('type', nil)
+		if t == 'git'
+			repository = i.fetch('repository', nil)
+			directory = i.fetch('directory', nil)
+			branch = i.fetch('branch', nil)
+			if repository.nil? or directory.nil?
+				next
+			end
+			repo_okay = false
+			if File.exists?(File.join("#{basedir}", "#{directory}"))
+				r = `cd "#{basedir}/#{directory}" && git remote show origin | grep 'Fetch URL: ' | awk -F 'Fetch URL: ' '{print $2}'`.strip
+				if r == repository
+					repo_okay = true
+				else
+					$stderr.puts "Repository: '#{repository}' doesn't match installed."
+					if really_use_rm
+						`rm -rf "#{basedir}/#{directory}"`
+					else
+						$stderr.puts `echo please: rm -rf "#{basedir}/#{directory}"`	# safer for now
+					end
+				end
+			else
+				r = `cd "#{basedir}" && git clone --recursive #{repository} #{directory}`
+				$stderr.puts r
+				repo_okay = true
+			end
+			if repo_okay and not branch.nil?
+				r = `cd "#{basedir}/#{directory}" && git checkout "#{branch}"`.strip
+			end
+			native.push("#{directory}")
+		else
+			$stderr.puts "Can't process extern type #{t}."
+		end
+	end
+end
+
+# clean up any directories or files that shouldn't be present
+Dir.glob(basedir+'*').each do |i|
+	b = File.basename(i)
+	if not native.include?(b)
+		if really_use_rm
+			`rm -rf "#{i}"`
+		else
+			$stderr.puts `echo please: rm -rf "#{i}"`	# safer for now
+		end
+	end
+end
 
 # add in puppet host if requested
 if puppet
