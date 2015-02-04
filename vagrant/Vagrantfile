@@ -427,6 +427,13 @@ if extern.length > 0
 						$stderr.puts `echo please: rm -rf "#{basedir}/#{directory}"`	# safer for now
 					end
 				end
+				# pull latest in if it exists
+				r = `cd "#{basedir}/#{directory}" && [ $(git fetch --dry-run 2>&1 | wc -l) -gt 0 ] || echo already up-to-date`.strip
+				if r == ''
+					r = `cd "#{basedir}/#{directory}" && git checkout master && git pull`.strip
+					$stderr.puts r
+				end
+
 			else
 				r = `cd "#{basedir}" && git clone --recursive #{repository} #{directory}`
 				$stderr.puts r
