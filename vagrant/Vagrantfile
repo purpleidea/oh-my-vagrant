@@ -419,7 +419,7 @@ if extern.length > 0
 			end
 			repo_okay = false
 			if File.exists?(File.join("#{basedir}", "#{directory}"))
-				r = `cd "#{basedir}/#{directory}" && git remote show origin | grep 'Fetch URL: ' | awk -F 'Fetch URL: ' '{print $2}'`.strip
+				r = `cd "#{basedir}/#{directory}" && git remote show -n origin | grep 'Fetch URL: ' | awk -F 'Fetch URL: ' '{print $2}'`.strip
 				if r == repository
 					repo_okay = true
 				else
