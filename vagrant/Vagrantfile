@@ -371,6 +371,8 @@ end
 
 username = global_username if "#{username}" == ''
 password = global_password if "#{password}" == ''
+username = '' if username.nil?
+password = '' if password.nil?
 #puts "ARGV: #{ARGV}"	# debug
 
 # networking
