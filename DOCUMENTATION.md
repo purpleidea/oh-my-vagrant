@@ -169,6 +169,14 @@ Yes, absolutely. This provides puppet integration, but it is entirely optional.
 If you'd like to add integration for another configuration management system,
 please send a patch.
 
+###Something isn't working correctly, and I feel I'm missing some code...
+
+This project has some useful dependencies which are included in the main
+project as git submodules. To ensure you get all of the code, make sure you do
+an initial clone with the `--recursive` flag. Example:
+
+```git clone --recursive https://github.com/purpleidea/oh-my-vagrant/```
+
 ###Awesome work, but it's missing support for a feature and/or platform!
 
 Since this is an Open Source / Free Software project that I also give away for
