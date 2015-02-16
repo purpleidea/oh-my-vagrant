@@ -37,7 +37,7 @@ really_use_rm = false	# this causes the rm -rf to actually happen
 #
 #	vms
 #
-# NOTE: you can specify the list of vms here, or in the vagrant.yaml file...
+# NOTE: you can specify the list of vms here, or in the omv.yaml file...
 # NOTE: if you set the vagrant vms array to nil, you'll default to this list
 vms = [
 #	{:name => 'example1', :docker => true, :puppet => true, },	# example1
@@ -124,8 +124,8 @@ end
 #
 #	ARGV parsing
 #
-f = g = File.join(projectdir, 'vagrant.yaml')
-# check for vagrant.yaml in folder subdirectory
+f = g = File.join(projectdir, 'omv.yaml')
+# check for omv.yaml in folder subdirectory
 load_folder = false
 if File.exist?(f)
 	settings = YAML::load_file f
@@ -142,7 +142,7 @@ if File.exist?(f)
 	end
 
 	# if folder is '', then this doesn't do any different from the original
-	ff = File.join(projectdir, folder, 'vagrant.yaml')
+	ff = File.join(projectdir, folder, 'omv.yaml')
 	if File.exist?(ff)
 		f = ff
 	end
@@ -567,7 +567,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#	set vms ips
 	#
 	vms.each_with_index do |x, i|
-		if not x.fetch(:ip, nil) # if vm ip was not set in vagrant.yaml...
+		if not x.fetch(:ip, nil) # if vm ip was not set in omv.yaml...
 			x[:ip] = range[offset+i].to_s # ...generate it, and set vm ip
 			#vms[i][:ip] = range[offset+i].to_s	# equivalent!
 		end
@@ -592,7 +592,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		if h != 'puppet' then
 			error_check = range.include? IPAddr.new ip
 			message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
-			message += "\nConsider changing 'network:' parameter in vagrant.yaml, or use the correct IP address from the range above!"
+			message += "\nConsider changing 'network:' parameter in omv.yaml, or use the correct IP address from the range above!"
 			raise Vagrant::Errors::VagrantError.new, message unless error_check
 		end
 
