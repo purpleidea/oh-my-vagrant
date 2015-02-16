@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	* [Example modules](#example-modules)
 4. [Usage/FAQ - Notes on usage and frequently asked questions](#usage-and-frequently-asked-questions)
 5. [Reference - Detailed reference](#reference)
-	* [vagrant.yaml](#vagrant.yaml)
+	* [omv.yaml](#omv.yaml)
 	* [Command line](#command-line)
 	* [oh-my-vagrant.yaml](#oh-my-vagrant.yaml)
 6. [Examples - Example configurations](#examples)
@@ -56,7 +56,7 @@ downloading, and more!
 
 Instead of having to write complex, partially declarative pseudo-ruby code to
 create and modify a Vagrant environment, you can instead do all the manipulation
-simply by editing a short vagrant.yaml definition file. This magic is what the
+simply by editing a short omv.yaml definition file. This magic is what the
 Oh-My-Vagrant project provides. Additionally, it integrates with code to help
 you automatically deploy a Puppet Master, kick off docker commands, and more!
 
@@ -92,16 +92,16 @@ $ cd oh-my-vagrant/vagrant/
 In this directory (or any of the children directories), you can run typical
 vagrant command line tools, which will use the powerful Vagrantfile provided.
 Instead of changing the pseudo-ruby code used in the Vagrantfile, you can
-instead customize the behaviour by modifying a simple vagrant.yaml file.
+instead customize the behaviour by modifying a simple omv.yaml file.
 
-Everytime you run a vagrant command, the vagrant.yaml file will be read in (if
+Everytime you run a vagrant command, the omv.yaml file will be read in (if
 it exists) parsed, and then written out in the same location. As a result, any
 erroneous, not compliant, or non parseable data you put in this file will be
 lost.
 
-If you do not have a vagrant.yaml template, running the ```vagrant status```
+If you do not have a omv.yaml template, running the ```vagrant status```
 command will cause one to be generated. Play around with the settings in the
-vagrant.yaml file, and forget about the days where small changes to your
+omv.yaml file, and forget about the days where small changes to your
 environment, required pasting in a mess of code.
 
 ###Complex usage
@@ -118,10 +118,10 @@ learning by example. It's fairly straightforward, but here are some quick
 pointers:
 
 * Your module should be a separate git repo with the correct format.
-* You'll need to set the vagrant.yaml "folder" parameter to match the name of
-your module.
+* You'll need to set the omv.yaml "folder" parameter to match the name of your
+module.
 * Include your module folder as a git submodule, in the directory next to the
-vagrant.yaml file provided with the Oh-My-Vagrant project. You should name your
+omv.yaml file provided with the Oh-My-Vagrant project. You should name your
 branch _module/your_module_name_. You should keep a reference to the branch
 with your module in it in this manner, and rebase your branch against the newer
 git master branch as often as you can.
@@ -197,12 +197,12 @@ information on these options, please view the source at:
 If you feel that a well used option needs documenting here, please contact me.
 
 ###Overview of reference
-* [vagrant.yaml](#vagrant.yaml): Main configuration file.
+* [omv.yaml](#omv.yaml): Main configuration file.
 * [Command line](#command-line): Command line parameters.
 * [oh-my-vagrant.yaml](#oh-my-vagrant.yaml): User specific configuration.
 
-###vagrant.yaml
-Editing the vagrant.yaml file is the primary way of modifying your Oh-My-Vagrant
+###omv.yaml
+Editing the omv.yaml file is the primary way of modifying your Oh-My-Vagrant
 environment. If you don't have a template, running the `vagrant status` command
 should cause one to get created with some sensible defaults.
 
@@ -260,7 +260,7 @@ Currently undocumented.
 ###Command line
 The command line arguments are currently undocumented. If you'd like to help
 improve these, please send a patch. They are not critical to Oh-My-Vagrant
-usage, because all operations can be done by editing the vagrant.yaml
+usage, because all operations can be done by editing the omv.yaml
 configuration file. Using the command line does make using Oh-My-Vagrant a lot
 faster if you're constantly changing your environment. It also makes people say
 "Whoa!".
