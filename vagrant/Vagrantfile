@@ -81,7 +81,7 @@ count = 1			# default number of hosts to build
 # can be used instead of a password so that it can be safely used in scripts...
 username = ''			# default subscription manager username
 password = ''			# default subscription manager password
-poolid = []			# default list of poolid's (true to auto-attach)
+poolid = true			# default list of poolid's (true to auto-attach)
 repos = []			# default list of extra repos's to enable
 
 def array_values_to_array_of_hashes(l)
