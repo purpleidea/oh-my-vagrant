@@ -926,7 +926,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				#end
 
 				# make puppet server a bit fatter by default :P
-				if puppet and vm_puppet and h == 'puppet'
+				if (puppet and vm_puppet and h == 'puppet') or vm.vm.box.start_with? 'rhel-'
 					libvirt.cpus = 2
 					libvirt.memory = 1024
 				end
