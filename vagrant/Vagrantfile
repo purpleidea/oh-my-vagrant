@@ -408,6 +408,65 @@ extra = []
 end
 vms = extra.concat vms
 
+# add in puppet host if requested
+if puppet
+	extra = [{:name => 'puppet', :ip => range[2].to_s}]
+	range[2] = '__reserved_puppet_addr'
+	vms = extra.concat vms
+
+	if not(classes.is_a?(Hash)) and not(classes.is_a?(Array))
+		classes = []
+	end
+end
+
+# transform docker value if necessary
+docker = array_values_to_array_of_hashes(docker)
+
+# erase host information from puppet so that the user can do partial rebuilds
+snoop = ARGV.select { |x| !x.start_with?('-') }
+if snoop.length > 1 and snoop[0] == 'destroy'
+	snoop.shift	# left over array snoop should be list of hosts
+	if snoop.include?('puppet')	# doesn't matter then...
+		snoop = []
+	end
+else
+	# important! clear snoop because we're not using 'destroy'
+	snoop = []
+end
+
+# figure out which hosts are getting destroyed
+destroy = ARGV.select { |x| !x.start_with?('-') }
+if destroy.length > 0 and destroy[0] == 'destroy'
+	destroy.shift	# left over array destroy should be list of hosts or []
+	if destroy.length == 0
+		destroy = true	# destroy everything
+	end
+else
+	destroy = false		# destroy nothing
+end
+
+# figure out which hosts are getting provisioned
+provision = ARGV.select { |x| !x.start_with?('-') }
+if provision.length > 0 and ['up', 'provision'].include?(provision[0])
+	provision.shift	# left over array provision should be list of hosts or []
+	if provision.length == 0
+		provision = true	# provision everything
+	end
+else
+	provision = false		# provision nothing
+end
+
+# XXX: workaround for: https://github.com/mitchellh/vagrant/issues/2447
+# only run on 'vagrant init' or if it's the first time running vagrant
+if sync == 'nfs' and ((ARGV.length > 0 and ARGV[0] == 'init') or not(File.exist?(f)))
+	`sudo systemctl restart nfs-server`
+	`firewall-cmd --permanent --zone public --add-service mountd`
+	`firewall-cmd --permanent --zone public --add-service rpc-bind`
+	`firewall-cmd --permanent --zone public --add-service nfs`
+	`firewall-cmd --reload`
+end
+
+# this extern code should be one of the *last* things before the big configure!
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 
@@ -493,64 +552,6 @@ end
 			$stderr.puts `echo please: rm -rf "#{i}"`	# safer for now
 		end
 	end
-end
-
-# add in puppet host if requested
-if puppet
-	extra = [{:name => 'puppet', :ip => range[2].to_s}]
-	range[2] = '__reserved_puppet_addr'
-	vms = extra.concat vms
-
-	if not(classes.is_a?(Hash)) and not(classes.is_a?(Array))
-		classes = []
-	end
-end
-
-# transform docker value if necessary
-docker = array_values_to_array_of_hashes(docker)
-
-# erase host information from puppet so that the user can do partial rebuilds
-snoop = ARGV.select { |x| !x.start_with?('-') }
-if snoop.length > 1 and snoop[0] == 'destroy'
-	snoop.shift	# left over array snoop should be list of hosts
-	if snoop.include?('puppet')	# doesn't matter then...
-		snoop = []
-	end
-else
-	# important! clear snoop because we're not using 'destroy'
-	snoop = []
-end
-
-# figure out which hosts are getting destroyed
-destroy = ARGV.select { |x| !x.start_with?('-') }
-if destroy.length > 0 and destroy[0] == 'destroy'
-	destroy.shift	# left over array destroy should be list of hosts or []
-	if destroy.length == 0
-		destroy = true	# destroy everything
-	end
-else
-	destroy = false		# destroy nothing
-end
-
-# figure out which hosts are getting provisioned
-provision = ARGV.select { |x| !x.start_with?('-') }
-if provision.length > 0 and ['up', 'provision'].include?(provision[0])
-	provision.shift	# left over array provision should be list of hosts or []
-	if provision.length == 0
-		provision = true	# provision everything
-	end
-else
-	provision = false		# provision nothing
-end
-
-# XXX: workaround for: https://github.com/mitchellh/vagrant/issues/2447
-# only run on 'vagrant init' or if it's the first time running vagrant
-if sync == 'nfs' and ((ARGV.length > 0 and ARGV[0] == 'init') or not(File.exist?(f)))
-	`sudo systemctl restart nfs-server`
-	`firewall-cmd --permanent --zone public --add-service mountd`
-	`firewall-cmd --permanent --zone public --add-service rpc-bind`
-	`firewall-cmd --permanent --zone public --add-service nfs`
-	`firewall-cmd --reload`
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
