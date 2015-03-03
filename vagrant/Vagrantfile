@@ -411,18 +411,33 @@ vms = extra.concat vms
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 
-# TODO: add ansible playbook support to extern
 if load_folder
-	basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
+	puppet_basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
+	# NOTE: i called the ansible child dir 'modules' because i didn't know
+	# what to call it. Suggestions welcome! It's not really 'playbooks' or
+	# 'roles' really, so it's 'modules' until something better comes along
+	ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
 else
-	basedir = File.join(projectdir, 'puppet/', 'modules/')
+	puppet_basedir = File.join(projectdir, 'puppet/', 'modules/')
+	ansible_basedir = File.join(projectdir, 'ansible/', 'modules/')
 end
-#puts basedir
-native = `cd "#{basedir}" && git ls-files`.strip.split("\n")	# native files
+
+native = []	# native files
+native += `cd "#{puppet_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{ansible_basedir}" && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
 		t = i.fetch('type', nil)
+		s = i.fetch('system', nil)	# puppet, ansible, and so on...
+		if s == 'puppet'
+			basedir = puppet_basedir
+		elsif s == 'ansible'
+			basedir = ansible_basedir
+		else
+			$stderr.puts "Can't process extern system #{s}."
+			next
+		end
 		if t == 'git'
 			repository = i.fetch('repository', nil)
 			if repository.start_with?('~/')
@@ -469,7 +484,7 @@ if extern.length > 0
 end
 
 # clean up any directories or files that shouldn't be present
-Dir.glob(basedir+'*').each do |i|
+(Dir.glob(puppet_basedir+'*')+Dir.glob(ansible_basedir+'*')).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
 		if really_use_rm
