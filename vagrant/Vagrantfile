@@ -73,6 +73,7 @@ extern = []			# default external module definitions
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
+ansible = []			# default ansible group list
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (defaults above)
 namespace = 'omv'		# default namespace (also used as network name)
@@ -161,6 +162,7 @@ if File.exist?(f)
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	docker = settings[:docker]
+	ansible = settings[:ansible]
 	cachier = settings[:cachier]
 	if settings[:vms].is_a?(Array)
 		vms = settings[:vms]
@@ -262,6 +264,16 @@ while skip < ARGV.length
 			end
 		end
 
+	elsif ARGV[skip].start_with?(arg='--vagrant-ansible=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.split(',').length > 0
+			ansible = v.split(',')
+		else
+			ansible = []
+		end
+
 	elsif ARGV[skip].start_with?(arg='--vagrant-cachier=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
@@ -353,6 +365,7 @@ settings = {
 	:puppet => puppet,
 	:classes => classes,
 	:docker => docker,
+	:ansible => ansible,
 	:cachier => cachier,
 	:vms => vms,
 	:namespace => namespace,
@@ -398,6 +411,7 @@ vms = extra.concat vms
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 
+# TODO: add ansible playbook support to extern
 if load_folder
 	basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
 else
@@ -573,6 +587,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		end
 	end
 
+	ansible_groups = {}
 	#
 	#	vms mainloop to define all the machines
 	#
@@ -586,6 +601,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_classes = x.fetch(:classes, classes)
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
+		vm_ansible = x.fetch(:ansible, ansible)	# get value
+		ansible_groups[h] = vm_ansible if vm_ansible != []
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -867,6 +884,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					libvirt.memory = 1024
 				end
 			end
+		end
+	end
+
+	#
+	#	ansible
+	#
+	if ansible_groups != {}
+		config.vm.provision 'ansible' do |ansible|
+			# FIXME: don't hardcode the playbook name
+			ansible.playbook = folder+'ansible/playbook.yml'
+			# reverse the mapping, so that the groups enumerate their hosts
+			ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
+
 		end
 	end
 
