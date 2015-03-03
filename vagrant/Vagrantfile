@@ -578,16 +578,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	range[3] = '__reserved_vip_addr'
 
 	#
-	#	set vms ips
+	#	set vms ips and do other pre-processing
 	#
+	ansible_groups = {}
 	vms.each_with_index do |x, i|
+		h = x[:name]
 		if not x.fetch(:ip, nil) # if vm ip was not set in omv.yaml...
 			x[:ip] = range[offset+i].to_s # ...generate it, and set vm ip
 			#vms[i][:ip] = range[offset+i].to_s	# equivalent!
 		end
+
+		# build ansible_groups variable now, because needed in big loop
+		vm_ansible = x.fetch(:ansible, ansible)	# get value
+		ansible_groups[h] = vm_ansible if vm_ansible != []
 	end
 
-	ansible_groups = {}
 	#
 	#	vms mainloop to define all the machines
 	#
@@ -601,8 +606,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_classes = x.fetch(:classes, classes)
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
-		vm_ansible = x.fetch(:ansible, ansible)	# get value
-		ansible_groups[h] = vm_ansible if vm_ansible != []
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -866,6 +869,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: 'service puppet stop'
 			end
 
+			#
+			#	ansible
+			#
+			if ansible_groups != {}
+				vm.vm.provision 'ansible' do |ansible|
+					# FIXME: don't hardcode the playbook name
+					ansible.playbook = folder+'ansible/playbook.yml'
+					# reverse the mapping, so that the groups enumerate their hosts
+					ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
+					ansible.host_key_checking = false
+				end
+			end
+
 			vm.vm.provider :libvirt do |libvirt|
 				# add additional disks to the os
 				#(1..disks).each do |j|	# if disks is 0, this passes :)
@@ -884,19 +900,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					libvirt.memory = 1024
 				end
 			end
-		end
-	end
-
-	#
-	#	ansible
-	#
-	if ansible_groups != {}
-		config.vm.provision 'ansible' do |ansible|
-			# FIXME: don't hardcode the playbook name
-			ansible.playbook = folder+'ansible/playbook.yml'
-			# reverse the mapping, so that the groups enumerate their hosts
-			ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
-			ansible.host_key_checking = false
 		end
 	end
 
