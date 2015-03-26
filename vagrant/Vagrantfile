@@ -32,7 +32,7 @@ require 'yaml'
 #
 # thanks to the gluster.org community for the public box hosting
 default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
-really_use_rm = false	# this causes the rm -rf to actually happen
+really_use_rm = false	# this causes the rm -rf to actually happen if set true
 
 #
 #	vms
@@ -175,6 +175,7 @@ if File.exist?(f)
 	password = settings[:password]
 	poolid = settings[:poolid]
 	repos = settings[:repos]
+	really_use_rm = settings[:reallyrm]
 end
 
 # ARGV parser
@@ -360,6 +361,17 @@ while skip < ARGV.length
 			end
 		end
 
+	elsif ARGV[skip].start_with?(arg='--vagrant-reallyrm=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		really_use_rm = v.to_s
+		if ['true'].include?(really_use_rm.downcase)
+			really_use_rm = true
+		else
+			really_use_rm = false
+		end
+
 	else	# skip over "official" vagrant args
 		skip = skip + 1
 	end
@@ -387,6 +399,7 @@ settings = {
 	:password => password,
 	:poolid => poolid,
 	:repos => repos,
+	:reallyrm => really_use_rm,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml
