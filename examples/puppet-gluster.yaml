@@ -1,0 +1,49 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: centos-6
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern:
+- type: git
+  system: puppet
+  repository: https://github.com/purpleidea/puppet-common
+  directory: common
+- type: git
+  system: puppet
+  repository: https://github.com/purpleidea/puppet-gluster
+  directory: gluster
+- type: git
+  system: puppet
+  repository: https://github.com/purpleidea/puppet-keepalived
+  directory: keepalived
+- type: git
+  system: puppet
+  repository: https://github.com/purpleidea/puppet-shorewall
+  directory: shorewall
+:puppet: true
+:classes:
+  '::gluster::simple':
+    replica: 2
+    volume:
+    - puppet
+    vrrp: true
+    vip: 192.168.123.3
+:docker: false
+:ansible: []
+:playbook: 
+:cachier: false
+:vms:
+- :name: client1
+  :classes:
+    module1:
+      arg1: val1
+      arg2: val2
+    module2: 
+:namespace: annex
+:count: 4
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
