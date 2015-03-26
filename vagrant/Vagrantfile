@@ -790,8 +790,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#	docker (in vm)
 			#
 			# TODO: do we need to start the docker daemon first ?
-			# FIXME: we can't do the importing of the images at the
-			# vm build time because we can't get the daemon to run!
+			# NOTE: this docker load from file isn't needed as much
+			# because vagrant-builder can now docker pull directly:
+			# done in git: b6bd325f3a23b25441050afdd8433457278819fd
 			if vm_docker.is_a?(Array)
 				vm_docker.each do |j|
 					# if there is a docker image already present, use that
