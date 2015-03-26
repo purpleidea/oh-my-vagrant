@@ -587,7 +587,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#
 	#	sync type
 	#
-	config.vm.synced_folder './', '/vagrant', type: sync	# nfs, rsync
+	disabled = false
+	if sync == ''
+		disabled = true
+	end
+	config.vm.synced_folder './', '/vagrant', disabled: disabled, type: sync	# nfs, rsync
 
 	#
 	#	cache
