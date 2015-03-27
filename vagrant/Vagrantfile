@@ -810,6 +810,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			# because vagrant-builder can now docker pull directly:
 			# done in git: b6bd325f3a23b25441050afdd8433457278819fd
 			if vm_docker.is_a?(Array)
+				vm.vm.provision 'shell', inline: 'systemctl start docker'
 				vm_docker.each do |j|
 					# if there is a docker image already present, use that
 					# otherwise pull one down...
@@ -817,6 +818,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 			elsif vm_docker
+				vm.vm.provision 'shell', inline: 'systemctl start docker'
 				# pull in all the docker images that the vm has
 				vm.vm.provision 'shell', inline: 'for i in /root/docker/*.docker; do [ -e "$i" ] || continue; docker load --input="$i"; done'
 			end
