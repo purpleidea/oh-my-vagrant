@@ -582,6 +582,9 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
+	# workaround vagrant 1.7.2 insecure key change
+	config.ssh.insert_key = false
+
 	#config.landrush.enable	# TODO ?
 
 	#
