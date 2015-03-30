@@ -670,7 +670,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			:ip => ip,
 			:libvirt__dhcp_enabled => false,
 			:libvirt__network_name => "#{namespace}"
-                        :virtualbox__intnet => "#{namespace}"
+			:virtualbox__intnet => "#{namespace}"
 
 			#
 			#	box (pre-built base image)
@@ -979,8 +979,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#	virtualbox
 	#
 	config.vm.provider :virtualbox do |vb|
-                # ref params: http://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm
-                vb.customize ["modifyvm", :id, "--hwvirtex", "on"]  # needed for kvm performance benefits !
+		# ref params: http://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm
+		vb.customize ["modifyvm", :id, "--hwvirtex", "on"]  # needed for kvm performance benefits !
+		# TODO: Find corresponding params in Virtual Box
 		# libvirt.connect_via_ssh = false
 		# libvirt.username = 'root'
 		# libvirt.storage_pool_name = 'default'
