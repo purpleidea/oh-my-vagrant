@@ -32,6 +32,8 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * my [puppet-yum](https://github.com/purpleidea/puppet-yum) module (optional, built-in)
 * pandoc (for building a pdf of the documentation)
 
+Note: If you are using Virtual-box as hypervisor, there is no need dependency on vagrant-libvirt.
+
 ## Patches:
 This code may be a work in progress. The interfaces may change without notice.
 Patches are welcome, but please be patient. They are best received by email.
