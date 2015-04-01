@@ -502,14 +502,17 @@ if load_folder
 	# what to call it. Suggestions welcome! It's not really 'playbooks' or
 	# 'roles' really, so it's 'modules' until something better comes along
 	ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
+	docker_basedir = File.join(projectdir, folder, 'docker/')
 else
 	puppet_basedir = File.join(projectdir, 'puppet/', 'modules/')
 	ansible_basedir = File.join(projectdir, 'ansible/', 'modules/')
+	docker_basedir = File.join(projectdir, 'docker/')
 end
 
 native = []	# native files
 native += `cd "#{puppet_basedir}" && git ls-files`.strip.split("\n")
 native += `cd "#{ansible_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{docker_basedir}" && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
@@ -519,6 +522,8 @@ if extern.length > 0
 			basedir = puppet_basedir
 		elsif s == 'ansible'
 			basedir = ansible_basedir
+		elsif s == 'docker'
+			basedir = docker_basedir
 		else
 			$stderr.puts "Can't process extern system: '#{s}'."
 			next
@@ -569,7 +574,7 @@ if extern.length > 0
 end
 
 # clean up any directories or files that shouldn't be present
-(Dir.glob(puppet_basedir+'*')+Dir.glob(ansible_basedir+'*')).uniq.each do |i|
+(Dir.glob(puppet_basedir+'*')+Dir.glob(ansible_basedir+'*')+Dir.glob(docker_basedir+'*')).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
 		if really_use_rm
@@ -828,18 +833,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision :docker, images: vm_docker.map { |y| y.fetch(:name, nil)}.compact
 			end
 
-			if vm_docker.is_a?(Array)
-				vm_docker.each do |y|
-					vm.vm.provision :docker do |d|
-						# XXX y is now a hash to be used here...
+			# docker build
+			if vm_docker	# for any value that is not false
+				Dir.glob(docker_basedir+'*').each do |dd|
+					if not File.directory?(dd)
+						next	# invalid, skip
 					end
-				end
-
-			elsif vm_docker
-				vm.vm.provision :docker do |d|
-					# XXX
-					#d.build_image '/vagrant/app'	# XXX: add a synced folder...
-					#d.run 'foo'	XXX
+					# full Dockerfile path
+					df = File.join(dd, 'Dockerfile')
+					if not(File.exists?(df)) or File.directory?(df)
+						next	# invalid, skip
+					end
+					# app directory name containing Dockerfile
+					b = File.basename(dd)
+					vm.vm.provision :docker do |d|
+						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
+						d.build_image "/vagrant/docker/#{b}", args: "-t #{b}"
+						#d.run "#{b}"	# use kube instead
+					end
 				end
 			end
 
