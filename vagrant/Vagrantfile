@@ -520,7 +520,7 @@ if extern.length > 0
 		elsif s == 'ansible'
 			basedir = ansible_basedir
 		else
-			$stderr.puts "Can't process extern system #{s}."
+			$stderr.puts "Can't process extern system: '#{s}'."
 			next
 		end
 		if t == 'git'
@@ -563,7 +563,7 @@ if extern.length > 0
 			end
 			native.push("#{directory}")
 		else
-			$stderr.puts "Can't process extern type #{t}."
+			$stderr.puts "Can't process extern type: '#{t}'."
 		end
 	end
 end
