@@ -26,6 +26,9 @@ VAGRANTFILE_API_VERSION = '2'
 
 require 'ipaddr'
 require 'yaml'
+require 'erb'
+require 'ostruct'
+require 'base64'
 
 #
 #	globals
@@ -73,6 +76,7 @@ extern = []			# default external module definitions
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
+kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
 playbook = []			# default ansible playbook
 cachier = false			# default cachier usage
@@ -95,6 +99,17 @@ def array_values_to_array_of_hashes(l)
 	end
 	return result
 end
+
+# useful for unindenting heredoc's
+class String
+	def unindent
+		gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, '')
+	end
+end
+# eg:
+#test = <<-EOT.unindent
+#	42
+#EOT
 
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
 
@@ -163,6 +178,7 @@ if File.exist?(f)
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	docker = settings[:docker]
+	kubernetes = settings [:kubernetes]
 	ansible = settings[:ansible]
 	playbook = settings[:playbook]
 	cachier = settings[:cachier]
@@ -265,6 +281,17 @@ while skip < ARGV.length
 			else
 				docker = false
 			end
+		end
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-kubernetes=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		kubernetes = v.to_s		# set kubernetes flag
+		if ['true', 'yes'].include?(kubernetes.downcase)
+			kubernetes = true
+		else
+			kubernetes = false
 		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-ansible=')
@@ -389,6 +416,7 @@ settings = {
 	:puppet => puppet,
 	:classes => classes,
 	:docker => docker,
+	:kubernetes => kubernetes,
 	:ansible => ansible,
 	:playbook => playbook,
 	:cachier => cachier,
@@ -503,16 +531,22 @@ if load_folder
 	# 'roles' really, so it's 'modules' until something better comes along
 	ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
 	docker_basedir = File.join(projectdir, folder, 'docker/')
+	kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
+	ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
 else
 	puppet_basedir = File.join(projectdir, 'puppet/', 'modules/')
 	ansible_basedir = File.join(projectdir, 'ansible/', 'modules/')
 	docker_basedir = File.join(projectdir, 'docker/')
+	kubernetes_basedir = File.join(projectdir, 'kubernetes/', 'applications/')
+	ktemplates_basedir = File.join(projectdir, 'kubernetes/', 'templates/')
 end
 
 native = []	# native files
 native += `cd "#{puppet_basedir}" && git ls-files`.strip.split("\n")
 native += `cd "#{ansible_basedir}" && git ls-files`.strip.split("\n")
 native += `cd "#{docker_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{kubernetes_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{ktemplates_basedir}" && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
@@ -524,6 +558,10 @@ if extern.length > 0
 			basedir = ansible_basedir
 		elsif s == 'docker'
 			basedir = docker_basedir
+		elsif s == 'kubernetes'
+			basedir = kubernetes_basedir
+		elsif s == 'ktemplates'
+			basedir = ktemplates_basedir
 		else
 			$stderr.puts "Can't process extern system: '#{s}'."
 			next
@@ -574,7 +612,13 @@ if extern.length > 0
 end
 
 # clean up any directories or files that shouldn't be present
-(Dir.glob(puppet_basedir+'*')+Dir.glob(ansible_basedir+'*')+Dir.glob(docker_basedir+'*')).uniq.each do |i|
+(
+	Dir.glob(puppet_basedir+'*') +
+	Dir.glob(ansible_basedir+'*') +
+	Dir.glob(docker_basedir+'*') +
+	Dir.glob(kubernetes_basedir+'*') +
+	Dir.glob(ktemplates_basedir+'*') +
+[]).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
 		if really_use_rm
@@ -631,6 +675,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#	set vms ips and do other pre-processing
 	#
 	ansible_groups = {}
+	kubernetes_master = false	# TODO: in future allow an array of masters ?
+	kubernetes_hosts = []	# list of every participating kubernetes host
+	kubernetes_templates = ''
+	kubernetes_json = []
 	vms.each_with_index do |x, i|
 		h = x[:name]
 		if not x.fetch(:ip, nil) # if vm ip was not set in omv.yaml...
@@ -638,10 +686,46 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#vms[i][:ip] = range[offset+i].to_s	# equivalent!
 		end
 
+		# kubernetes
+		vm_kubernetes = x.fetch(:kubernetes, kubernetes)	# get value
+		if kubernetes.is_a?(Hash) and vm_kubernetes.is_a?(Hash)
+			vm_kubernetes = kubernetes.merge(vm_kubernetes)	# inherit from global
+		end
+		if vm_kubernetes
+			kubernetes_hosts.push(h)
+		end
+
 		# build ansible_groups variable now, because needed in big loop
 		vm_ansible = x.fetch(:ansible, ansible)	# get value
 		ansible_groups[h] = vm_ansible if vm_ansible != []
 	end
+	if kubernetes_hosts.length > 0
+		kubernetes_master = kubernetes_hosts[0]	# default to first host
+		if kubernetes.is_a?(Hash)
+			# a master key can set which kubernetes host is the master one!
+			tmp = kubernetes.fetch('master', nil)
+			if kubernetes_hosts.include?(tmp)
+				kubernetes_master = tmp
+			end
+
+			# kubernetes templates base path inside repo, eg: v0.9.0
+			tmp = kubernetes.fetch('ktemplates', 'default/latest/')	# pick!
+			if tmp.is_a?(String)
+				tmp = File.join(ktemplates_basedir, tmp)
+				if File.exists?(tmp)
+					kubernetes_templates = tmp
+				end
+			end
+
+			# json definition file
+			kubernetes_json = kubernetes.fetch('applications', [])	# pick!
+			if not kubernetes_json.is_a?(Array)
+				kubernetes_json = []
+			end
+		end
+	end
+	#$stderr.puts "Kubernetes master: #{kubernetes_master}"
+	#$stderr.puts "Kubernetes others: #{kubernetes_hosts.join(',')}"
 
 	#
 	#	vms mainloop to define all the machines
@@ -851,6 +935,129 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
 						d.build_image "/vagrant/docker/#{b}", args: "-t #{b}"
 						#d.run "#{b}"	# use kube instead
+					end
+				end
+			end
+
+			#
+			#	kubernetes
+			#
+			# NOTE: one could rewrite this kubernetes portion as a
+			# vagrant plugin, but until this idea is more baked, i
+			# think this is a perfectly fine place to hack this in
+
+			# if we have a master host and if i am an allowed host
+			if kubernetes_master and kubernetes_hosts.include?(h)
+
+				# TODO: add support for non yum-based distros
+				vm.vm.provision 'shell', inline: 'which kubectl || yum install -y kubernetes'
+
+				# templates are in the kubernetes_templates dir
+				ktemplates_host = ((kubernetes_master == h) ? 'master' : 'minion')
+				ktemplates = {}
+				Dir.glob(File.join(kubernetes_templates, "#{ktemplates_host}/")+'*').each do |ktemplate|
+					kbdir = File.basename(ktemplate)
+					ktemplates[kbdir] = open(ktemplate, 'r') {|f| f.read}
+				end
+
+				kubernetes_ostruct = OpenStruct.new({
+					:master => kubernetes_master,
+					:hosts => kubernetes_hosts,
+					:diff => (kubernetes_hosts - [kubernetes_master]),
+					:me => h,
+				})
+
+				ktemplates.each do |kpath, template|
+					if kpath.end_with?('.erb')
+						kpath = File.join('/etc/kubernetes/', kpath[0, kpath.length-'.erb'.length])
+						value = ERB.new(template).result(kubernetes_ostruct.instance_eval {binding})
+						b64 = Base64.encode64(value)
+					else
+						# copy data, don't template it!
+						kpath = File.join('/etc/kubernetes/', kpath)
+						value = template	# str
+						b64 = Base64.encode64(value)
+					end
+					# FIXME: add a diff check so this doesn't clobber unnecessarily
+					vm.vm.provision 'shell' do |s|
+						s.inline = "echo '#{b64}' | base64 -d > '#{kpath}'"
+					end
+				end
+
+				# systemctl changes for kubernetes
+				if kubernetes_master == h	# master
+					services = ['etcd', 'kube-apiserver', 'kube-controller-manager', 'kube-scheduler']
+				else
+					# a dirty auth hack that scollier wants
+					vm.vm.provision 'shell', inline: 'echo "{}" > /var/lib/kubelet/auth'
+					services = ['kube-proxy', 'kubelet']
+				end
+				services.each do |service|
+					# a restart causes a start if stopped :)
+					vm.vm.provision 'shell', inline: "systemctl restart #{service}"
+					vm.vm.provision 'shell', inline: "systemctl enable #{service}"
+				end
+
+				# scollier and purpleidea decided against
+				# templating the kubernetes json files...
+				# run from an application/ dir instead :)
+				if kubernetes_master == h	# master
+					kubernetes_json.each do |jsonfile|
+						roll = false
+						if jsonfile.is_a?(Hash)
+							roll = jsonfile.fetch('roll', false)
+							roll = (['true', 'yes'].include?(roll.downcase) ? true : false)
+							jsonfile = jsonfile.fetch('file', '')
+
+							if jsonfile == ''
+								$stderr.puts "Warning: Kubernetes application list element is an invalid hash!"
+								next
+							end
+						end
+
+						if not File.exists?(File.join(kubernetes_basedir, jsonfile))
+							$stderr.puts "Warning: Kubernetes .json file: '#{jsonfile}' doesn't exist!"
+							next
+						end
+
+						# get path to json file inside vm...
+						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
+						jsonfile = File.join('/vagrant/kubernetes/applications/', jsonfile)
+						$script = <<-SCRIPT.unindent
+							# the sed strips off the quotes from the python string output
+							# unescaped sed is: sed 's/\(^"\|"$\)//g'
+							kind="`cat '#{jsonfile}' | python -c 'import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)["kind"]))' | sed 's/\\(^"\\|"$\\)//g'`"
+							kid="`cat '#{jsonfile}' | python -c 'import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)["id"]))' | sed 's/\\(^"\\|"$\\)//g'`"
+							roll='false'
+							case "$kind" in
+							'ReplicationController')
+								# remap to command arg name
+								kind='replicationControllers'
+								roll='#{roll}'
+							;;
+							'Service')
+							;;
+							'Pod')
+							;;
+							*)
+							echo "Kubernetes kind: '$kind' not yet supported in Oh-My-Vagrant."
+							;;
+							esac
+							if [ "`kubectl get $kind | tail -n +2 | awk '{print $1}'`" = "$kid" ]; then
+								# exists...
+								# TODO: can we roll like this?
+								if [ "$roll" = 'true' ]; then
+									kubectl rollingupdate "$kid" -f '#{jsonfile}'
+								else
+									# update from existing json file...
+									kubectl update -f '#{jsonfile}'
+								fi
+							else
+								# new
+								kubectl create -f '#{jsonfile}'
+							fi
+						SCRIPT
+						config.vm.provision 'shell', inline: $script
 					end
 				end
 			end

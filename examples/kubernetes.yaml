@@ -1,0 +1,37 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: centos-7.0-docker
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern:
+- type: git
+  system: kubernetes
+  repository: ~/code/kubernetes-simple1
+  directory: fakeapp1
+- type: git
+  system: kubernetes
+  repository: ~/code/kubernetes-simple2
+  directory: fakeapp2
+:puppet: false
+:classes: []
+:docker: []
+:kubernetes:
+  master: omv0
+  applications:
+  - fakeapp1/foo1.json
+  - file: fakeapp1/foo2.json
+    roll: 'true'
+  - fakeapp2/foo.json
+:ansible: []
+:playbook: []
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 3
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:reallyrm: false
