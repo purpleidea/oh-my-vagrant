@@ -26,6 +26,9 @@ VAGRANTFILE_API_VERSION = '2'
 
 require 'ipaddr'
 require 'yaml'
+require 'erb'
+require 'ostruct'
+require 'base64'
 
 #
 #	globals
@@ -73,6 +76,7 @@ extern = []			# default external module definitions
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
+kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
 playbook = []			# default ansible playbook
 cachier = false			# default cachier usage
@@ -94,6 +98,12 @@ def array_values_to_array_of_hashes(l)
 		end
 	end
 	return result
+end
+
+class String
+	def unindent
+		gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, '')
+	end
 end
 
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
@@ -163,6 +173,7 @@ if File.exist?(f)
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	docker = settings[:docker]
+	kubernetes = settings [:kubernetes]
 	ansible = settings[:ansible]
 	playbook = settings[:playbook]
 	cachier = settings[:cachier]
@@ -265,6 +276,17 @@ while skip < ARGV.length
 			else
 				docker = false
 			end
+		end
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-kubernetes=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		kubernetes = v.to_s		# set kubernetes flag
+		if ['true', 'yes'].include?(kubernetes.downcase)
+			kubernetes = true
+		else
+			kubernetes = false
 		end
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-ansible=')
@@ -389,6 +411,7 @@ settings = {
 	:puppet => puppet,
 	:classes => classes,
 	:docker => docker,
+	:kubernetes => kubernetes,
 	:ansible => ansible,
 	:playbook => playbook,
 	:cachier => cachier,
@@ -631,6 +654,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#	set vms ips and do other pre-processing
 	#
 	ansible_groups = {}
+	kubernetes_master = false	# TODO: in future allow an array of masters ?
+	kubernetes_hosts = []	# list of every participating kubernetes host
 	vms.each_with_index do |x, i|
 		h = x[:name]
 		if not x.fetch(:ip, nil) # if vm ip was not set in omv.yaml...
@@ -638,10 +663,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#vms[i][:ip] = range[offset+i].to_s	# equivalent!
 		end
 
+		# kubernetes
+		vm_kubernetes = x.fetch(:kubernetes, kubernetes)	# get value
+		if kubernetes.is_a?(Hash) and vm_kubernetes.is_a?(Hash)
+			vm_kubernetes = kubernetes.merge(vm_kubernetes)	# inherit from global
+		end
+		if vm_kubernetes
+			kubernetes_hosts.push(h)
+		end
+
 		# build ansible_groups variable now, because needed in big loop
 		vm_ansible = x.fetch(:ansible, ansible)	# get value
 		ansible_groups[h] = vm_ansible if vm_ansible != []
 	end
+	if kubernetes_hosts.length > 0
+		kubernetes_master = kubernetes_hosts[0]	# default to first host
+		# a master key can set which kubernetes host is the master one!
+		tmp = (kubernetes.is_a?(Hash) ? kubernetes.fetch('master', nil) : nil)
+		if kubernetes_hosts.include?(tmp)
+			kubernetes_master = tmp
+		end
+	end
+	#$stderr.puts "Kubernetes master: #{kubernetes_master}"
+	#$stderr.puts "Kubernetes others: #{kubernetes_hosts.join(',')}"
 
 	#
 	#	vms mainloop to define all the machines
@@ -853,6 +897,64 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						#d.run "#{b}"	# use kube instead
 					end
 				end
+			end
+
+			#
+			#	kubernetes
+			#
+			# NOTE: one could rewrite this kubernetes portion as a
+			# vagrant plugin, but until this idea is more baked, i
+			# think this is a perfectly fine place to hack this in
+
+			# as long as we have one master exists and i am a host
+			if kubernetes_master and kubernetes_hosts.include?(h)
+
+				# TODO: add support for non yum-based distros
+				vm.vm.provision 'shell', inline: 'which kubectl || yum install -y kubernetes'
+
+				if kubernetes_master == h	# master
+					# XXX
+					kubernetes_template_test = <<-EOT.unindent
+						<%= 42 %>
+						diff: <%= diff.join(",") %>
+					EOT
+					kubernetes_templates = {
+						# XXX
+						'test' => kubernetes_template_test,
+						#'config' => '<%= 42 %>',
+						#'controller-manager' => 'heyscollier',
+						#'apiserver' => 'diff: <%= diff.join(",") %>',
+						#'template' => open(projectdir...+'template.erb', 'r') {|f| f.read},
+					}
+				else				# minion
+					kubernetes_templates = {
+						# XXX
+						#'apiserver' => 'TODO',
+					}
+				end
+
+				kubernetes_ostruct = OpenStruct.new({
+					:master => kubernetes_master,
+					:hosts => kubernetes_hosts,
+					:diff => (kubernetes_hosts - [kubernetes_master]),
+					#:me => h	# TODO ?
+				})
+
+				kubernetes_templates.each do |kpath, template|
+					kpath = File.join('/etc/kubernetes/', kpath)
+					value = ERB.new(template).result(kubernetes_ostruct.instance_eval {binding})
+					b64 = Base64.encode64(value)
+					# FIXME: add a diff check so this doesn't clobber unnecessarily
+					vm.vm.provision 'shell' do |s|
+						s.inline = "echo '#{b64}' | base64 -d > '#{kpath}'"
+					end
+				end
+
+				# XXX: systemctl changes for kubernetes
+				#vm.vm.provision 'shell', inline: 'systemctl start XXX'
+
+				# XXX: template the kube .json file...
+				# XXX: potentially switch the replication controllers automatically to failover to new version of app...
 			end
 
 			#
