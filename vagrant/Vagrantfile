@@ -100,11 +100,16 @@ def array_values_to_array_of_hashes(l)
 	return result
 end
 
+# useful for unindenting heredoc's
 class String
 	def unindent
 		gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, '')
 	end
 end
+# eg:
+#test = <<-EOT.unindent
+#	42
+#EOT
 
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
 
@@ -526,16 +531,22 @@ if load_folder
 	# 'roles' really, so it's 'modules' until something better comes along
 	ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
 	docker_basedir = File.join(projectdir, folder, 'docker/')
+	kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
+	ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
 else
 	puppet_basedir = File.join(projectdir, 'puppet/', 'modules/')
 	ansible_basedir = File.join(projectdir, 'ansible/', 'modules/')
 	docker_basedir = File.join(projectdir, 'docker/')
+	kubernetes_basedir = File.join(projectdir, 'kubernetes/', 'applications/')
+	ktemplates_basedir = File.join(projectdir, 'kubernetes/', 'templates/')
 end
 
 native = []	# native files
 native += `cd "#{puppet_basedir}" && git ls-files`.strip.split("\n")
 native += `cd "#{ansible_basedir}" && git ls-files`.strip.split("\n")
 native += `cd "#{docker_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{kubernetes_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{ktemplates_basedir}" && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
@@ -547,6 +558,10 @@ if extern.length > 0
 			basedir = ansible_basedir
 		elsif s == 'docker'
 			basedir = docker_basedir
+		elsif s == 'kubernetes'
+			basedir = kubernetes_basedir
+		elsif s == 'ktemplates'
+			basedir = ktemplates_basedir
 		else
 			$stderr.puts "Can't process extern system: '#{s}'."
 			next
@@ -597,7 +612,13 @@ if extern.length > 0
 end
 
 # clean up any directories or files that shouldn't be present
-(Dir.glob(puppet_basedir+'*')+Dir.glob(ansible_basedir+'*')+Dir.glob(docker_basedir+'*')).uniq.each do |i|
+(
+	Dir.glob(puppet_basedir+'*') +
+	Dir.glob(ansible_basedir+'*') +
+	Dir.glob(docker_basedir+'*') +
+	Dir.glob(kubernetes_basedir+'*') +
+	Dir.glob(ktemplates_basedir+'*') +
+[]).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
 		if really_use_rm
@@ -656,6 +677,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	ansible_groups = {}
 	kubernetes_master = false	# TODO: in future allow an array of masters ?
 	kubernetes_hosts = []	# list of every participating kubernetes host
+	kubernetes_templates = ''
+	kubernetes_json = []
 	vms.each_with_index do |x, i|
 		h = x[:name]
 		if not x.fetch(:ip, nil) # if vm ip was not set in omv.yaml...
@@ -678,10 +701,27 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 	if kubernetes_hosts.length > 0
 		kubernetes_master = kubernetes_hosts[0]	# default to first host
-		# a master key can set which kubernetes host is the master one!
-		tmp = (kubernetes.is_a?(Hash) ? kubernetes.fetch('master', nil) : nil)
-		if kubernetes_hosts.include?(tmp)
-			kubernetes_master = tmp
+		if kubernetes.is_a?(Hash)
+			# a master key can set which kubernetes host is the master one!
+			tmp = kubernetes.fetch('master', nil)
+			if kubernetes_hosts.include?(tmp)
+				kubernetes_master = tmp
+			end
+
+			# kubernetes templates base path inside repo, eg: v0.9.0
+			tmp = kubernetes.fetch('ktemplates', nil)	# pick!
+			if tmp.is_a?(String)
+				tmp = File.join(ktemplates_basedir, tmp)
+				if File.exists?(tmp)
+					kubernetes_templates = tmp
+				end
+			end
+
+			# json definition file
+			kubernetes_json = kubernetes.fetch('applications', [])	# pick!
+			if not kubernetes_json.is_a?(Array)
+				kubernetes_json = []
+			end
 		end
 	end
 	#$stderr.puts "Kubernetes master: #{kubernetes_master}"
@@ -906,55 +946,84 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			# vagrant plugin, but until this idea is more baked, i
 			# think this is a perfectly fine place to hack this in
 
-			# as long as we have one master exists and i am a host
+			# if we have a master host and if i am an allowed host
 			if kubernetes_master and kubernetes_hosts.include?(h)
 
 				# TODO: add support for non yum-based distros
 				vm.vm.provision 'shell', inline: 'which kubectl || yum install -y kubernetes'
 
-				if kubernetes_master == h	# master
-					# XXX
-					kubernetes_template_test = <<-EOT.unindent
-						<%= 42 %>
-						diff: <%= diff.join(",") %>
-					EOT
-					kubernetes_templates = {
-						# XXX
-						'test' => kubernetes_template_test,
-						#'config' => '<%= 42 %>',
-						#'controller-manager' => 'heyscollier',
-						#'apiserver' => 'diff: <%= diff.join(",") %>',
-						#'template' => open(projectdir...+'template.erb', 'r') {|f| f.read},
-					}
-				else				# minion
-					kubernetes_templates = {
-						# XXX
-						#'apiserver' => 'TODO',
-					}
+				# templates are in the kubernetes_templates dir
+				ktemplates_host = ((kubernetes_master == h) ? 'master' : 'minion')
+				ktemplates = {}
+				Dir.glob(File.join(kubernetes_templates, "#{ktemplates_host}/")+'*').each do |ktemplate|
+					kbdir = File.basename(ktemplate)
+					ktemplates[kbdir] = open(ktemplate, 'r') {|f| f.read}
 				end
 
 				kubernetes_ostruct = OpenStruct.new({
 					:master => kubernetes_master,
 					:hosts => kubernetes_hosts,
 					:diff => (kubernetes_hosts - [kubernetes_master]),
-					#:me => h	# TODO ?
+					:me => h,
 				})
 
-				kubernetes_templates.each do |kpath, template|
-					kpath = File.join('/etc/kubernetes/', kpath)
-					value = ERB.new(template).result(kubernetes_ostruct.instance_eval {binding})
-					b64 = Base64.encode64(value)
+				ktemplates.each do |kpath, template|
+					if kpath.end_with?('.erb')
+						kpath = File.join('/etc/kubernetes/', kpath[0, kpath.length-'.erb'.length])
+						value = ERB.new(template).result(kubernetes_ostruct.instance_eval {binding})
+						b64 = Base64.encode64(value)
+					else
+						# copy data, don't template it!
+						kpath = File.join('/etc/kubernetes/', kpath)
+						value = template	# str
+						b64 = Base64.encode64(value)
+					end
 					# FIXME: add a diff check so this doesn't clobber unnecessarily
 					vm.vm.provision 'shell' do |s|
 						s.inline = "echo '#{b64}' | base64 -d > '#{kpath}'"
 					end
 				end
 
-				# XXX: systemctl changes for kubernetes
-				#vm.vm.provision 'shell', inline: 'systemctl start XXX'
+				# systemctl changes for kubernetes
+				if kubernetes_master == h	# master
+					services = ['etcd', 'kube-apiserver', 'kube-controller-manager', 'kube-scheduler']
+					services.each do |service|
+						vm.vm.provision 'shell', inline: "systemctl start #{service}"
+						vm.vm.provision 'shell', inline: "systemctl enable #{service}"
+					end
+				else
+					# a dirty auth hack that scollier wants
+					vm.vm.provision 'shell', inline: 'echo "{}" > /var/lib/kubelet/auth'
 
-				# XXX: template the kube .json file...
-				# XXX: potentially switch the replication controllers automatically to failover to new version of app...
+					services = ['kube-proxy', 'kubelet']
+					services.each do |service|
+						vm.vm.provision 'shell', inline: "systemctl start #{service}"
+						vm.vm.provision 'shell', inline: "systemctl enable #{service}"
+					end
+				end
+
+				# scollier and purpleidea decided against
+				# templating the kubernetes json files...
+				# run from an application/ dir instead :)
+				if kubernetes_master == h	# master
+					kubernetes_json.each do |jsonfile|
+
+						if not File.exists?(File.join(kubernetes_basedir, jsonfile))
+							$stderr.puts "Warning: Kubernetes .json file: '#{jsonfile}' doesn't exist!"
+							next
+						end
+
+						# get path to json file inside vm...
+						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
+						jsonfile = File.join('/vagrant/kubernetes/applications/', jsonfile)
+						# XXX: only do this if none exist already...
+						#vm.vm.provision 'shell', inline: "kubectl create -f #{jsonfile}"
+						# XXX: if this exists, upload a new one and you can
+						# XXX: potentially switch the replication controllers
+						# automatically to failover to new version of app...
+						# XXX: see if different than the existing one uploaded before...
+					end
+				end
 			end
 
 			#
