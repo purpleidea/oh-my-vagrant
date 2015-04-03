@@ -709,7 +709,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			# kubernetes templates base path inside repo, eg: v0.9.0
-			tmp = kubernetes.fetch('ktemplates', nil)	# pick!
+			tmp = kubernetes.fetch('ktemplates', 'default/latest/')	# pick!
 			if tmp.is_a?(String)
 				tmp = File.join(ktemplates_basedir, tmp)
 				if File.exists?(tmp)

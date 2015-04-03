@@ -16,3 +16,6 @@
 [submodule "vagrant/xdg"]
 	path = vagrant/gems/xdg
 	url = https://github.com/rubyworks/xdg
+[submodule "vagrant/kubernetes/templates/default"]
+	path = vagrant/kubernetes/templates/default
+	url = https://github.com/purpleidea/omv-ktemplates
