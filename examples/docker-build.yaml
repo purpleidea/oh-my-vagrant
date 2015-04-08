@@ -8,8 +8,8 @@
 :extern:
 - type: git
   system: docker
-  repository: https://github.com/purpleidea/docker-fakeapp1
-  directory: app1
+  repository: https://github.com/purpleidea/docker-simple1
+  directory: simple-app1
 :puppet: false
 :classes: []
 :docker: []
