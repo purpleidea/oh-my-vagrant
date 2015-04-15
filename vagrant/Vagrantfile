@@ -987,19 +987,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				# systemctl changes for kubernetes
 				if kubernetes_master == h	# master
 					services = ['etcd', 'kube-apiserver', 'kube-controller-manager', 'kube-scheduler']
-					services.each do |service|
-						vm.vm.provision 'shell', inline: "systemctl start #{service}"
-						vm.vm.provision 'shell', inline: "systemctl enable #{service}"
-					end
 				else
 					# a dirty auth hack that scollier wants
 					vm.vm.provision 'shell', inline: 'echo "{}" > /var/lib/kubelet/auth'
-
 					services = ['kube-proxy', 'kubelet']
-					services.each do |service|
-						vm.vm.provision 'shell', inline: "systemctl start #{service}"
-						vm.vm.provision 'shell', inline: "systemctl enable #{service}"
-					end
+				end
+				services.each do |service|
+					# a restart causes a start if stopped :)
+					vm.vm.provision 'shell', inline: "systemctl restart #{service}"
+					vm.vm.provision 'shell', inline: "systemctl enable #{service}"
 				end
 
 				# scollier and purpleidea decided against
@@ -1007,6 +1003,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				# run from an application/ dir instead :)
 				if kubernetes_master == h	# master
 					kubernetes_json.each do |jsonfile|
+						roll = false
+						if jsonfile.is_a?(Hash)
+							roll = jsonfile.fetch('roll', false)
+							roll = (['true', 'yes'].include?(roll.downcase) ? true : false)
+							jsonfile = jsonfile.fetch('file', '')
+
+							if jsonfile == ''
+								$stderr.puts "Warning: Kubernetes application list element is an invalid hash!"
+								next
+							end
+						end
 
 						if not File.exists?(File.join(kubernetes_basedir, jsonfile))
 							$stderr.puts "Warning: Kubernetes .json file: '#{jsonfile}' doesn't exist!"
@@ -1016,12 +1023,41 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# get path to json file inside vm...
 						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
 						jsonfile = File.join('/vagrant/kubernetes/applications/', jsonfile)
-						# XXX: only do this if none exist already...
-						#vm.vm.provision 'shell', inline: "kubectl create -f #{jsonfile}"
-						# XXX: if this exists, upload a new one and you can
-						# XXX: potentially switch the replication controllers
-						# automatically to failover to new version of app...
-						# XXX: see if different than the existing one uploaded before...
+						$script = <<-SCRIPT.unindent
+							# the sed strips off the quotes from the python string output
+							# unescaped sed is: sed 's/\(^"\|"$\)//g'
+							kind="`cat '#{jsonfile}' | python -c 'import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)["kind"]))' | sed 's/\\(^"\\|"$\\)//g'`"
+							kid="`cat '#{jsonfile}' | python -c 'import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)["id"]))' | sed 's/\\(^"\\|"$\\)//g'`"
+							roll='false'
+							case "$kind" in
+							'ReplicationController')
+								# remap to command arg name
+								kind='replicationControllers'
+								roll='#{roll}'
+							;;
+							'Service')
+							;;
+							'Pod')
+							;;
+							*)
+							echo "Kubernetes kind: '$kind' not yet supported in Oh-My-Vagrant."
+							;;
+							esac
+							if [ "`kubectl get $kind | tail -n +2 | awk '{print $1}'`" = "$kid" ]; then
+								# exists...
+								# TODO: can we roll like this?
+								if [ "$roll" = 'true' ]; then
+									kubectl rollingupdate "$kid" -f '#{jsonfile}'
+								else
+									# update from existing json file...
+									kubectl update -f '#{jsonfile}'
+								fi
+							else
+								# new
+								kubectl create -f '#{jsonfile}'
+							fi
+						SCRIPT
+						config.vm.provision 'shell', inline: $script
 					end
 				end
 			end
