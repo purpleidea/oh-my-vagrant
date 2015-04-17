@@ -18,9 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO: the /etc/hosts DNS setup is less than ideal, but I didn't implement
-# anything better yet. Please feel free to suggest something else!
-
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = '2'
 
@@ -671,6 +668,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	range[3] = '__reserved_vip_addr'
 
 	#
+	#	hostmanager
+	#
+	# TODO: does this plugin still mess up the real vagrant-libvirt hostname ?
+	config.hostmanager.enabled = true
+	config.hostmanager.manage_host = false	# don't manage local /etc/hosts
+	config.hostmanager.ignore_private_ip = false
+	config.hostmanager.include_offline = true	# manage all the hosts!
+	config.hostmanager.fqdn_friendly = true		# fqdns need to work...
+	config.hostmanager.domain_name = domain		# use this domain name!
+	config.hostmanager.extra_hosts = [
+		{
+			:host => "#{vip_hostname}.#{domain}",
+			:ip => "#{vip_ip}",
+			:aliases => ["#{vip_hostname}"],
+		}
+	]
+
+	#
 	#	set vms ips and do other pre-processing
 	#
 	ansible_groups = {}
@@ -754,6 +769,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 		config.vm.define h.to_sym do |vm|
 			vm.vm.hostname = h
+			#vm.hostmanager.aliases = ["#{h}.#{domain}"]
 
 			# this is the real network that we'll use...
 			vm.vm.network :private_network,
@@ -847,20 +863,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			#	shell
 			#
-			if not File.exists?(fv)	# only modify /etc/hosts once
+			if not File.exists?(fv)	# only run these actions once!
 				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(h))
 					File.open(fv, 'w') {}	# touch
-				end
-				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
-				vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
-
-				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
-				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
-				# /etc/hosts entries for all hosts
-				vms.each do |xx|
-					oh = xx[:name]
-					oip = xx[:ip] # This will be set at this point
-					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
 				end
 
 				# subscribe rhel machines
