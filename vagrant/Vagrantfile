@@ -1057,7 +1057,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 								kubectl create -f '#{jsonfile}'
 							fi
 						SCRIPT
-						config.vm.provision 'shell', inline: $script
+						vm.vm.provision 'shell', inline: $script
 					end
 				end
 			end
