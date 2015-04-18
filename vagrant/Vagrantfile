@@ -637,11 +637,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#config.landrush.enable	# TODO ?
 
 	#
-	#	sync type
-	#
-	config.vm.synced_folder './', '/vagrant', type: sync	# nfs, rsync
-
-	#
 	#	cache
 	#
 	# NOTE: you should probably erase the cache between rebuilds if you are
@@ -741,6 +736,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
+		vm_sync = x.fetch(:sync, sync)	# get value
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -766,10 +762,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			vm.vm.box = vm_image	# set vm specific image
 
+			synced_folder = '/vagrant'	# default sync folder
+
 			# use a specialized vagrant box if it exists :)
 			if vm_docker
 				if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
 					vm.vm.box = "#{vm_image}-docker"
+				end
+			end
+
+			# sync type
+			disabled = false
+			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
+				disabled = true
+			end
+			vm.vm.synced_folder './', '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
+
+			if vm.vm.box.start_with? 'atomic-'
+				synced_folder = '/home/vagrant/sync'
+				if vm_sync != ''
+					vm.vm.synced_folder '.', synced_folder, type: sync
 				end
 			end
 
@@ -932,8 +944,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					# app directory name containing Dockerfile
 					b = File.basename(dd)
 					vm.vm.provision :docker do |d|
-						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
-						d.build_image "/vagrant/docker/#{b}", args: "-t #{b}"
+						d.build_image "#{synced_folder}/docker/#{b}", args: "-t #{b}"
 						#d.run "#{b}"	# use kube instead
 					end
 				end
@@ -1021,8 +1032,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						end
 
 						# get path to json file inside vm...
-						# FIXME: this base dir shouldn't be /vagrant when using atomic hosts...
-						jsonfile = File.join('/vagrant/kubernetes/applications/', jsonfile)
+						jsonfile = File.join("#{synced_folder}/kubernetes/applications/", jsonfile)
 						$script = <<-SCRIPT.unindent
 							# the sed strips off the quotes from the python string output
 							# unescaped sed is: sed 's/\(^"\|"$\)//g'
