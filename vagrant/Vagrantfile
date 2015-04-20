@@ -802,7 +802,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					exists = false
 				end
 			end
-			if not(exists) and not vm.vm.box.start_with? 'rhel-'
+			if not(exists) and not (vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-')
 				vm.vm.box_url = "#{default_boxurlprefix}/#{vm.vm.box}/#{vm.vm.box}.box"
 			end
 
@@ -828,7 +828,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			# unsubscribe rhel machines on destroy
 			if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
-				if vm.vm.box.start_with? 'rhel-'
+				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
 					# check these to know if we registered!
 					if username != '' and password != ''
 						# ssh into itself and unregister
@@ -859,7 +859,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 				# subscribe rhel machines
-				if vm.vm.box.start_with? 'rhel-'
+				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
 					if username != '' and password != ''
 						vm.vm.provision 'shell', inline: "subscription-manager register --username=#{username} --password=#{password}"
 					end
