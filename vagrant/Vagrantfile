@@ -846,17 +846,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(h))
 					File.open(fv, 'w') {}	# touch
 				end
-				vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
-				vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
 
-				vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
-				#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
-				# /etc/hosts entries for all hosts
-				vms.each do |xx|
-					oh = xx[:name]
-					oip = xx[:ip] # This will be set at this point
-					vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
-				end
+				if puppet # we assume that the VM has not installed puppet if puppet is not enabled
+					vm.vm.provision 'shell', inline: 'puppet resource host localhost.localdomain ip=127.0.0.1 host_aliases=localhost'
+					vm.vm.provision 'shell', inline: "puppet resource host #{h} ensure=absent"	# so that fqdn works
+
+					vm.vm.provision 'shell', inline: "puppet resource host #{vip_hostname}.#{domain} ip=#{vip_ip} host_aliases=#{vip_hostname} ensure=present"
+					#vm.vm.provision 'shell', inline: "[ ! -e /root/puppet-cert-is-clean ] && ssh -o 'StrictHostKeyChecking=no' puppet puppet cert clean #{h}.#{domain} ; touch /root/puppet-cert-is-clean"
+					# /etc/hosts entries for all hosts
+					vms.each do |xx|
+						oh = xx[:name]
+						oip = xx[:ip] # This will be set at this point
+						vm.vm.provision 'shell', inline: "puppet resource host #{oh}.#{domain} ip=#{oip} host_aliases=#{oh} ensure=present"
+					end
+				end # if puppet
 
 				# subscribe rhel machines
 				if vm.vm.box.start_with? 'rhel-'
@@ -1157,6 +1160,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# reverse the mapping, so that the groups enumerate their hosts
 						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
 						ansible.host_key_checking = false
+						ansible.sudo = true
+						ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
 					end
 				end
 			end
@@ -1174,7 +1179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				#end
 
 				# make puppet server a bit fatter by default :P
-				if puppet and vm_puppet and h == 'puppet'
+				if (puppet and vm_puppet and h == 'puppet') or vm.vm.box.start_with? 'rhel-'
 					libvirt.cpus = 2
 					libvirt.memory = 1024
 				end
