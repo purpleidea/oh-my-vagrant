@@ -13,6 +13,7 @@
 :puppet: false
 :classes: []
 :docker: false
+:kubernetes: false
 :ansible:
 - kubernetes/setup.yml
 :playbook: []

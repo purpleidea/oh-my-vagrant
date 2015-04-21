@@ -13,6 +13,7 @@
 :puppet: false
 :classes: []
 :docker: []
+:kubernetes: false
 :ansible: []
 :playbook: []
 :cachier: false
