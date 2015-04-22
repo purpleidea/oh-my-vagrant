@@ -78,7 +78,7 @@ function vscreen {
 	[ -e "$f" ] && ssh -t -F "$f" "$1" 'screen -xRR'
 	if [ $? -eq 255 ]; then
 		# you probably want a shorter timeout if you see this often
-		echo 'Cached connection was stale. Cleaning...'
+		echo 'Maybe cached connection was stale? Cleaning...'
 		rm -f "$f"	# clean stale ssh connection
 		# TODO: recurse up to one time?
 	fi
