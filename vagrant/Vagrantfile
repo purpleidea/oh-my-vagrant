@@ -89,6 +89,7 @@ username = ''			# default subscription manager username
 password = ''			# default subscription manager password
 poolid = true			# default list of poolid's (true to auto-attach)
 repos = []			# default list of extra repos's to enable
+update = false			# determine whether or not to update the box on vagrant up
 
 def array_values_to_array_of_hashes(l)
 	result = l
@@ -192,6 +193,7 @@ if File.exist?(f)
 	poolid = settings[:poolid]
 	repos = settings[:repos]
 	really_use_rm = settings[:reallyrm]
+	update = settings[:update]
 end
 
 # ARGV parser
@@ -428,6 +430,7 @@ settings = {
 	:poolid => poolid,
 	:repos => repos,
 	:reallyrm => really_use_rm,
+	:update => update,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml
@@ -737,6 +740,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_repos = x.fetch(:repos, repos)	# get value
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
+		vm_update = x.fetch(:update, update) # get value
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -893,6 +897,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# NOTE: probably a strong edge
 						vm.vm.provision 'shell', inline: "for i in `subscription-manager repos --list | grep '^Repo ID:' | awk '{print $3}'`; do subscription-manager repos --enable=$i; done"
 					end
+
+				end
+
+				# update the hosts
+				if vm_update
+					vm.vm.provision 'shell', inline: 'yum -y update'
 				end
 			end
 
