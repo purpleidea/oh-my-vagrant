@@ -23,8 +23,8 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 ** [https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/)
 
 ## Dependencies:
-* vagrant (available in Fedora 22+)
-** [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 22+)
+* vagrant (available in Fedora 21+)
+** [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 21+)
 ** in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
 * [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (required, built-in)
 * [puppet-module-data](https://github.com/ripienaar/puppet-module-data/) (optional, puppet >= 3.0.0, built-in)

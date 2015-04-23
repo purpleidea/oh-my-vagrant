@@ -6,7 +6,7 @@ https://ttboj.wordpress.com/2014/05/13/vagrant-on-fedora-with-libvirt-reprise/
 
 (The second one is more up to date, and mostly replaces the first...)
 
-In Fedora 22+ Vagrant and Vagrant-Libvirt should be included in the distro.
+In Fedora 21+ Vagrant and Vagrant-Libvirt should be included in the distro.
 
 Happy Hacking!
 
