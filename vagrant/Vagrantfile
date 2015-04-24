@@ -580,22 +580,23 @@ if extern.length > 0
 				next
 			end
 			repo_okay = false
-			if File.exists?(File.join("#{basedir}", "#{directory}"))
-				r = `cd "#{basedir}/#{directory}" && git remote show -n origin | grep 'Fetch URL: ' | awk -F 'Fetch URL: ' '{print $2}'`.strip
+			bd = File.join("#{basedir}", "#{directory}")
+			if File.exists?(bd)
+				r = `cd "#{bd}" && git remote show -n origin | grep 'Fetch URL: ' | awk -F 'Fetch URL: ' '{print $2}'`.strip
 				if r == repository
 					repo_okay = true
 				else
 					$stderr.puts "Repository: '#{repository}' doesn't match installed."
 					if really_use_rm
-						`rm -rf "#{basedir}/#{directory}"`
+						`rm -rf "#{bd}"`
 					else
-						$stderr.puts `echo please: rm -rf "#{basedir}/#{directory}"`	# safer for now
+						$stderr.puts `echo please: rm -rf "#{bd}"`	# safer for now
 					end
 				end
 				# pull latest in if it exists
-				r = `cd "#{basedir}/#{directory}" && [ $(git fetch --dry-run 2>&1 | wc -l) -gt 0 ] || echo already up-to-date`.strip
+				r = `cd "#{bd}" && [ $(git fetch --dry-run 2>&1 | wc -l) -gt 0 ] || echo already up-to-date`.strip
 				if r == ''
-					r = `cd "#{basedir}/#{directory}" && git checkout master && git pull`.strip
+					r = `cd "#{bd}" && git checkout master && git pull`.strip
 					$stderr.puts r
 				end
 
@@ -605,7 +606,7 @@ if extern.length > 0
 				repo_okay = true
 			end
 			if repo_okay and not branch.nil?
-				r = `cd "#{basedir}/#{directory}" && git checkout "#{branch}"`.strip
+				r = `cd "#{bd}" && git checkout "#{branch}"`.strip
 			end
 			native.push("#{directory}")
 		else
