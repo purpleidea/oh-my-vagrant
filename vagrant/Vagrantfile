@@ -904,6 +904,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if vm_update
 					vm.vm.provision 'shell', inline: 'yum -y update'
 				end
+
+				# atomic hosts lack the docker group which the
+				# docker provisioner expects... workaround this
+				if vm_docker
+					vm.vm.provision 'shell', inline: 'getent group docker || groupadd --system docker'
+				end
 			end
 
 			# TODO: remove this chunk?
@@ -933,12 +939,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.provision 'shell', inline: 'systemctl start docker'
 				# pull in all the docker images that the vm has
 				vm.vm.provision 'shell', inline: 'for i in /root/docker/*.docker; do [ -e "$i" ] || continue; docker load --input="$i"; done'
-			end
-
-			if vm.vm.box.start_with? 'atomic-'
-				# atomic hosts lack the docker group which the
-				# docker provisioner expects... workaround this
-				vm.vm.provision 'shell', inline: 'getent group docker || groupadd --system docker'
 			end
 
 			# TODO: should we run the docker pull with vagrant too?
