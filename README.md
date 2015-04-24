@@ -26,6 +26,9 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * vagrant (available in Fedora 21+)
 ** [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 21+)
 ** in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
+* [https://github.com/purpleidea/vagrant-hostmanager/](vagrant-hostmanager)
+** you need the feat/oh-my-vagrant patches for this to work properly
+** to install them, run the script from: [extras/patch-hostmanager.sh](extras/patch-hostmanager.sh)
 * [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (required, built-in)
 * [puppet-module-data](https://github.com/ripienaar/puppet-module-data/) (optional, puppet >= 3.0.0, built-in)
 * my [puppet-puppet](https://github.com/purpleidea/puppet-puppet) module (optional, built-in)
