@@ -20,15 +20,15 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things.
 * There are still some unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
 * An intro article about this environment is available:
-** [https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/)
+  * [https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/)
 
 ## Dependencies:
 * vagrant (available in Fedora 21+)
-** [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 21+)
-** in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
+  * [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 21+)
+  * in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
 * [https://github.com/purpleidea/vagrant-hostmanager/](vagrant-hostmanager)
-** you need the feat/oh-my-vagrant patches for this to work properly
-** to install them, run the script from: [extras/patch-hostmanager.sh](extras/patch-hostmanager.sh)
+  * you need the feat/oh-my-vagrant patches for this to work properly
+  * to install them, run the script from: [extras/patch-hostmanager.sh](extras/patch-hostmanager.sh)
 * [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (required, built-in)
 * [puppet-module-data](https://github.com/ripienaar/puppet-module-data/) (optional, puppet >= 3.0.0, built-in)
 * my [puppet-puppet](https://github.com/purpleidea/puppet-puppet) module (optional, built-in)
