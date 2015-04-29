@@ -809,11 +809,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			synced_folder = '/vagrant'	# default sync folder
 
 			# use a specialized vagrant box if it exists :)
-			if vm_docker
-				if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
-					vm.vm.box = "#{vm_image}-docker"
-				end
-			end
+			#if vm_docker
+			#	if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
+			#		vm.vm.box = "#{vm_image}-docker"
+			#	end
+			#end
 
 			# sync type
 			disabled = false
@@ -836,19 +836,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			# FIXME: speed up or cache (memoize) this check...
-			if `vagrant box list | grep -q '^#{vm.vm.box}' && echo -n found` != ''
-				exists = true
-			else
-				if vm.vm.box_url.is_a?(String)
-					puts "Running wget check on: '#{vm.vm.box_url}'"
-					exists = `wget -q --spider #{vm.vm.box_url}`
-				else
-					exists = false
-				end
-			end
-			if not(exists) and not (vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-')
-				vm.vm.box_url = "#{default_boxurlprefix}/#{vm.vm.box}/#{vm.vm.box}.box"
-			end
+			#if `vagrant box list | grep -q '^#{vm.vm.box}' && echo -n found` != ''
+			#	exists = true
+			#else
+			#	if vm.vm.box_url.is_a?(String)
+			#		puts "Running wget check on: '#{vm.vm.box_url}'"
+			#		exists = `wget -q --spider #{vm.vm.box_url}`
+			#	else
+			#		exists = false
+			#	end
+			#end
+			#if not(exists) and not (vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-')
+			#	vm.vm.box_url = "#{default_boxurlprefix}/#{vm.vm.box}/#{vm.vm.box}.box"
+			#end
 
 			#vm.landrush.host h, ip	# TODO ?
 
