@@ -892,7 +892,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 							# then it will be disabled... this is
 							# useful to kill repos from a poolid.
 							if j.start_with? '#'
-								vm.vm.provision 'shell', inline: "subscription-manager repos --disable=#{j}"
+								vm.vm.provision 'shell', inline: "subscription-manager repos --disable=#{j[1,j.length]}"
 							else
 								vm.vm.provision 'shell', inline: "subscription-manager repos --enable=#{j}"
 							end
