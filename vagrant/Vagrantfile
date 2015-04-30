@@ -1216,8 +1216,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 				# Give RHEL Server and Atomic Host a little bit more air to breath
                                 if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-'
-                                        libvirt.cpus = 2
-                                        libvirt.memory = 4096
+					vb.customize ["modifyvm", :id, "--cpus", "2"]
+					vb.customize ["modifyvm", :id, "--memory", "4096"]
                                 end
 
 			end
