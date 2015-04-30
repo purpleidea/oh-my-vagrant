@@ -1200,6 +1200,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					libvirt.cpus = 2
 					libvirt.memory = 1024
 				end
+
+				# Give RHEL Server and Atomic Host a little bit more air to breath
+				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-'
+                                        libvirt.cpus = 2
+                                        libvirt.memory = 4096 
+				end
 			end
 			vm.vm.provider :virtualbox do |vb|
 				# make puppet server a bit fatter by default :P
@@ -1207,6 +1213,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					vb.customize ["modifyvm", :id, "--cpus", "2"]
 					vb.customize ["modifyvm", :id, "--memory", "1024"]
 				end
+
+				# Give RHEL Server and Atomic Host a little bit more air to breath
+                                if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-'
+					vb.customize ["modifyvm", :id, "--cpus", "2"]
+					vb.customize ["modifyvm", :id, "--memory", "4096"]
+                                end
+
 			end
 		end
 	end
