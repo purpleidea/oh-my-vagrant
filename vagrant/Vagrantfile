@@ -1075,17 +1075,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 							echo "Kubernetes kind: '$kind' not yet supported in Oh-My-Vagrant."
 							;;
 							esac
+							echo Running kubernetes...
 							if [ "`kubectl get $kind | tail -n +2 | awk '{print $1}'`" = "$kid" ]; then
 								# exists...
 								# TODO: can we roll like this?
 								if [ "$roll" = 'true' ]; then
+									echo Running kubernetes: rollingupdate...
 									kubectl rollingupdate "$kid" -f '#{jsonfile}'
 								else
 									# update from existing json file...
+									echo Running kubernetes: update...
 									kubectl update -f '#{jsonfile}'
 								fi
 							else
 								# new
+								echo Running kubernetes: create...
 								kubectl create -f '#{jsonfile}'
 							fi
 						SCRIPT
