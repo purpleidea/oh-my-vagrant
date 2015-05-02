@@ -19,8 +19,15 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * The current name is obviously a nod to the success of the 'oh-my-zsh' project, although I'm actually a bash user :)
 * It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things.
 * There are still some unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
-* An intro article about this environment is available:
+* I've published a number of articles about this environment:
   * [https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/)
+  * [https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/)
+  * [https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/)
+  * [https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/)
+* There are some screencasts available:
+  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv)
+  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv)
+  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv)
 
 ## Dependencies:
 * vagrant (available in Fedora 21+)
