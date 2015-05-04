@@ -37,4 +37,5 @@
 :password: ''
 :poolid: true
 :repos: []
-:reallyrm: true
+:reallyrm: false
+:update: false
