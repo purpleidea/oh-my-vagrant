@@ -1,0 +1,43 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: fedora-21
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern:
+- type: git
+  system: ansible
+  repository: https://github.com/purpleidea/ansible-simple1
+  directory: ansible-simple1
+:puppet: false
+:classes: []
+:docker: false
+:kubernetes: false
+:ansible:
+- ansible-simple1/setup.yml
+:playbook: []
+:cachier: false
+:vms:
+- :name: primary1
+  :ansible:
+  - primary
+  - machine
+  :playbook:
+  - ansible-simple1/primary.yml
+- :name: secondary1
+  :ansible:
+  - secondary
+  - machine
+- :name: secondary2
+  :ansible:
+  - secondary
+  - machine
+:namespace: omv
+:count: 0
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:reallyrm: false
+:update: false
