@@ -189,8 +189,8 @@ if File.exist?(f)
 	password = settings[:password]
 	poolid = settings[:poolid]
 	repos = settings[:repos]
-	really_use_rm = settings[:reallyrm]
 	update = settings[:update]
+	really_use_rm = settings[:reallyrm]
 end
 
 # ARGV parser
@@ -426,8 +426,8 @@ settings = {
 	:password => password,
 	:poolid => poolid,
 	:repos => repos,
-	:reallyrm => really_use_rm,
 	:update => update,
+	:reallyrm => really_use_rm,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml

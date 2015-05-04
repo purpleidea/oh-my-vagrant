@@ -20,5 +20,5 @@
 :password: ''
 :poolid: true
 :repos: []
-:reallyrm: false
 :update: false
+:reallyrm: false
