@@ -1,0 +1,24 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: atomic-fedora-21
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern: []
+:puppet: false
+:classes: []
+:docker: false
+:kubernetes: false
+:ansible: []
+:playbook: []
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 1
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:reallyrm: false
+:update: false
