@@ -387,6 +387,17 @@ while skip < ARGV.length
 			end
 		end
 
+	elsif ARGV[skip].start_with?(arg='--vagrant-update=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		update = v.to_s
+		if ['true'].include?(update.downcase)
+			update = true
+		else
+			update = false
+		end
+
 	elsif ARGV[skip].start_with?(arg='--vagrant-reallyrm=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
