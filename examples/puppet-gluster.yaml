@@ -31,6 +31,7 @@
     vrrp: true
     vip: 192.168.123.3
 :docker: false
+:kubernetes: false
 :ansible: []
 :playbook: 
 :cachier: false
@@ -47,4 +48,5 @@
 :password: ''
 :poolid: true
 :repos: []
-:reallyrm: true
+:reallyrm: false
+:update: false
