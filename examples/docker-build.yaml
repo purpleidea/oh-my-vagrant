@@ -25,3 +25,4 @@
 :poolid: true
 :repos: []
 :reallyrm: false
+:update: false
