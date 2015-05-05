@@ -75,6 +75,7 @@ classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
 kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
+ansible_extra_vars = {}		# default ansible extra_vars
 playbook = []			# default ansible playbook
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (defaults above)
@@ -782,6 +783,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
+		vm_ansible_extra_vars = x.fetch :ansible_extra_vars, ansible_extra_vars
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -1210,9 +1212,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						ansible.host_key_checking = false
 						ansible.sudo = true
 
-						if ansible_extra_vars != ''
-							ansible.extra_vars = ansible_extra_vars
-						end
+						ansible.extra_vars = vm_ansible_extra_vars unless vm_ansible_extra_vars.nil?
 					end
 				end
 			end
