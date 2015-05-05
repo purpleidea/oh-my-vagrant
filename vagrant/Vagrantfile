@@ -87,6 +87,7 @@ password = ''			# default subscription manager password
 poolid = true			# default list of poolid's (true to auto-attach)
 repos = []			# default list of extra repos's to enable
 update = false			# determine whether or not to update the box on vagrant up
+memory = 512			# default memory size
 
 def array_values_to_array_of_hashes(l)
 	result = l
@@ -191,6 +192,7 @@ if File.exist?(f)
 	repos = settings[:repos]
 	really_use_rm = settings[:reallyrm]
 	update = settings[:update]
+	memory = settings[:memory]
 end
 
 # ARGV parser
@@ -428,6 +430,7 @@ settings = {
 	:repos => repos,
 	:reallyrm => really_use_rm,
 	:update => update,
+	:memory => memory,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml
@@ -757,6 +760,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
+		vm_memory = x.fetch :memory, memory # get value
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -1179,6 +1183,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# reverse the mapping, so that the groups enumerate their hosts
 						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
 						ansible.host_key_checking = false
+						ansible.sudo = true
+						ansible.extra_vars = {
+							openshift_deployment_type: "enterprise",
+						}
+
 					end
 				end
 			end
@@ -1201,11 +1210,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					libvirt.memory = 1024
 				end
 
-				# Give RHEL Server and Atomic Host a little bit more air to breath
-				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-'
-                                        libvirt.cpus = 2
-                                        libvirt.memory = 4096 
-				end
+                                libvirt.memory = vm_memory 
 			end
 			vm.vm.provider :virtualbox do |vb|
 				# make puppet server a bit fatter by default :P
@@ -1214,11 +1219,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					vb.customize ["modifyvm", :id, "--memory", "1024"]
 				end
 
-				# Give RHEL Server and Atomic Host a little bit more air to breath
-                                if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-'
-					vb.customize ["modifyvm", :id, "--cpus", "2"]
-					vb.customize ["modifyvm", :id, "--memory", "4096"]
-                                end
+				vb.customize ["modifyvm", :id, "--memory", vm_memory]
 
 			end
 		end
