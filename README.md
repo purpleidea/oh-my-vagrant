@@ -5,6 +5,9 @@
 ## Documentation:
 Please see: [DOCUMENTATION.md](DOCUMENTATION.md) or [PDF](https://pdfdoc-purpleidea.rhcloud.com/pdf/https://github.com/purpleidea/oh-my-vagrant/blob/master/DOCUMENTATION.md).
 
+## Questions:
+Come join us in #ohmyvagrant on Freenode!
+
 ## Installation:
 Please read the [INSTALL](INSTALL) file for instructions on getting this installed.
 
