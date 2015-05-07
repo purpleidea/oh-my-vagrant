@@ -1,5 +1,5 @@
 ### VAGRANT ###################################################################
-# avoid needing to always add --provider=kvm
+# avoid needing to always add --provider=libvirt
 export VAGRANT_DEFAULT_PROVIDER=libvirt
 #alias vagrant='/opt/vagrant/bin/vagrant'
 alias vs='vagrant status'
