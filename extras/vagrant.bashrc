@@ -8,7 +8,7 @@ alias vup='vagrant up'
 alias vssh='vagrant ssh'
 alias vrsync='vagrant rsync'
 alias vdestroy='vagrant destroy'
-alias vrm-rf='vagrant --vagrant-reallyrmonce=true status'
+alias vrm-rf='vagrant --omv-reallyrmonce=true status'
 function vlog {
 	VAGRANT_LOG=info vagrant "$@" 2> vagrant.log
 }

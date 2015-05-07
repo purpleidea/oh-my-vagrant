@@ -148,7 +148,7 @@ if File.exist?(f)
 	folder = settings[:folder]
 
 	(0..ARGV.length-1).each do |i|
-		if ARGV[i].start_with?(arg='--vagrant-folder=')
+		if ARGV[i].start_with?(arg='--omv-folder=')
 			v = ARGV.delete_at(i).dup
 			v.slice! arg
 			folder = v.to_s		# set folder prefix
@@ -198,44 +198,44 @@ end
 skip = 0
 while skip < ARGV.length
 	#puts "#{skip}, #{ARGV[skip]}"	# debug
-	if ARGV[skip].start_with?(arg='--vagrant-domain=')
+	if ARGV[skip].start_with?(arg='--omv-domain=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 		#puts "#{arg}, #{v}"	# debug
 
 		domain = v.to_s		# set domain
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-network=')
+	elsif ARGV[skip].start_with?(arg='--omv-network=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		network = v.to_s	# set network range
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-image=')
+	elsif ARGV[skip].start_with?(arg='--omv-image=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		image = v.to_s	# set base image
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-boxurlprefix=')
+	elsif ARGV[skip].start_with?(arg='--omv-boxurlprefix=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		boxurlprefix = v.to_s	# set box url prefix
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-sync=')
+	elsif ARGV[skip].start_with?(arg='--omv-sync=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		sync = v.to_s		# set sync type
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-folder=')
+	elsif ARGV[skip].start_with?(arg='--omv-folder=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		folder = v.to_s		# set folder prefix
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-extern=')
+	elsif ARGV[skip].start_with?(arg='--omv-extern=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -246,7 +246,7 @@ while skip < ARGV.length
 			extern = []
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-puppet=')
+	elsif ARGV[skip].start_with?(arg='--omv-puppet=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -257,7 +257,7 @@ while skip < ARGV.length
 			puppet = false
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-puppet-classes=')
+	elsif ARGV[skip].start_with?(arg='--omv-puppet-classes=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -267,7 +267,7 @@ while skip < ARGV.length
 			classes = []
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-docker=')
+	elsif ARGV[skip].start_with?(arg='--omv-docker=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -283,7 +283,7 @@ while skip < ARGV.length
 			end
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-kubernetes=')
+	elsif ARGV[skip].start_with?(arg='--omv-kubernetes=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -294,7 +294,7 @@ while skip < ARGV.length
 			kubernetes = false
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-ansible=')
+	elsif ARGV[skip].start_with?(arg='--omv-ansible=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -304,7 +304,7 @@ while skip < ARGV.length
 			ansible = []
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-playbook=')
+	elsif ARGV[skip].start_with?(arg='--omv-playbook=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -314,7 +314,7 @@ while skip < ARGV.length
 			playbook = []
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-cachier=')
+	elsif ARGV[skip].start_with?(arg='--omv-cachier=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -325,7 +325,7 @@ while skip < ARGV.length
 			cachier = false
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-vms=')
+	elsif ARGV[skip].start_with?(arg='--omv-vms=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -334,31 +334,31 @@ while skip < ARGV.length
 			vms = array_values_to_array_of_hashes(v)
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-namespace=')
+	elsif ARGV[skip].start_with?(arg='--omv-namespace=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		namespace = v.to_s	# set namespace
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-count=')
+	elsif ARGV[skip].start_with?(arg='--omv-count=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		count = v.to_i		# set host count
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-username=')
+	elsif ARGV[skip].start_with?(arg='--omv-username=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		username = v.to_s	# set username
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-password=')
+	elsif ARGV[skip].start_with?(arg='--omv-password=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
 		password = v.to_s	# set password
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-poolid=')
+	elsif ARGV[skip].start_with?(arg='--omv-poolid=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -373,7 +373,7 @@ while skip < ARGV.length
 			end
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-repos=')
+	elsif ARGV[skip].start_with?(arg='--omv-repos=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -388,7 +388,7 @@ while skip < ARGV.length
 			end
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-update=')
+	elsif ARGV[skip].start_with?(arg='--omv-update=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -399,7 +399,7 @@ while skip < ARGV.length
 			update = false
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-reallyrm=')
+	elsif ARGV[skip].start_with?(arg='--omv-reallyrm=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
@@ -410,7 +410,7 @@ while skip < ARGV.length
 			really_use_rm = false
 		end
 
-	elsif ARGV[skip].start_with?(arg='--vagrant-reallyrmonce=')
+	elsif ARGV[skip].start_with?(arg='--omv-reallyrmonce=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
