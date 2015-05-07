@@ -33,6 +33,7 @@ require 'base64'
 # thanks to the gluster.org community for the public box hosting
 default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
 really_use_rm = false	# this causes the rm -rf to actually happen if set true
+really_use_rm_once = nil	# this causes the rm -rf to happen once
 
 #
 #	vms
@@ -409,6 +410,17 @@ while skip < ARGV.length
 			really_use_rm = false
 		end
 
+	elsif ARGV[skip].start_with?(arg='--vagrant-reallyrmonce=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		really_use_rm_once = v.to_s
+		if ['true'].include?(really_use_rm_once.downcase)
+			really_use_rm_once = true
+		else
+			really_use_rm_once = false
+		end
+
 	else	# skip over "official" vagrant args
 		skip = skip + 1
 	end
@@ -595,7 +607,7 @@ if extern.length > 0
 					repo_okay = true
 				else
 					$stderr.puts "Repository: '#{repository}' doesn't match installed."
-					if really_use_rm
+					if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
 						`rm -rf "#{bd}"`
 					else
 						$stderr.puts `echo please: rm -rf "#{bd}"`	# safer for now
@@ -633,7 +645,7 @@ end
 []).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
-		if really_use_rm
+		if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
 			`rm -rf "#{i}"`
 		else
 			$stderr.puts `echo please: rm -rf "#{i}"`	# safer for now
