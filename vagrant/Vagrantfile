@@ -75,6 +75,7 @@ classes = []			# default list or hash of classes to include
 docker = false			# default use of docker or not
 kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
+ansible_extra_vars = {}		# default ansible extra_vars
 playbook = []			# default ansible playbook
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (defaults above)
@@ -178,6 +179,7 @@ if File.exist?(f)
 	docker = settings[:docker]
 	kubernetes = settings [:kubernetes]
 	ansible = settings[:ansible]
+	ansible_extra_vars = settings[:ansible_extra_vars]
 	playbook = settings[:playbook]
 	cachier = settings[:cachier]
 	if settings[:vms].is_a?(Array)
@@ -302,6 +304,18 @@ while skip < ARGV.length
 		else
 			ansible = []
 		end
+
+	elsif ARGV[skip].start_with?(arg='--vagrant-ansible-extra-vars=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		# it should be a ruby hash
+		if v.is_a?(::Hash)
+			ansible_extra_vars = v
+		else
+			$stderr.puts "Warning: --vagrant-ansible-extra-vars had no hash with it... skipping and assuming no extra_vars were supplied"
+			ansible_extra_vars = ''
+		end	
 
 	elsif ARGV[skip].start_with?(arg='--vagrant-playbook=')
 		v = ARGV.delete_at(skip).dup
@@ -428,6 +442,7 @@ settings = {
 	:docker => docker,
 	:kubernetes => kubernetes,
 	:ansible => ansible,
+	:ansible_extra_vars => ansible_extra_vars,
 	:playbook => playbook,
 	:cachier => cachier,
 	:vms => vms,
@@ -768,6 +783,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
+		vm_ansible_extra_vars = x.fetch :ansible_extra_vars, ansible_extra_vars
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -1194,6 +1210,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						# reverse the mapping, so that the groups enumerate their hosts
 						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
 						ansible.host_key_checking = false
+						ansible.sudo = true
+
+						ansible.extra_vars = vm_ansible_extra_vars unless vm_ansible_extra_vars.nil?
 					end
 				end
 			end
