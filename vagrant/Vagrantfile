@@ -162,6 +162,12 @@ if File.exist?(f)
 	if File.exist?(ff)
 		f = ff
 	end
+
+	# Check the CWD for an omv.yaml
+	ff = File.join('.', 'omv.yaml')
+	if File.exist?(ff)
+		f = ff
+	end
 end
 
 # load settings
