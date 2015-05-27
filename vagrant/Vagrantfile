@@ -891,6 +891,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					File.open(fv, 'w') {}	# touch
 				end
 
+				# add missing root password where necessary
+				vm.vm.provision 'shell', inline: 'echo vagrant | passwd --stdin root'
+
+				# fix atomic hosts with missing authorized_keys
+				if vm.vm.box.start_with? 'atomic-'
+					vm.vm.provision 'shell', inline: 'test -e /root/.ssh/ || cp -r /home/vagrant/.ssh/ /root/'
+				end
+
 				# subscribe rhel machines
 				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
 					if username != '' and password != ''
