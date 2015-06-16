@@ -31,7 +31,7 @@ require 'base64'
 #	globals
 #
 # thanks to the gluster.org community for the public box hosting
-default_boxurlprefix = 'https://download.gluster.org/pub/gluster/purpleidea/vagrant'
+default_boxurlprefix = 'https://dl.fedoraproject.org/pub/alt/purpleidea/vagrant'
 really_use_rm = false	# this causes the rm -rf to actually happen if set true
 really_use_rm_once = nil	# this causes the rm -rf to happen once
 

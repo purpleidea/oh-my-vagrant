@@ -28,9 +28,9 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
   * [https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/)
   * [https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/)
 * There are some screencasts available:
-  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv)
-  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv)
-  * [https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv](https://download.gluster.org/pub/gluster/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv)
+  * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv)
+  * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv)
+  * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv)
 
 ## Dependencies:
 * vagrant (available in Fedora 21+)
