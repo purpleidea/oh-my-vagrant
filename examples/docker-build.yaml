@@ -9,7 +9,7 @@
 - type: git
   system: docker
   repository: https://github.com/purpleidea/docker-simple1
-  directory: simple-app1
+  directory: docker-simple1
 :puppet: false
 :classes: []
 :docker: []
