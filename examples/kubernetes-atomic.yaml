@@ -1,0 +1,35 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: atomic-fedora-22
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern:
+- type: git
+  system: docker
+  repository: https://github.com/purpleidea/docker-simple1
+  directory: docker-simple1
+- type: git
+  system: kubernetes
+  repository: https://github.com/purpleidea/kube-simple1
+  directory: kube-simple1
+:puppet: false
+:classes: []
+:docker: []
+:kubernetes:
+  applications:
+  - kube-simple1/simple1.json
+:ansible: []
+:playbook: []
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 3
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:comment: 'simple kubernetes on atomic example without cached images'
+:reallyrm: false
