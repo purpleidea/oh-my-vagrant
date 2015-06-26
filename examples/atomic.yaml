@@ -21,4 +21,5 @@
 :poolid: true
 :repos: []
 :update: false
+:comment: simple atomic example
 :reallyrm: false

@@ -49,4 +49,5 @@
 :poolid: true
 :repos: []
 :update: false
+:comment: contrived puppet-gluster example
 :reallyrm: false

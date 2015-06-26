@@ -40,4 +40,5 @@
 :poolid: true
 :repos: []
 :update: false
+:comment: ''
 :reallyrm: false

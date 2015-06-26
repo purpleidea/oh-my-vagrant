@@ -25,4 +25,5 @@
 :poolid: true
 :repos: []
 :update: false
+:comment: simple docker build example
 :reallyrm: false
