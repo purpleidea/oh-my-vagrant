@@ -4,6 +4,15 @@
 # features that are needed for oh-my-vagrant until they are upstream!
 # https://github.com/smdahlen/vagrant-hostmanager/pull/145
 
+# NOTE: some users have needed the following dependencies for this script:
+#
+#	sudo dnf install ruby-devel libvirt-devel libxslt-devel libxml2-devel
+#	gem install domain_name -v 0.5.24
+#	gem install net-ssh -v '2.9.2'
+#
+# NOTE: it is recommended to run the 'gem install' commands as the user
+# NOTE: it is recommended to pick the versions as prompted on errors...
+
 vagrant plugin list | grep -qF 'vagrant-hostmanager'
 if [ $? -ne 0 ]; then
 	vagrant plugin install vagrant-hostmanager
