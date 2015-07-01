@@ -194,6 +194,50 @@ free (as in beer, free as in gratis, free as in libre), I'm unable to provide
 unlimited support. Please consider donating funds, hardware, virtual machines,
 and other resources. For specific needs, you could perhaps sponsor a feature!
 
+###I am seeing a similar error that mentions `hostmanager`. The error looks like:
+
+```
+$ vagrant status
+There are errors in the configuration of this machine. Please fix
+the following errors and try again:
+
+Vagrant:
+* Unknown configuration section 'hostmanager'.
+```
+
+You are seeing this error because OMV has certain requirements. One of which
+is a plugin that can manage hostnames. In general, we want to be able to have
+members of the cluster access each other via FQDN. Now, there are two ways to
+do this:
+
+1. Add a real DNS server somewhere and make sure the hosts can get to it.
+2. Modify the /etc/hosts file on each host in the vagrant cluster to have a record
+for all of the other machines
+
+So, the way we can fix this error is to install the `hostmanager` plugin.
+
+```
+$ wget https://raw.githubusercontent.com/purpleidea/oh-my-vagrant/master/extras/patch-hostmanager.sh
+<snip>
+2015-07-01 13:11:45 (384 MB/s) - ‘patch-hostmanager.sh’ saved [1315/1315]
+
+$ chmod +x patch-hostmanager.sh && ./patch-hostmanager.sh
+Installing the 'vagrant-hostmanager' plugin. This can take a few minutes...
+Installed the plugin 'vagrant-hostmanager (1.5.0)'!
+Cloning into 'vagrant-hostmanager'...
+remote: Counting objects: 801, done.
+remote: Total 801 (delta 0), reused 0 (delta 0), pack-reused 801
+Receiving objects: 100% (801/801), 132.64 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (465/465), done.
+Checking connectivity... done.
+<snip>
+sent 20,583 bytes  received 319 bytes  41,804.00 bytes/sec
+total size is 19,533  speedup is 0.93
+Patched successfully!
+```
+Now you can run `vagrant status` successfully and utilize the function of the plug-in
+which allows you to modify the /etc/hosts file on each host in the cluster.
+
 ###You didn't answer my question, or I have a question!
 
 Contact me through my [technical blog](https://ttboj.wordpress.com/contact/)
