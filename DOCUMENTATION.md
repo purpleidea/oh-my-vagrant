@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##Overview
 
 The Oh-My-Vagrant project lets you describe your Vagrant configuration declaratively
-in YAML, and provides a general purpose VagrantFile that reads that configuration
+in YAML, and provides a general purpose Vagrantfile that reads that configuration
 and passes it to Vagrant.
 
 ##Project Description
@@ -57,7 +57,7 @@ files to work across multiple local virt providers (e.g. VirtualBox, libvirt), a
 multiple host operating systems (whether Windows, Mac OS X, or your preferred
 flavour of Linux).
 
-The Oh-My-Vagrant project provides a rich VagrantFile that avoids (or works around)
+The Oh-My-Vagrant project provides a rich Vagrantfile that avoids (or works around)
 many of those rough edges by reading in the desired configuration from a
 declarative YAML syntax that allows for dynamic lists of virtual machines,
 Puppet(/Ansible/Chef/Salt) integration, docker containers in each machine,
