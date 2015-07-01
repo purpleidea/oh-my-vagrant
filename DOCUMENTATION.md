@@ -46,19 +46,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ##Overview
 
-The Oh-My-Vagrant project is a dynamic Vagrant environment that you can extend.
+The Oh-My-Vagrant project lets you describe your Vagrant configuration declaratively
+in YAML, and provides a general purpose VagrantFile that reads that configuration
+and passes it to Vagrant.
 
 ##Project Description
 
-The Oh-My-Vagrant project allows for dynamic lists of virtual machines, puppet
-integration, docker containers in each machine, automatic DNS setup, easy box
-downloading, and more!
+Vagrant is great, but it has some rough edges, especially if you want your Vagrant
+files to work across multiple local virt providers (e.g. VirtualBox, libvirt), and
+multiple host operating systems (whether Windows, Mac OS X, or your preferred
+flavour of Linux).
+
+The Oh-My-Vagrant project provides a rich VagrantFile that avoids (or works around)
+many of those rough edges by reading in the desired configuration from a
+declarative YAML syntax that allows for dynamic lists of virtual machines,
+Puppet(/Ansible/Chef/Salt) integration, docker containers in each machine,
+automatic DNS setup, easy box downloading, and more!
 
 Instead of having to write complex, partially declarative pseudo-ruby code to
 create and modify a Vagrant environment, you can instead do all the manipulation
-simply by editing a short omv.yaml definition file. This magic is what the
-Oh-My-Vagrant project provides. Additionally, it integrates with code to help
-you automatically deploy a Puppet Master, kick off docker commands, and more!
+simply by editing a short `omv.yaml` definition file. The provided Vagrantfile
+then reads this definition to dynamically configure Vagrant. Additionally, it
+integrates with code to help you run existing configuration management utilities,
+kick off docker commands, and more!
 
 For more information, start by reading and working through the introductory
 [blog post](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/).
@@ -71,11 +81,11 @@ Oh-My-Vagrant is designed to be able to deal with:
 
 * Dynamic lists of named virtual machines
 * Dynamic lists of numbered virtual machines
-* Automatic Puppet Master deployment
-* Automatic Puppet Master integration
+* Automatic Puppet/Ansible/Chef/Salt integration
 * Automatic DNS setup
 * Easy Vagrant box downloading (for certain OS choices)
 * Docker container enablement in each virtual machine
+* Automatic Kubernetes setup
 * And much more...
 
 ###Simple usage
@@ -205,6 +215,12 @@ If you feel that a well used option needs documenting here, please contact me.
 Editing the omv.yaml file is the primary way of modifying your Oh-My-Vagrant
 environment. If you don't have a template, running the `vagrant status` command
 should cause one to get created with some sensible defaults.
+
+While the reference docs for OMV itself are currently incomplete, you can get a
+fair way given the main [Vagrant documentation](https://docs.vagrantup.com/) and
+the assumption that if an `omv.yaml` setting matches the name of a Vagrant box
+configuration setting, then that setting in the YAML provides arguments to
+the corresponding call in the Vagrantfile.
 
 ####`domain`
 Currently undocumented.
