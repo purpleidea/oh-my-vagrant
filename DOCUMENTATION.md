@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 2. [Project description - What the project does](#project-description)
 3. [Setup - Getting started with Oh-My-Vagrant](#setup)
 	* [What can Oh-My-Vagrant do?](#what-can-oh-my-vagrant-do)
+	* [Mainstream usage](#mainstream-usage)
 	* [Simple usage](#simple-usage)
 	* [Complex usage](#complex-usage)
 	* [Example modules](#example-modules)
@@ -87,6 +88,23 @@ Oh-My-Vagrant is designed to be able to deal with:
 * Docker container enablement in each virtual machine
 * Automatic Kubernetes setup
 * And much more...
+
+###Mainstream usage
+Oh-My-Vagrant now supports a "mainstream" mode. This is the most common way to
+use OMV when it is installed via your package manager. You interact with it
+entirely with the `omv` binary. The `omv` binary works exactly like the
+`vagrant` command that you're used to, except that it works directly on the
+`omv.yaml` file, and hides the Vagrantfile complexity inside a system folder.
+
+To initialize a new OMV environment, you can run:
+
+```bash
+$ omv init
+```
+
+to automatically create an `omv.yaml` file. If you supply a path as an argument
+to the init verb, then all OMV project specific files will be stored in this
+sub directory, to avoid cluttering up your project root directory.
 
 ###Simple usage
 

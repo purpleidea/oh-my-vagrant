@@ -111,6 +111,7 @@ end
 #	42
 #EOT
 
+vagrantfiledir = File.expand_path File.dirname(__FILE__)	# Vagrantfile dir
 projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
 
 #
@@ -119,7 +120,7 @@ projectdir = File.expand_path File.dirname(__FILE__)	# vagrant project dir!!
 # Vagrant is using it's own gem path. Using local xdg gem
 # Another option could be adding xdg gem directly to vagrant
 begin
-	gemlibdir = File.join(projectdir, 'gems/xdg/lib')
+	gemlibdir = File.join(vagrantfiledir, 'gems/xdg/lib')
 	$:.unshift(gemlibdir)	# add local path for gems
 	require 'xdg'
 	auth_config = File.join("#{XDG['CONFIG']}/oh-my-vagrant/", 'auth.yaml')
@@ -137,6 +138,22 @@ if File.exist?(auth_config)
 	global_username = settings[:username]
 	global_password = settings[:password]
 end
+
+#
+#	mainstream mode
+#
+if "#{ENV['VAGRANT_CWD']}" != ''	# if called by omv.sh, this is set...
+	projectdir = "#{Dir.pwd}"	# and we're calling from the new root
+	omvsearch = projectdir
+	while omvsearch != '/'		# search upwards for omv.yaml
+		if File.exist?(File.join(omvsearch, 'omv.yaml'))
+			projectdir = omvsearch	# found one!
+			break
+		end
+		omvsearch = File.expand_path('..', omvsearch)
+	end
+end
+#ENV['VAGRANT_DOTFILE_PATH'] = File.join(projectdir, '.vagrant/')
 
 #
 #	ARGV parsing
@@ -555,30 +572,32 @@ end
 # this extern code should be one of the *last* things before the big configure!
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
+#puts "folder is: #{folder}"	# debug
 
-if load_folder
-	puppet_basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
-	# NOTE: i called the ansible child dir 'modules' because i didn't know
-	# what to call it. Suggestions welcome! It's not really 'playbooks' or
-	# 'roles' really, so it's 'modules' until something better comes along
-	ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
-	docker_basedir = File.join(projectdir, folder, 'docker/')
-	kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
-	ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
-else
-	puppet_basedir = File.join(projectdir, 'puppet/', 'modules/')
-	ansible_basedir = File.join(projectdir, 'ansible/', 'modules/')
-	docker_basedir = File.join(projectdir, 'docker/')
-	kubernetes_basedir = File.join(projectdir, 'kubernetes/', 'applications/')
-	ktemplates_basedir = File.join(projectdir, 'kubernetes/', 'templates/')
-end
+puppet_basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
+# NOTE: i called the ansible child dir 'modules' because i didn't know
+# what to call it. Suggestions welcome! It's not really 'playbooks' or
+# 'roles' really, so it's 'modules' until something better comes along
+ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
+docker_basedir = File.join(projectdir, folder, 'docker/')
+kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
+ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
+
+# mkdir in case these folders are missing
+mkdirp = 'mkdir -p'
+mkdirp += " #{puppet_basedir}"
+mkdirp += " #{ansible_basedir}"
+mkdirp += " #{docker_basedir}"
+mkdirp += " #{kubernetes_basedir}"
+mkdirp += " #{ktemplates_basedir}"
+`#{mkdirp}`
 
 native = []	# native files
-native += `cd "#{puppet_basedir}" && git ls-files`.strip.split("\n")
-native += `cd "#{ansible_basedir}" && git ls-files`.strip.split("\n")
-native += `cd "#{docker_basedir}" && git ls-files`.strip.split("\n")
-native += `cd "#{kubernetes_basedir}" && git ls-files`.strip.split("\n")
-native += `cd "#{ktemplates_basedir}" && git ls-files`.strip.split("\n")
+native += `cd "#{puppet_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{ansible_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{docker_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{kubernetes_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{ktemplates_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
