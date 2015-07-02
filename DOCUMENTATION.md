@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 3. [Setup - Getting started with Oh-My-Vagrant](#setup)
 	* [What can Oh-My-Vagrant do?](#what-can-oh-my-vagrant-do)
 	* [Simple usage](#simple-usage)
+	* [Vagrant CWD](#vagrant-cwd)
 	* [Complex usage](#complex-usage)
 	* [Example modules](#example-modules)
 4. [Usage/FAQ - Notes on usage and frequently asked questions](#usage-and-frequently-asked-questions)
@@ -113,6 +114,17 @@ If you do not have a omv.yaml template, running the ```vagrant status```
 command will cause one to be generated. Play around with the settings in the
 omv.yaml file, and forget about the days where small changes to your
 environment, required pasting in a mess of code.
+
+###Vagrant CWD
+
+The most straightfoward way to use Oh-My-Vagrant is to clone its git repository
+somewhere, and then set the VAGRANT_CWD environment variable to
+/path/to/oh-my-vagrant/vagrant. This will cause Vagrant to find Oh-My-Vagrant's
+Vagrantfile first for all of your vagrant commands. Then, you are free to
+checkout your project's code anywhere you like, and it will only need to define
+an omv.yaml file. You can read about the paths that Vagrant checks here:
+
+http://docs.vagrantup.com/v2/vagrantfile/index.html
 
 ###Complex usage
 
