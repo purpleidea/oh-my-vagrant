@@ -1,0 +1,33 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: centos-7.1-docker
+:boxurlprefix: ''
+:sync: rsync
+:folder: ''
+:extern:
+- type: git
+  system: docker
+  repository: https://github.com/fedora-cloud/Fedora-Dockerfiles
+  directory: Fedora-Dockerfiles
+:puppet: false
+:classes: []
+:docker:
+  images: []
+  files:
+  - Fedora-Dockerfiles/apache
+  - Fedora-Dockerfiles/wordpress
+:kubernetes: false
+:ansible: []
+:playbook: []
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 1
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:comment: sub folder simple docker file build example
+:reallyrm: false

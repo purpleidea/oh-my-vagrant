@@ -604,6 +604,7 @@ if extern.length > 0
 				repository = File.expand_path(repository)
 			end
 			directory = i.fetch('directory', nil)
+			directory = directory[0, (directory.index('/', 1).nil?? directory.length : directory.index('/', 1))]
 			branch = i.fetch('branch', nil)
 			if repository.nil? or directory.nil?
 				next
@@ -994,7 +995,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			# docker build
 			if vm_docker	# for any value that is not false
-				Dir.glob(docker_basedir+'*').each do |dd|
+				dlist = Dir.glob(docker_basedir+'*')
+				if vm_docker.is_a?(Hash)
+					dfiles = vm_docker.fetch('files', nil)
+					if dfiles.is_a?(Array)
+						dlist = vm_docker['files'].map{|dfile| File.join(docker_basedir, dfile)}
+					end
+				end
+				dlist.each do |dd|
 					if not File.directory?(dd)
 						next	# invalid, skip
 					end
