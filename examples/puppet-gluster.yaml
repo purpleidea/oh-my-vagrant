@@ -30,6 +30,7 @@
     - puppet
     vrrp: true
     vip: 192.168.123.3
+:shell: []
 :docker: false
 :kubernetes: false
 :ansible: []

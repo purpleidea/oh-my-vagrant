@@ -12,6 +12,7 @@
   directory: kubernetes
 :puppet: false
 :classes: []
+:shell: []
 :docker: false
 :kubernetes: false
 :ansible:

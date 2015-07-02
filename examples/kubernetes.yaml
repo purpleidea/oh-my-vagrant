@@ -16,6 +16,7 @@
   directory: fakeapp2
 :puppet: false
 :classes: []
+:shell: []
 :docker: []
 :kubernetes:
   master: omv0

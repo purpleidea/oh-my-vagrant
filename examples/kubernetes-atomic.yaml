@@ -16,6 +16,7 @@
   directory: kube-simple1
 :puppet: false
 :classes: []
+:shell: []
 :docker: []
 :kubernetes:
   applications:

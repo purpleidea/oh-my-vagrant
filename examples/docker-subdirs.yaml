@@ -12,6 +12,7 @@
   directory: Fedora-Dockerfiles
 :puppet: false
 :classes: []
+:shell: []
 :docker:
   images: []
   files:

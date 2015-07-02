@@ -73,6 +73,7 @@ folder = ''			# default folder prefix
 extern = []			# default external module definitions
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
+shell = []			# default list of shell scripts to run
 docker = false			# default use of docker or not
 kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
@@ -194,6 +195,7 @@ if File.exist?(f)
 	extern = settings[:extern]
 	puppet = settings[:puppet]
 	classes = settings[:classes]
+	shell = settings[:shell]
 	docker = settings[:docker]
 	kubernetes = settings [:kubernetes]
 	ansible = settings[:ansible]
@@ -286,6 +288,15 @@ while skip < ARGV.length
 			classes = []
 		end
 
+	elsif ARGV[skip].start_with?(arg='--omv-shell=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+			shell = v.split(',')
+		else
+			shell = []
+		end
 	elsif ARGV[skip].start_with?(arg='--omv-docker=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
@@ -462,6 +473,7 @@ settings = {
 	:extern => extern,
 	:puppet => puppet,
 	:classes => classes,
+	:shell => shell,
 	:docker => docker,
 	:kubernetes => kubernetes,
 	:ansible => ansible,
@@ -575,6 +587,7 @@ folder = '' if folder.start_with?('/')	# only relative paths are allowed...
 #puts "folder is: #{folder}"	# debug
 
 puppet_basedir = File.join(projectdir, folder, 'puppet/', 'modules/')
+shell_basedir = File.join(projectdir, folder, 'shell/')
 # NOTE: i called the ansible child dir 'modules' because i didn't know
 # what to call it. Suggestions welcome! It's not really 'playbooks' or
 # 'roles' really, so it's 'modules' until something better comes along
@@ -586,6 +599,7 @@ ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
 # mkdir in case these folders are missing
 mkdirp = 'mkdir -p'
 mkdirp += " #{puppet_basedir}"
+mkdirp += " #{shell_basedir}"
 mkdirp += " #{ansible_basedir}"
 mkdirp += " #{docker_basedir}"
 mkdirp += " #{kubernetes_basedir}"
@@ -594,6 +608,7 @@ mkdirp += " #{ktemplates_basedir}"
 
 native = []	# native files
 native += `cd "#{puppet_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{shell_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 native += `cd "#{ansible_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 native += `cd "#{docker_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 native += `cd "#{kubernetes_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
@@ -605,6 +620,8 @@ if extern.length > 0
 		s = i.fetch('system', nil)	# puppet, ansible, and so on...
 		if s == 'puppet'
 			basedir = puppet_basedir
+		elsif s == 'shell'
+			basedir = shell_basedir
 		elsif s == 'ansible'
 			basedir = ansible_basedir
 		elsif s == 'docker'
@@ -667,6 +684,7 @@ end
 # clean up any directories or files that shouldn't be present
 (
 	Dir.glob(puppet_basedir+'*') +
+	Dir.glob(shell_basedir+'*') +
 	Dir.glob(ansible_basedir+'*') +
 	Dir.glob(docker_basedir+'*') +
 	Dir.glob(kubernetes_basedir+'*') +
@@ -804,6 +822,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
 		vm_classes = x.fetch(:classes, classes)
+		vm_shell = x.fetch(:shell, shell)	# get value
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
@@ -975,6 +994,35 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				# docker provisioner expects... workaround this
 				if vm_docker
 					vm.vm.provision 'shell', inline: 'getent group docker || groupadd --system docker'
+				end
+			end
+
+			# custom shell provisioner
+			# TODO: support running first/last as a setting
+			if vm_shell.is_a?(Array)
+				vm_shell.each do |sf|
+					shell_once = false
+					if sf.is_a?(Hash)
+						shell_once = sf.fetch('once', shell_once) # get value
+						si = sf.fetch('script', nil)
+						if not(si.nil?)
+							if not(shell_once) or (shell_once and not(File.exists?(fv)))
+								vm.vm.provision 'shell', inline: "#{si}"
+							end
+							next
+						end
+
+						sx = sf.fetch('path', '')
+					elsif sf.is_a?(String)
+						sx = sf
+					end
+
+					sx = File.join(shell_basedir, sx)
+					if File.exists?(sx) and not(File.directory?(sx)) and File.executable?(sx)
+						if not(shell_once) or (shell_once and not(File.exists?(fv)))
+							vm.vm.provision 'shell', path: "#{sx}"
+						end
+					end
 				end
 			end
 
