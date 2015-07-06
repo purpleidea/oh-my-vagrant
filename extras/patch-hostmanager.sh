@@ -41,4 +41,3 @@ if [ -e ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/lib/ ]; then
 fi
 
 echo 'Patched successfully!'
-

@@ -75,4 +75,3 @@ node default {	# all the other hosts
 		}
 	}
 }
-

@@ -12,4 +12,3 @@ else
 	echo 'Script could not proceed automatically. Already patched?'
 	exit 1
 fi
-

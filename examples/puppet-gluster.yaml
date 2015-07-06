@@ -34,7 +34,7 @@
 :docker: false
 :kubernetes: false
 :ansible: []
-:playbook: 
+:playbook:
 :cachier: false
 :vms:
 - :name: client1
@@ -42,7 +42,7 @@
     module1:
       arg1: val1
       arg2: val2
-    module2: 
+    module2:
 :namespace: annex
 :count: 4
 :username: ''

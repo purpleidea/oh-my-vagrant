@@ -10,4 +10,3 @@ time vagrant rsync puppet
 
 # run puppet on puppet master which syncs files from /vagrant into /etc/puppet/
 time vagrant provision puppet
-

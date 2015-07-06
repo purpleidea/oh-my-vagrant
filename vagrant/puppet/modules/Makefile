@@ -61,4 +61,3 @@ $(MODULENAME):
 	j=`echo $$i | awk -F '-' '{print $$2}'`; \
 	[ -d "$$j" ] || git clone ../../../. $$j; \
 	[ -d "$$j" ] && cd $$j && git checkout master && git pull && git checkout $(SHA1SUM); cd ..
-

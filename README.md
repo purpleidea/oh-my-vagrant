@@ -55,4 +55,3 @@ Please ping me if you have big changes in mind, before you write a giant patch.
 ##
 
 Happy hacking!
-

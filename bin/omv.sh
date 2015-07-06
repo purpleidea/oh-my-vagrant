@@ -47,4 +47,3 @@ done
 
 # this is where the magic happens...
 VAGRANT_CWD="$vagrantdir" VAGRANT_DOTFILE_PATH="$projectdir/.vagrant/" vagrant $args
-

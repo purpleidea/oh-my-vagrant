@@ -275,4 +275,3 @@ function vansible {
 
 	ansible --private-key="$k" --inventory="$i" "$@"
 }
-
