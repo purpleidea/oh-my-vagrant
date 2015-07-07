@@ -12,6 +12,8 @@ BuildArch:	noarch
 
 Requires: vagrant >= 1.6.5
 Requires: vagrant-libvirt >= 0.0.24
+# git should really be a "suggests", since technically it's optional
+Requires: git
 
 %description
 An easy to use dev environment for using vagrant with puppet, docker and more!
