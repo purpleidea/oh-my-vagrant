@@ -21,7 +21,7 @@ vagrantdir="$HOME/code/oh-my-vagrant/vagrant/"	# this should be set at install
 projectdir="`pwd`"	# default to where we are
 args=$@
 
-if [ "$1" = '' ]; then
+if [ "$1" = '' ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
         echo -e "Usage: ./"`basename $0`" --help | init [dir] | <vagrant cmd>"
 fi
 
