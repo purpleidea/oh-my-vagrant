@@ -858,7 +858,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			# use a specialized vagrant box if it exists :)
 			if vm_docker
-				if `vagrant box list | grep -q '^#{vm_image}-docker' && echo -n found` != ''
+				if `vagrant box list | awk '{print $1}' | grep -q '^#{vm_image}-docker$' && echo -n found` != ''
 					vm.vm.box = "#{vm_image}-docker"
 				end
 			end
@@ -884,7 +884,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			# FIXME: speed up or cache (memoize) this check...
-			if `vagrant box list | grep -q '^#{vm.vm.box}' && echo -n found` != ''
+			if `vagrant box list | awk '{print $1}' | grep -q '^#{vm.vm.box}$' && echo -n found` != ''
 				exists = true
 			else
 				if vm.vm.box_url.is_a?(String)
