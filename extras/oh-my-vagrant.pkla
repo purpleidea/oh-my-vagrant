@@ -1,0 +1,6 @@
+[Allow vagrant libvirt management permissions]
+Identity=unix-group:vagrant
+Action=org.libvirt.unix.manage
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
