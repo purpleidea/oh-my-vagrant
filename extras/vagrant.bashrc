@@ -2,28 +2,41 @@
 # avoid needing to always add --provider=libvirt
 export VAGRANT_DEFAULT_PROVIDER=libvirt
 #alias vagrant='/opt/vagrant/bin/vagrant'
-alias vs='vagrant status'
-alias vp='vagrant provision'
-alias vup='vagrant up'
-alias vssh='vagrant ssh'
-alias vrsync='vagrant rsync'
-alias vdestroy='vagrant destroy'
-alias vrm-rf='vagrant --omv-reallyrmonce=true status'
+
+# if oh-my-vagrant has the mainstream entrypoint installed, then use it instead
+OMV=`which omv 2> /dev/null`
+if [ "$OMV" != '' ] && [ "$VAGRANT" = '' ]; then
+	VAGRANT='omv'
+else
+	VAGRANT='vagrant'
+fi
+
+alias vs="$VAGRANT status"
+alias vp="$VAGRANT provision"
+alias vup="$VAGRANT up"
+alias vssh="$VAGRANT ssh"
+alias vrsync="$VAGRANT rsync"
+alias vdestroy="$VAGRANT destroy"
+alias vrm-rf="$VAGRANT --omv-reallyrmonce=true status"
 function vlog {
-	VAGRANT_LOG=info vagrant "$@" 2> vagrant.log
+	VAGRANT_LOG=info $VAGRANT "$@" 2> vagrant.log
 }
 
 # vagrant sftp
 function vsftp {
 	[ "$1" = '' ] || [ "$2" != '' ] && echo "Usage: vsftp <vm-name> - vagrant sftp" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
 	wd=`pwd`		# save wd, then find the Vagrant project
-	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/Vagrantfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
 		#echo "pwd is `pwd`"
 		cd ..
 	done
 	pwd=`pwd`
 	cd $wd
-	if [ ! -e "$pwd/Vagrantfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
@@ -41,7 +54,7 @@ function vsftp {
 	if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 		mkdir -p "$d"
 		# we cache the lookup because this command is slow...
-		vagrant ssh-config "$h" > "$f" || rm "$f"
+		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 	fi
 	[ -e "$f" ] && sftp -F "$f" "$1"
 }
@@ -49,14 +62,18 @@ function vsftp {
 # vagrant screen
 function vscreen {
 	[ "$1" = '' ] || [ "$2" != '' ] && echo "Usage: vscreen <vm-name> - vagrant screen" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
 	wd=`pwd`		# save wd, then find the Vagrant project
-	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/Vagrantfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
 		#echo "pwd is `pwd`"
 		cd ..
 	done
 	pwd=`pwd`
 	cd $wd
-	if [ ! -e "$pwd/Vagrantfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
@@ -74,7 +91,7 @@ function vscreen {
 	if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 		mkdir -p "$d"
 		# we cache the lookup because this command is slow...
-		vagrant ssh-config "$h" > "$f" || rm "$f"
+		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 	fi
 	[ -e "$f" ] && ssh -t -F "$f" "$1" 'screen -xRR'
 	if [ $? -eq 255 ]; then
@@ -88,14 +105,18 @@ function vscreen {
 # vagrant cssh
 function vcssh {
 	[ "$1" = '' ] && echo "Usage: vcssh [options] [user@]<vm1>[ [user@]vm2[ [user@]vmN...]] - vagrant cssh" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
 	wd=`pwd`		# save wd, then find the Vagrant project
-	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/Vagrantfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
 		#echo "pwd is `pwd`"
 		cd ..
 	done
 	pwd=`pwd`
 	cd $wd
-	if [ ! -e "$pwd/Vagrantfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
@@ -181,7 +202,7 @@ function vcssh {
 		if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 			mkdir -p "$d"
 			# we cache the lookup because this command is slow...
-			vagrant ssh-config "$h" > "$f" || rm "$f"
+			$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 		fi
 
 		if [ -e "$f" ]; then
@@ -203,14 +224,18 @@ function vcssh {
 # vagrant forward (ssh -L)
 function vfwd {
 	[ "$1" = '' ] || [ "$2" = '' ] && echo "Usage: vfwd <vm-name> hostport:guestport [hostport:guestport] - vagrant ssh forward" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
 	wd=`pwd`		# save wd, then find the Vagrant project
-	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/Vagrantfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
 		#echo "pwd is `pwd`"
 		cd ..
 	done
 	pwd=`pwd`
 	cd $wd
-	if [ ! -e "$pwd/Vagrantfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
@@ -228,7 +253,7 @@ function vfwd {
 	if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 		mkdir -p "$d"
 		# we cache the lookup because this command is slow...
-		vagrant ssh-config "$h" > "$f" || rm "$f"
+		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 	fi
 
 	name="$1"
@@ -252,14 +277,18 @@ function vfwd {
 # vagrant ansible
 function vansible {
 	[ "$1" = '' ] && echo "Usage: vansible [ansible args] - vagrant ansible" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
 	wd=`pwd`		# save wd, then find the Vagrant project
-	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/Vagrantfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
 		#echo "pwd is `pwd`"
 		cd ..
 	done
 	pwd=`pwd`
 	cd $wd
-	if [ ! -e "$pwd/Vagrantfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
