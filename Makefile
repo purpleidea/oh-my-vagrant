@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: all docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms
+.PHONY: all docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr
 .SILENT:
 
 # version of the program
@@ -24,9 +24,11 @@ RELEASE = 1
 SPEC = rpmbuild/SPECS/oh-my-vagrant.spec
 SOURCE = rpmbuild/SOURCES/oh-my-vagrant-$(VERSION).tar.bz2
 SRPM = rpmbuild/SRPMS/oh-my-vagrant-$(VERSION)-$(RELEASE).src.rpm
+SRPM_BASE = oh-my-vagrant-$(VERSION)-$(RELEASE).src.rpm
 RPM = rpmbuild/RPMS/oh-my-vagrant-$(VERSION)-$(RELEASE).rpm
+USERNAME := $(shell cat ~/.config/copr | grep username | awk -F '=' '{print $$2}' | tr -d ' ')
 SERVER = 'dl.fedoraproject.org'
-REMOTE_PATH = 'pub/oh-my-vagrant'
+REMOTE_PATH = 'pub/alt/$(USERNAME)/oh-my-vagrant'
 
 all: docs rpm
 
@@ -156,5 +158,11 @@ upload-rpms: rpmbuild/RPMS/ rpmbuild/RPMS/SHA256SUMS rpmbuild/RPMS/SHA256SUMS.as
 		echo Running RPMS upload...; \
 		rsync -avz --prune-empty-dirs rpmbuild/RPMS/ $(SERVER):$(REMOTE_PATH)/RPMS/; \
 	fi
+
+#
+#	copr build
+#
+copr: upload-srpms
+	./extras/copr-build.py https://$(SERVER)/$(REMOTE_PATH)/SRPMS/$(SRPM_BASE)
 
 # vim: ts=8
