@@ -17,7 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-vagrantdir="$HOME/code/oh-my-vagrant/vagrant/"	# this should be set at install
+vagrantdir="/usr/share/oh-my-vagrant/"		# this should be set at install
+if [ "$OHMYVAGRANT_DIR" != "" ]; then
+	vagrantdir="$OHMYVAGRANT_DIR"		# use user provided dir instead
+fi
+vagrantdir="$vagrantdir""vagrant/"		# append vagrant/ path postfix!
 projectdir="`pwd`"	# default to where we are
 args=$@
 
