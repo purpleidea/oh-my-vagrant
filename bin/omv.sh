@@ -21,6 +21,7 @@ vagrantdir="/usr/share/oh-my-vagrant/"		# this should be set at install
 if [ "$OHMYVAGRANT_DIR" != "" ]; then
 	vagrantdir="$OHMYVAGRANT_DIR"		# use user provided dir instead
 fi
+vagrantbase="$vagrantdir"
 vagrantdir="$vagrantdir""vagrant/"		# append vagrant/ path postfix!
 projectdir="`pwd`"	# default to where we are
 args=$@
@@ -31,6 +32,27 @@ fi
 
 # initialize a new omv project (if called with $2 it puts mess in that folder!)
 if [ "$1" = 'init' ]; then
+
+	# install user session dependencies automatically
+	# do this in init to avoid constant checking from normal vagrant runs
+	# this sha matches what I expect from the plugin!
+	if [ "`sha1sum ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/README.md | awk '{print $1}'`" != 'ad4b0de54cbefdd41bdcb0d6afb9c8d48e4d3bff' ]; then
+		echo 'Oh-My-Vagrant needs to install a modified vagrant-hostmanager plugin.'
+		read -p 'Is this ok [y/N]: ' -r answer
+		if [[ $answer =~ ^[Yy]$ ]]
+		then
+			# run hostmanager installer
+			$vagrantbase'extras/patch-hostmanager.sh'
+			if [ $? -ne 0 ]; then
+				echo 'Problem installing plugin.'
+				exit 1
+			fi
+		else
+			echo "Can't continue."
+			exit 1
+		fi
+	fi
+
 	args='status'
 	if [ "$2" != '' ]; then
 		mkdir -p "$projectdir/$2"
