@@ -24,7 +24,8 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-git clone https://github.com/purpleidea/vagrant-hostmanager
+tempd=`mktemp -d`
+cd $tempd && git clone https://github.com/purpleidea/vagrant-hostmanager
 if [ ! -d 'vagrant-hostmanager' ]; then
 	echo 'Problem cloning vagrant-hostmanager!'
 	exit 1
