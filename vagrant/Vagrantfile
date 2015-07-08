@@ -442,6 +442,8 @@ while skip < ARGV.length
 		really_use_rm = v.to_s
 		if ['true'].include?(really_use_rm.downcase)
 			really_use_rm = true
+		elsif [nil, 'nil', 'null', 'none'].include?(really_use_rm.downcase)
+			really_use_rm = nil	# don't rm or bug user at all
 		else
 			really_use_rm = false
 		end
@@ -653,10 +655,13 @@ if extern.length > 0
 					repo_okay = true
 				else
 					$stderr.puts "Repository: '#{repository}' doesn't match installed."
-					if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
-						`rm -rf "#{bd}"`
-					else
-						$stderr.puts `echo please: rm -rf "#{bd}"`	# safer for now
+
+					if not(really_use_rm.nil?)	# if it's nil, never bug the user...
+						if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
+							`rm -rf "#{bd}"`
+						else
+							$stderr.puts `echo please: rm -rf "#{bd}"`	# safer for now
+						end
 					end
 				end
 				# pull latest in if it exists
@@ -692,10 +697,12 @@ end
 []).uniq.each do |i|
 	b = File.basename(i)
 	if not native.include?(b)
-		if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
-			`rm -rf "#{i}"`
-		else
-			$stderr.puts `echo please: rm -rf "#{i}"`	# safer for now
+		if not(really_use_rm.nil?)	# if it's nil, never bug the user...
+			if (really_use_rm_once.nil? and really_use_rm) or (not(really_use_rm_once.nil?) and really_use_rm_once)
+				`rm -rf "#{i}"`
+			else
+				$stderr.puts `echo please: rm -rf "#{i}"`	# safer for now
+			end
 		end
 	end
 end
