@@ -8,4 +8,8 @@ https://ttboj.wordpress.com/2014/05/13/vagrant-on-fedora-with-libvirt-reprise/
 
 In Fedora 21+ Vagrant and Vagrant-Libvirt should be included in the distro.
 
+In Fedora 22+ Oh-My-Vagrant is now available as a COPR:
+https://copr.fedoraproject.org/coprs/purpleidea/oh-my-vagrant/
+https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/
+
 Happy Hacking!

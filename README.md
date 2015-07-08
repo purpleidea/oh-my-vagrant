@@ -27,6 +27,8 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
   * [https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/)
   * [https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/)
   * [https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/05/02/kubernetes-clusters-with-oh-my-vagrant/)
+  * [https://ttboj.wordpress.com/2015/06/12/a-super-privileged-puppet-container/](https://ttboj.wordpress.com/2015/06/12/a-super-privileged-puppet-container/)
+  * [https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/](https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/)
 * There are some screencasts available:
   * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv)
   * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv)
