@@ -37,8 +37,8 @@ git checkout feat/oh-my-vagrant || (
 	exit 1
 )
 
-if [ -e ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/lib/ ]; then
-	rsync -av --delete lib/ ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/lib/
+if [ -e ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/ ]; then
+	rsync -av --delete . ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/
 fi
 
 echo 'Patched successfully!'
