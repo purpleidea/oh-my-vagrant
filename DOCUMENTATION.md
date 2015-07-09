@@ -181,6 +181,18 @@ changes to my Vagrant environment.
 
 ###Why are there multiple network interfaces created on each OMV managed host?
 
+Each VM brought up by OMV and vagrant-libvirt typically has two interfaces by
+default. The first interface on the VM (which uses DHCP) is used to initially
+get a connection to vagrant, since vagrant finds the machines by looking in the
+DHCP leases table in Dnsmasq. This is the only way vagrant can find the IP
+address. It would be great if there was an out of band communication method,
+but nothing like this exists in vagrant-libvirt at this time. After vagrant
+has found the VM, it makes all of its changes over this interface using SSH.
+Since the first interface requires DHCP, and because many multi host clusters
+prefer a consistent (statically assigned) IP address across reboots, OMV adds a
+second interface which has this statically assigned address. It also provides
+DNS for this network interface via the `/etc/hosts` file.
+
 ###Do you have any tricks for using Vagrant and Vagrant-Libvirt?
 
 I've written a bunch about Vagrant and Vagrant-Libvirt on my
