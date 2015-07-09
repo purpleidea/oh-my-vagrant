@@ -213,6 +213,9 @@ if File.exist?(f)
 	update = settings[:update]
 	comment = settings[:comment]
 	really_use_rm = settings[:reallyrm]
+	if [nil, 'nil', 'null', 'none'].include?(really_use_rm.downcase)
+		really_use_rm = nil	# don't rm or bug user at all
+	end
 end
 
 # ARGV parser
