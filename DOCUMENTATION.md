@@ -179,6 +179,8 @@ project. I took what I learnt about Vagrant, and generalized that in a single
 project. Now I don't have to duplicate code, or waste time when I want to make
 changes to my Vagrant environment.
 
+###Why are there multiple network interfaces created on each OMV managed host?
+
 ###Do you have any tricks for using Vagrant and Vagrant-Libvirt?
 
 I've written a bunch about Vagrant and Vagrant-Libvirt on my
