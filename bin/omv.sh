@@ -28,6 +28,8 @@ args=$@
 
 if [ "$1" = '' ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
 	echo -e "Usage: ./"`basename $0`" --help | init [dir] | <vagrant cmd>"
+	vagrant	# display vagrant usage...
+	exit 1
 fi
 
 # initialize a new omv project (if called with $2 it puts mess in that folder!)
