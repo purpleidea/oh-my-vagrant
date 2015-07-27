@@ -15,7 +15,7 @@
 
 vagrant plugin list | grep -qF 'vagrant-hostmanager'
 if [ $? -ne 0 ]; then
-	vagrant plugin install vagrant-hostmanager
+	vagrant plugin install --plugin-version 1.5.0 vagrant-hostmanager
 fi
 
 vagrant plugin list | grep -qF 'vagrant-hostmanager (1.5.0)'
@@ -39,6 +39,9 @@ git checkout feat/oh-my-vagrant || (
 
 if [ -e ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/ ]; then
 	rsync -av --delete . ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/
+else
+	echo 'Problem copying code!'
+	exit 1
 fi
 
 echo 'Patched successfully!'
