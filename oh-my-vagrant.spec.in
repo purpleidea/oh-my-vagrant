@@ -15,6 +15,12 @@ Requires: vagrant-libvirt >= 0.0.24
 # git should really be a "suggests", since technically it's optional
 Requires: git
 Requires: polkit-pkla-compat
+# these deps are "runtime" because vagrant-hostmanager is built in userspace
+# if vagrant-hostmanager is ever packaged, then these deps should go away...
+Requires: ruby-devel
+Requires: gcc
+Requires: gcc-c++
+Requires: libvirt-devel
 
 %description
 An easy to use dev environment for using vagrant with puppet, docker and more!
