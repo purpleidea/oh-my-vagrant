@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: all docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr
+.PHONY: all version docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr
 .SILENT:
 
 # version of the program
-VERSION := $(shell git tag | sort -r --version-sort | head -1)
+# TODO: technically the star match should be "one or more" matches instead...
+VERSION := $(shell git describe --match '[0-9]*\.[0-9]*\.[0-9]*' --tags --dirty)
 RELEASE = 1
 SPEC = rpmbuild/SPECS/oh-my-vagrant.spec
 SOURCE = rpmbuild/SOURCES/oh-my-vagrant-$(VERSION).tar.bz2
@@ -31,6 +32,10 @@ SERVER = 'dl.fedoraproject.org'
 REMOTE_PATH = 'pub/alt/$(USERNAME)/oh-my-vagrant'
 
 all: docs rpm
+
+# show the current version
+version:
+	@echo $(VERSION)
 
 #
 #	aliases
