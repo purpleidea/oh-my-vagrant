@@ -30,5 +30,6 @@
 :poolid: true
 :repos: []
 :update: false
+:nested: false
 :comment: sub folder simple docker file build example
 :reallyrm: false

@@ -32,5 +32,6 @@
 :poolid: true
 :repos: []
 :update: false
+:nested: false
 :comment: 'simple kubernetes on atomic example without cached images'
 :reallyrm: false

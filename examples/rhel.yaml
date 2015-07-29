@@ -22,5 +22,6 @@
 :poolid: true
 :repos: []
 :update: false
+:nested: false
 :comment: simple rhel example
 :reallyrm: false

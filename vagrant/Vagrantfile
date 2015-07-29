@@ -89,6 +89,7 @@ password = ''			# default subscription manager password
 poolid = true			# default list of poolid's (true to auto-attach)
 repos = []			# default list of extra repos's to enable
 update = false			# determine whether or not to update the box on vagrant up
+nested = false			# should we allow vm nesting
 comment = ''			# store a comment field in the omv.yaml file
 
 def array_values_to_array_of_hashes(l)
@@ -211,6 +212,7 @@ if File.exist?(f)
 	poolid = settings[:poolid]
 	repos = settings[:repos]
 	update = settings[:update]
+	nested = settings[:nested]
 	comment = settings[:comment]
 	really_use_rm = settings[:reallyrm]
 	if [nil, 'nil', 'null', 'none'].include?(really_use_rm.to_s.downcase)
@@ -432,6 +434,17 @@ while skip < ARGV.length
 			update = false
 		end
 
+	elsif ARGV[skip].start_with?(arg='--omv-nested=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		nested = v.to_s
+		if ['true'].include?(nested.downcase)
+			nested = true
+		else
+			nested = false
+		end
+
 	elsif ARGV[skip].start_with?(arg='--omv-comment=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
@@ -492,6 +505,7 @@ settings = {
 	:poolid => poolid,
 	:repos => repos,
 	:update => update,
+	:nested => nested,
 	:comment => comment,
 	:reallyrm => really_use_rm.nil?? 'nil' : really_use_rm,
 }
@@ -838,6 +852,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
+		vm_nested = x.fetch(:nested, nested) # get value
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
@@ -1335,6 +1350,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if puppet and vm_puppet and h == 'puppet'
 					libvirt.cpus = 2
 					libvirt.memory = 1024
+				end
+
+				# allow nesting vm's
+				if vm_nested
+					libvirt.nested = true
+					libvirt.cpu_mode = 'host-model'
 				end
 			end
 			vm.vm.provider :virtualbox do |vb|

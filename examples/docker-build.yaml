@@ -26,5 +26,6 @@
 :poolid: true
 :repos: []
 :update: false
+:nested: false
 :comment: simple docker build example
 :reallyrm: false

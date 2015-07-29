@@ -36,5 +36,6 @@
 :poolid: true
 :repos: []
 :update: false
+:nested: false
 :comment: fake kubernetes example
 :reallyrm: false
