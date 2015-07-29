@@ -67,6 +67,8 @@ vms = [
 domain = 'example.com'		# demain domain to use (yes this *can* work)
 network = '192.168.123.0/24'	# default network to use
 image = 'centos-7.1'		# default image name
+cpus = ''			# default vcpu count in int (default to undef)
+memory = ''			# default memory size in mb (default to undef)
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 folder = ''			# default folder prefix
@@ -190,6 +192,8 @@ if File.exist?(f)
 	domain = settings[:domain]
 	network = settings[:network]
 	image = settings[:image]
+	cpus = settings[:cpus]
+	memory = settings[:memory]
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
 	folder = settings[:folder] if not(load_folder)
@@ -242,6 +246,18 @@ while skip < ARGV.length
 		v.slice! arg
 
 		image = v.to_s	# set base image
+
+	elsif ARGV[skip].start_with?(arg='--omv-cpus=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		cpus = v.to_i		# set cpus count
+
+	elsif ARGV[skip].start_with?(arg='--omv-memory=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		memory = v.to_i		# set memory amount
 
 	elsif ARGV[skip].start_with?(arg='--omv-boxurlprefix=')
 		v = ARGV.delete_at(skip).dup
@@ -485,6 +501,8 @@ settings = {
 	:domain => domain,
 	:network => network,
 	:image => image,
+	:cpus => cpus,
+	:memory => memory,
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
 	:folder => folder,
@@ -842,6 +860,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		h = x[:name]
 		ip = x.fetch(:ip) # get value
 		vm_image = x.fetch(:image, image)	# get value
+		vm_cpus = x.fetch(:cpus, cpus)		# get value
+		vm_memory = x.fetch(:memory, memory)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
@@ -1345,10 +1365,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				#		:type => 'qcow2'
 				#
 				#end
+				if vm_cpus.to_i != 0	# handles '', nil, & 0
+					libvirt.cpus = vm_cpus
 
 				# make puppet server a bit fatter by default :P
-				if (puppet and vm_puppet and h == 'puppet') or vm_nested
+				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
 					libvirt.cpus = 2
+				end
+
+				if vm_memory.to_i != 0
+					libvirt.memory = vm_memory
+
+				# make puppet server a bit fatter by default :P
+				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
 					libvirt.memory = 1024
 				end
 
@@ -1359,9 +1388,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 			end
 			vm.vm.provider :virtualbox do |vb|
+
+				if vm_cpus.to_i != 0	# handles '', nil, & 0
+					vb.customize ["modifyvm", :id, "--cpus", "#{vm_cpus}"]
+
 				# make puppet server a bit fatter by default :P
-				if (puppet and vm_puppet and h == 'puppet') or vm_nested
+				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
 					vb.customize ["modifyvm", :id, "--cpus", "2"]
+				end
+
+				if vm_memory.to_i != 0
+					vb.customize ["modifyvm", :id, "--memory", "#{vm_memory}"]
+
+				# make puppet server a bit fatter by default :P
+				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
 					vb.customize ["modifyvm", :id, "--memory", "1024"]
 				end
 			end

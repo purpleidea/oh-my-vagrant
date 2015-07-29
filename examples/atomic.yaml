@@ -2,6 +2,8 @@
 :domain: example.com
 :network: 192.168.123.0/24
 :image: atomic-fedora-22
+:cpus: ''
+:memory: ''
 :boxurlprefix: ''
 :sync: rsync
 :folder: ''
