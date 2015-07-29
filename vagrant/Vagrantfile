@@ -1360,7 +1360,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 			vm.vm.provider :virtualbox do |vb|
 				# make puppet server a bit fatter by default :P
-				if puppet and vm_puppet and h == 'puppet'
+				if (puppet and vm_puppet and h == 'puppet') or vm_nested
 					vb.customize ["modifyvm", :id, "--cpus", "2"]
 					vb.customize ["modifyvm", :id, "--memory", "1024"]
 				end
