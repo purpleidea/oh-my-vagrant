@@ -20,8 +20,13 @@
 
 # version of the program
 # TODO: technically the star match should be "one or more" matches instead...
-VERSION := $(shell git describe --match '[0-9]*\.[0-9]*\.[0-9]*' --tags --dirty)
-RELEASE = 1
+VERSION := $(shell git describe --match '[0-9]*\.[0-9]*\.[0-9]*' --tags --abbrev=0)
+HACKED_VERSION := $(shell git describe --match '[0-9]*\.[0-9]*\.[0-9]*' --tags --dirty)
+ifeq ($(VERSION),$(HACKED_VERSION))
+	RELEASE = 1
+else
+	RELEASE = untagged
+endif
 SPEC = rpmbuild/SPECS/oh-my-vagrant.spec
 SOURCE = rpmbuild/SOURCES/oh-my-vagrant-$(VERSION).tar.bz2
 SRPM = rpmbuild/SRPMS/oh-my-vagrant-$(VERSION)-$(RELEASE).src.rpm
@@ -95,7 +100,7 @@ $(SPEC): rpmbuild/ oh-my-vagrant.spec.in
 $(SOURCE): rpmbuild/
 	@echo Running git archive...
 	# use HEAD if tag doesn't exist yet, so that development is easier...
-	git archive --prefix=oh-my-vagrant-$(VERSION)/ -o $(SOURCE) $(VERSION) 2> /dev/null || (echo 'Warning: $(VERSION) does not exist.' && git archive --prefix=oh-my-vagrant-$(VERSION)/ -o $(SOURCE) HEAD)
+	git archive --prefix=oh-my-vagrant-$(VERSION)/ -o $(SOURCE) $(VERSION) 2> /dev/null || (echo 'Warning: $(VERSION) does not exist. Using HEAD instead.' && git archive --prefix=oh-my-vagrant-$(VERSION)/ -o $(SOURCE) HEAD)
 	# TODO: if git archive had a --submodules flag this would easier!
 	@echo Running git archive submodules...
 	# i thought i would need --ignore-zeros, but it doesn't seem necessary!
