@@ -38,7 +38,7 @@ if [ "$1" = 'init' ]; then
 	# install user session dependencies automatically
 	# do this in init to avoid constant checking from normal vagrant runs
 	# this sha matches what I expect from the plugin!
-	if [ "`sha1sum ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/README.md | awk '{print $1}'`" != 'ad4b0de54cbefdd41bdcb0d6afb9c8d48e4d3bff' ]; then
+	if [ "`sha1sum ~/.vagrant.d/gems/gems/vagrant-hostmanager-1.5.0/README.md 2> /dev/null | awk '{print $1}'`" != 'ad4b0de54cbefdd41bdcb0d6afb9c8d48e4d3bff' ]; then
 		echo 'Oh-My-Vagrant needs to install a modified vagrant-hostmanager plugin.'
 		read -p 'Is this ok [y/N]: ' -r answer
 		if [[ $answer =~ ^[Yy]$ ]]
