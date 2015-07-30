@@ -20,6 +20,7 @@
 :ansible:
 - ansible-simple1/setup.yml
 :playbook: []
+:ansible_extras: {}
 :cachier: false
 :vms:
 - :name: primary1

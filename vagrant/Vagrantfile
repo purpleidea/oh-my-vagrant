@@ -80,6 +80,7 @@ docker = false			# default use of docker or not
 kubernetes = false		# default use of kubernetes or not
 ansible = []			# default ansible group list
 playbook = []			# default ansible playbook
+ansible_extras = {}		# default ansible extras
 cachier = false			# default cachier usage
 #vms = []			# default list of vms to build (defaults above)
 namespace = 'omv'		# default namespace (also used as network name)
@@ -205,6 +206,7 @@ if File.exist?(f)
 	kubernetes = settings [:kubernetes]
 	ansible = settings[:ansible]
 	playbook = settings[:playbook]
+	ansible_extras = settings[:ansible_extras]
 	cachier = settings[:cachier]
 	if settings[:vms].is_a?(Array)
 		vms = settings[:vms]
@@ -365,6 +367,13 @@ while skip < ARGV.length
 			playbook = []
 		end
 
+	elsif ARGV[skip].start_with?(arg='--omv-ansible-extras=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		# TODO: support this command line arg in some way...
+		ansible_extras = {}
+
 	elsif ARGV[skip].start_with?(arg='--omv-cachier=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
@@ -514,6 +523,7 @@ settings = {
 	:kubernetes => kubernetes,
 	:ansible => ansible,
 	:playbook => playbook,
+	:ansible_extras => ansible_extras,
 	:cachier => cachier,
 	:vms => vms,
 	:namespace => namespace,
@@ -870,6 +880,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_poolid = x.fetch(:poolid, poolid)	# get value
 		vm_repos = x.fetch(:repos, repos)	# get value
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
+		vm_ansible_extras = x.fetch(:ansible_extras, ansible_extras)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
 		vm_nested = x.fetch(:nested, nested) # get value
@@ -1349,7 +1360,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
 						ansible.host_key_checking = false
 						ansible.limit = 'all'
-						ansible.extra_vars = { ansible_ssh_user: 'root' }
+						ansible_sudo = vm_ansible_extras.fetch(:sudo, nil)
+						if ansible_sudo.is_a?(Bool)
+							ansible.sudo = ansible_sudo
+						end
+						ansible_extra_vars = vm_ansible_extras.fetch(:extra_vars, {})
+						ansible_extra_vars_hash = {}
+						if ansible_extra_vars.is_a?(Hash)
+							ansible_extra_vars.keys.sort.each do |akey|
+								ansible_extra_vars_hash[akey] = ansible_extra_vars[akey]
+							end
+						end
+						# add a default
+						if not ansible_extra_vars_hash.has_key?('ansible_ssh_user')
+							ansible_extra_vars_hash['ansible_ssh_user'] = 'root'
+						end
+						ansible.extra_vars = ansible_extra_vars_hash
 					end
 				end
 			end

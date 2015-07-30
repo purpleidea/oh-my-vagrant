@@ -29,6 +29,7 @@
   - fakeapp2/foo.json
 :ansible: []
 :playbook: []
+:ansible_extras: {}
 :cachier: false
 :vms: []
 :namespace: omv

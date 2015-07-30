@@ -25,6 +25,7 @@
   - kube-simple1/simple1.json
 :ansible: []
 :playbook: []
+:ansible_extras: {}
 :cachier: false
 :vms: []
 :namespace: omv

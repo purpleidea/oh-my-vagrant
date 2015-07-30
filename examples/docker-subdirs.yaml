@@ -23,6 +23,7 @@
 :kubernetes: false
 :ansible: []
 :playbook: []
+:ansible_extras: {}
 :cachier: false
 :vms: []
 :namespace: omv
