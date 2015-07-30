@@ -1355,7 +1355,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			if ansible_groups != {}
 				vm_playbook.each do |pb|
 					vm.vm.provision 'ansible' do |ansible|
-						ansible.playbook = folder+'ansible/modules/'+pb
+						# NOTE: this seems to need an absolute path spec
+						ansible.playbook = File.join(projectdir, folder+'ansible/modules/'+pb)
 						# reverse the mapping, so that the groups enumerate their hosts
 						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
 						ansible.host_key_checking = false
