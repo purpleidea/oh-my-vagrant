@@ -1361,7 +1361,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						ansible.host_key_checking = false
 						ansible.limit = 'all'
 						ansible_sudo = vm_ansible_extras.fetch(:sudo, nil)
-						if ansible_sudo.is_a?(Bool)
+						if ansible_sudo.is_a?(TrueClass) or ansible_sudo.is_a?(FalseClass)
 							ansible.sudo = ansible_sudo
 						end
 						ansible_extra_vars = vm_ansible_extras.fetch(:extra_vars, {})
