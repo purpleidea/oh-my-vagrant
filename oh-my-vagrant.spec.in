@@ -35,6 +35,7 @@ rm -rf %{buildroot}
 # _datadir is typically /usr/share/
 install -d -m 0755 %{buildroot}/%{_datadir}/oh-my-vagrant/
 cp -r oh-my-vagrant-%{project_version}/* %{buildroot}/%{_datadir}/oh-my-vagrant/
+echo %{project_version} > %{buildroot}/%{_datadir}/oh-my-vagrant/VERSION
 
 mkdir -p %{buildroot}/%{_bindir}
 install -m 0755 oh-my-vagrant-%{project_version}/bin/omv.sh %{buildroot}/%{_bindir}/omv

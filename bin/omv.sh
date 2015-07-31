@@ -32,6 +32,16 @@ if [ "$1" = '' ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
 	exit 1
 fi
 
+if [ "$1" = '--version' ]; then
+	if [ -e "${vagrantdir}VERSION" ]; then
+		echo -e "Version: "`cat ${vagrantdir}VERSION`
+		exit 0
+	else
+		echo "Can't find version file. Oh-My-Vagrant is not installed properly."
+		exit 1
+	fi
+fi
+
 # initialize a new omv project (if called with $2 it puts mess in that folder!)
 if [ "$1" = 'init' ]; then
 
