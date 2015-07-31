@@ -1055,7 +1055,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				# grow if root xfs file system abnormally small
 				# NOTE: empirically, the operating systems that
 				# use xfs as / also support the findmnt -b flag
-				vm.vm.provision 'shell', inline: '! findmnt -t xfs --target "/" || (test `findmnt --output "SIZE" -t xfs --target "/" -nb` -lt `expr 1024 \* 1024 \* 1024 \* 20` && xfs_growfs /)'
+				vm.vm.provision 'shell', inline: '! findmnt -t xfs --target "/" || (( !(findmnt -b 2> /dev/null) || test `findmnt --output "SIZE" -t xfs --target "/" -nb` -lt `expr 1024 \* 1024 \* 1024 \* 20`) && xfs_growfs /)'
 			end
 
 			# custom shell provisioner
