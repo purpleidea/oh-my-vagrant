@@ -33,8 +33,8 @@ if [ "$1" = '' ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
 fi
 
 if [ "$1" = '--version' ]; then
-	if [ -e "${vagrantdir}VERSION" ]; then
-		echo -e "Version: "`cat ${vagrantdir}VERSION`
+	if [ -e "${vagrantbase}VERSION" ]; then
+		echo -e "Version: "`cat ${vagrantbase}VERSION`
 		exit 0
 	else
 		echo "Can't find version file. Oh-My-Vagrant is not installed properly."
