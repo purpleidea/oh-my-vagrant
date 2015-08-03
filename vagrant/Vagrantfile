@@ -990,7 +990,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			#	shell
 			#
-			if not File.exists?(fv)	# only run these actions once!
+			first_run = not(File.exists?(fv))
+			if first_run	# only run these actions once!
 				if provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?(h))
 					File.open(fv, 'w') {}	# touch
 				end
@@ -1067,7 +1068,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						shell_once = sf.fetch('once', shell_once) # get value
 						si = sf.fetch('script', nil)
 						if not(si.nil?)
-							if not(shell_once) or (shell_once and not(File.exists?(fv)))
+							if not(shell_once) or (shell_once and first_run)
 								vm.vm.provision 'shell', inline: "#{si}"
 							end
 							next
@@ -1080,7 +1081,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 					sx = File.join(shell_basedir, sx)
 					if File.exists?(sx) and not(File.directory?(sx)) and File.executable?(sx)
-						if not(shell_once) or (shell_once and not(File.exists?(fv)))
+						if not(shell_once) or (shell_once and first_run)
 							vm.vm.provision 'shell', path: "#{sx}"
 						end
 					end
