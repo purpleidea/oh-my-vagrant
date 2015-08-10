@@ -1327,10 +1327,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			elsif puppet and vm_puppet and h == 'puppet'
 				vm.vm.provision :puppet do |p|
-					p.module_path = folder+'puppet/modules'
-					p.manifests_path = folder+'puppet/manifests'
+					p.module_path = File.join(projectdir, folder+'puppet/modules')
+					p.manifests_path = File.join(projectdir, folder+'puppet/manifests')
 					p.manifest_file = 'site.pp'
-					p.hiera_config_path = folder+'puppet/hiera.yaml'
+					p.hiera_config_path = File.join(projectdir, folder+'puppet/hiera.yaml')
 					# custom fact
 					p.facter = {
 						'vagrant' => '1',
