@@ -911,6 +911,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vm.vm.box = vm_image	# set vm specific image
 
 			synced_folder = '/vagrant'	# default sync folder
+			dot = "#{File.join(projectdir, folder)}"
 
 			# use a specialized vagrant box if it exists :)
 			if vm_docker
@@ -924,12 +925,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
 				disabled = true
 			end
-			vm.vm.synced_folder './', '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
+			vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
 
 			if vm.vm.box.start_with? 'atomic-'
 				synced_folder = '/home/vagrant/sync'
 				if vm_sync != ''
-					vm.vm.synced_folder '.', synced_folder, type: sync
+					vm.vm.synced_folder "#{dot}", synced_folder, type: sync
 				end
 			end
 
