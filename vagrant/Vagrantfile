@@ -68,6 +68,8 @@ domain = 'example.com'		# demain domain to use (yes this *can* work)
 network = '192.168.123.0/24'	# default network to use
 image = 'centos-7.1'		# default image name
 cpus = ''			# default vcpu count in int (default to undef)
+disks = 0			# default additional disks (default to none)
+disksize = '20G'		# default additioanl disk size (defaults to 20G)
 memory = ''			# default memory size in mb (default to undef)
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
@@ -194,6 +196,8 @@ if File.exist?(f)
 	network = settings[:network]
 	image = settings[:image]
 	cpus = settings[:cpus]
+	disks = settings[:disks]
+	disksize = settings[:disksize]
 	memory = settings[:memory]
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
@@ -511,6 +515,8 @@ settings = {
 	:network => network,
 	:image => image,
 	:cpus => cpus,
+	:disks => disks,
+	:disksize => disksize,
 	:memory => memory,
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
@@ -869,6 +875,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	vms.each_with_index do |x, i|
 		h = x[:name]
 		ip = x.fetch(:ip) # get value
+		vm_disks = x.fetch(:disks, disks)	# get value
+		vm_disksize = x.fetch(:disksize, disksize)	# get value
 		vm_image = x.fetch(:image, image)	# get value
 		vm_cpus = x.fetch(:cpus, cpus)		# get value
 		vm_memory = x.fetch(:memory, memory)	# get value
@@ -1009,16 +1017,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
 					if username != '' and password != ''
 						vm.vm.provision 'shell', inline: "subscription-manager register --username=#{username} --password=#{password}"
+					end
 
-						# attach correct pools
-						if vm_poolid.is_a?(Array)
-							vm_poolid.each do |j|
-								vm.vm.provision 'shell', inline: "subscription-manager attach --pool=#{j}"
-							end
-						elsif vm_poolid
-							# auto attach if value is true
-							vm.vm.provision 'shell', inline: 'subscription-manager attach --auto'
+					# attach correct pools
+					if vm_poolid.is_a?(Array)
+						vm_poolid.each do |j|
+							vm.vm.provision 'shell', inline: "subscription-manager attach --pool=#{j}"
 						end
+
+					elsif vm_poolid
+						# auto attach if value is true
+						vm.vm.provision 'shell', inline: 'subscription-manager attach --auto'
 					end
 
 					# enable particular repositories
@@ -1384,15 +1393,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			vm.vm.provider :libvirt do |libvirt|
 				# add additional disks to the os
-				#(1..disks).each do |j|	# if disks is 0, this passes :)
-				#	#print "disk: #{j}"
-				#	libvirt.storage :file,
-				#		#:path => '',		# auto!
-				#		#:device => 'vdb',	# auto!
-				#		#:size => '10G',	# auto!
-				#		:type => 'qcow2'
-				#
-				#end
+				if vm_disks.to_i !=0
+					(1..vm_disks).each do |j|	# if disks is 0, this passes :)
+						#print "disk: #{j}"
+						libvirt.storage :file,
+							#:path => '',		# auto!
+							#:device => 'vdb',	# auto!
+							:size => vm_disksize,
+							:type => 'qcow2'
+					
+					end
+				end
 				if vm_cpus.to_i != 0	# handles '', nil, & 0
 					libvirt.cpus = vm_cpus
 
