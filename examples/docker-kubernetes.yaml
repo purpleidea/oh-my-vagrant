@@ -4,6 +4,8 @@
 :image: centos-7.1-docker
 :cpus: ''
 :memory: ''
+:disks: 0
+:disksize: '40G'
 :boxurlprefix: ''
 :sync: rsync
 :folder: ''
