@@ -877,7 +877,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		ip = x.fetch(:ip) # get value
 		vm_image = x.fetch(:image, image)	# get value
 		vm_disks = x.fetch(:disks, disks)       # get value
-                vm_disksize = x.fetch(:disksize, disksize)      # get value
+		vm_disksize = x.fetch(:disksize, disksize)      # get value
 		vm_cpus = x.fetch(:cpus, cpus)		# get value
 		vm_memory = x.fetch(:memory, memory)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
