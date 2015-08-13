@@ -24,7 +24,7 @@ fi
 vagrantbase="$vagrantdir"
 vagrantdir="$vagrantdir""vagrant/"		# append vagrant/ path postfix!
 projectdir="`pwd`"	# default to where we are
-args=$@
+args=("$@")	# save as an array
 
 if [ "$1" = '' ] || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
 	echo -e "Usage: ./"`basename $0`" --help | init [dir] | <vagrant cmd>"
@@ -65,11 +65,12 @@ if [ "$1" = 'init' ]; then
 		fi
 	fi
 
-	args='status'
+	args=('status')
 	if [ "$2" != '' ]; then
 		mkdir -p "$projectdir/$2"
 		ln -s "$2/omv.yaml" 'omv.yaml'	# relative, not absolute symlink!
-		args="--omv-folder=$2 $args"
+		args+=("--omv-folder=$2")
+		args+=('status')
 	fi
 fi
 
@@ -84,4 +85,4 @@ while [ "$omvsearch" != "/" ]; do
 done
 
 # this is where the magic happens...
-VAGRANT_CWD="$vagrantdir" VAGRANT_DOTFILE_PATH="$projectdir/.vagrant/" vagrant $args
+VAGRANT_CWD="$vagrantdir" VAGRANT_DOTFILE_PATH="$projectdir/.vagrant/" vagrant "${args[@]}"
