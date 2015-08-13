@@ -4,6 +4,8 @@
 :image: fedora-21
 :cpus: ''
 :memory: ''
+:disks: 0
+:disksize: '40G' 
 :boxurlprefix: ''
 :sync: rsync
 :folder: ''
