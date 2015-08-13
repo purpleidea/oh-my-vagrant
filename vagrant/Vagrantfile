@@ -628,6 +628,14 @@ if sync == 'nfs' and ((ARGV.length > 0 and ARGV[0] == 'init') or not(File.exist?
 	`firewall-cmd --reload`
 end
 
+create_directories = true
+ssh_config = ARGV.select { |x| !x.start_with?('-') }
+if ssh_config.length > 0 and ssh_config[0] == 'ssh-config'
+	# don't create a new Vagrant environment if the user accidentally
+	# runs vscreen in the wrong directory.
+	create_directories = false
+end
+
 # this extern code should be one of the *last* things before the big configure!
 folder = (folder + '/') if not(folder.end_with?('/'))	# ensure trailing slash
 folder = '' if folder.start_with?('/')	# only relative paths are allowed...
@@ -643,15 +651,17 @@ docker_basedir = File.join(projectdir, folder, 'docker/')
 kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
 ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
 
-# mkdir in case these folders are missing
-mkdirp = 'mkdir -p'
-mkdirp += " #{puppet_basedir}"
-mkdirp += " #{shell_basedir}"
-mkdirp += " #{ansible_basedir}"
-mkdirp += " #{docker_basedir}"
-mkdirp += " #{kubernetes_basedir}"
-mkdirp += " #{ktemplates_basedir}"
-`#{mkdirp}`
+if create_directories
+	# mkdir in case these folders are missing
+	mkdirp = 'mkdir -p'
+	mkdirp += " #{puppet_basedir}"
+	mkdirp += " #{shell_basedir}"
+	mkdirp += " #{ansible_basedir}"
+	mkdirp += " #{docker_basedir}"
+	mkdirp += " #{kubernetes_basedir}"
+	mkdirp += " #{ktemplates_basedir}"
+	`#{mkdirp}`
+end
 
 native = []	# native files
 native += `cd "#{puppet_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
