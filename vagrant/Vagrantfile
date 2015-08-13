@@ -1393,7 +1393,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vm.vm.provider :libvirt do |libvirt|
 				# add additional disks to the os
 				if vm_disks.to_i !=0
-					(1..vm_disks.each do |j|
+					(1..vm_disks).each do |j|
 					libvirt.storage :file,
 						#:path => '',		#auto!
 						#:device => 'vdb',	#auto!
