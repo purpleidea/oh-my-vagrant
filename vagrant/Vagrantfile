@@ -1009,17 +1009,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
 					if username != '' and password != ''
 						vm.vm.provision 'shell', inline: "subscription-manager register --username=#{username} --password=#{password}"
-					end
 
-					# attach correct pools
-					if vm_poolid.is_a?(Array)
-						vm_poolid.each do |j|
-							vm.vm.provision 'shell', inline: "subscription-manager attach --pool=#{j}"
+						# attach correct pools
+						if vm_poolid.is_a?(Array)
+							vm_poolid.each do |j|
+								vm.vm.provision 'shell', inline: "subscription-manager attach --pool=#{j}"
+							end
+						elsif vm_poolid
+							# auto attach if value is true
+							vm.vm.provision 'shell', inline: 'subscription-manager attach --auto'
 						end
-
-					elsif vm_poolid
-						# auto attach if value is true
-						vm.vm.provision 'shell', inline: 'subscription-manager attach --auto'
 					end
 
 					# enable particular repositories
