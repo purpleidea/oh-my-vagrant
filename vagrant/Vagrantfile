@@ -1451,6 +1451,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#
 	config.vm.provider :libvirt do |libvirt|
 		libvirt.driver = 'kvm'	# needed for kvm performance benefits !
+		libvirt.graphics_type = 'spice'
+		libvirt.video_type = 'qxl'
 		# leave out to connect directly with qemu:///system
 		#libvirt.host = 'localhost'
 		libvirt.connect_via_ssh = false
