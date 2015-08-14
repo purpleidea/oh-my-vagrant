@@ -349,6 +349,11 @@ Currently undocumented.
 ####`repos`
 Currently undocumented.
 
+####`unsafe`
+Set this to true if you want to use KVM's unsafe cache mode. If you do this, you
+will trade data integrity on your development environment's filesystem for a
+noticeable speed boost. See http://libvirt.org/formatdomain.html#elementsDisks
+
 ###Command line
 The command line arguments are currently undocumented. If you'd like to help
 improve these, please send a patch. They are not critical to Oh-My-Vagrant

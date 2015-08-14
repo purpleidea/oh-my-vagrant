@@ -53,6 +53,7 @@
 :poolid: true
 :repos: []
 :update: false
+:unsafe: false
 :nested: false
 :comment: contrived puppet-gluster example
 :reallyrm: false

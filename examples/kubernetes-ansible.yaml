@@ -42,6 +42,7 @@
 :poolid: true
 :repos: []
 :update: false
+:unsafe: false
 :nested: false
 :comment: ''
 :reallyrm: false

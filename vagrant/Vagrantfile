@@ -92,6 +92,7 @@ password = ''			# default subscription manager password
 poolid = true			# default list of poolid's (true to auto-attach)
 repos = []			# default list of extra repos's to enable
 update = false			# determine whether or not to update the box on vagrant up
+unsafe = false			# true will trade data safety for performance gains
 nested = false			# should we allow vm nesting
 comment = ''			# store a comment field in the omv.yaml file
 
@@ -218,6 +219,7 @@ if File.exist?(f)
 	poolid = settings[:poolid]
 	repos = settings[:repos]
 	update = settings[:update]
+	unsafe = settings[:unsafe]
 	nested = settings[:nested]
 	comment = settings[:comment]
 	really_use_rm = settings[:reallyrm]
@@ -459,6 +461,17 @@ while skip < ARGV.length
 			update = false
 		end
 
+	elsif ARGV[skip].start_with?(arg='--omv-unsafe=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		unsafe = v.to_s
+		if ['true'].include?(unsafe.downcase)
+			unsafe = true
+		else
+			unsafe = false
+		end
+
 	elsif ARGV[skip].start_with?(arg='--omv-nested=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
@@ -533,6 +546,7 @@ settings = {
 	:poolid => poolid,
 	:repos => repos,
 	:update => update,
+	:unsafe => unsafe,
 	:nested => nested,
 	:comment => comment,
 	:reallyrm => really_use_rm.nil?? 'nil' : really_use_rm,
@@ -893,6 +907,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_ansible_extras = x.fetch(:ansible_extras, ansible_extras)	# get value
 		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
+		vm_unsafe = x.fetch(:unsafe, unsafe) # get value
 		vm_nested = x.fetch(:nested, nested) # get value
 
 		# sanity check the user-supplied IP addresses and gracefully fail
@@ -1417,6 +1432,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				# make puppet server a bit fatter by default :P
 				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
 					libvirt.memory = 1024
+				end
+
+				# use kvm's unsafe mode
+				if vm_unsafe
+					# Configure the Vagrant environment to use kvm's unsafe cache mode.
+					# If you do this, you will trade data integrity on your development
+					# environment's filesystem for a noticeable speed boost.
+					# See http://libvirt.org/formatdomain.html#elementsDisks
+					libvirt.volume_cache = 'unsafe'
 				end
 
 				# allow nesting vm's
