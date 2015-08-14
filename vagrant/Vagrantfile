@@ -69,6 +69,8 @@ network = '192.168.123.0/24'	# default network to use
 image = 'centos-7.1'		# default image name
 cpus = ''			# default vcpu count in int (default to undef)
 memory = ''			# default memory size in mb (default to undef)
+disks = 0                       # default additional disks (default to none)
+disksize = '40G'                # default additional disk size (defaults to 20G)
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 folder = ''			# default folder prefix
@@ -196,6 +198,8 @@ if File.exist?(f)
 	image = settings[:image]
 	cpus = settings[:cpus]
 	memory = settings[:memory]
+	disks = settings[:disks]
+	disksize = settings[:disksize]
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
 	folder = settings[:folder] if not(load_folder)
@@ -262,6 +266,18 @@ while skip < ARGV.length
 		v.slice! arg
 
 		memory = v.to_i		# set memory amount
+
+        elsif ARGV[skip].start_with?(arg='--omv-disks=')
+                v = ARGV.delete_at(skip).dup
+                v.slice! arg
+
+                disks = v.to_i		# set extra disk amount
+
+        elsif ARGV[skip].start_with?(arg='--omv-disksize=')
+                v = ARGV.delete_at(skip).dup
+                v.slice! arg
+
+                disksize = v.to_s	# set extra disk size
 
 	elsif ARGV[skip].start_with?(arg='--omv-boxurlprefix=')
 		v = ARGV.delete_at(skip).dup
@@ -525,6 +541,8 @@ settings = {
 	:image => image,
 	:cpus => cpus,
 	:memory => memory,
+	:disks => disks,
+	:disksize => disksize,
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
 	:folder => folder,
@@ -896,6 +914,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_image = x.fetch(:image, image)	# get value
 		vm_cpus = x.fetch(:cpus, cpus)		# get value
 		vm_memory = x.fetch(:memory, memory)	# get value
+		vm_disks = x.fetch(:disks, disks)	# get value
+		vm_disksize = x.fetch(:disksize, disksize)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
@@ -1408,16 +1428,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			vm.vm.provider :libvirt do |libvirt|
-				# add additional disks to the os
-				#(1..disks).each do |j|	# if disks is 0, this passes :)
-				#	#print "disk: #{j}"
-				#	libvirt.storage :file,
-				#		#:path => '',		# auto!
-				#		#:device => 'vdb',	# auto!
-				#		#:size => '10G',	# auto!
-				#		:type => 'qcow2'
-				#
-				#end
+				if vm_disks.to_i !=0
+				(	1..vm_disks).each do |j|	# if disks is 0, this passes :)
+						libvirt.storage :file,
+							#:path => '',		# auto!
+							#:device => 'vdb',	# auto!
+							:size => vm_disksize,
+							:type => 'qcow2'
+				end
+
 				if vm_cpus.to_i != 0	# handles '', nil, & 0
 					libvirt.cpus = vm_cpus
 
