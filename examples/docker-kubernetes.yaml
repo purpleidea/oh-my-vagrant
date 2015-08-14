@@ -35,6 +35,7 @@
 :poolid: true
 :repos: []
 :update: false
+:unsafe: false
 :nested: false
 :comment: simple docker kubernetes example
 :reallyrm: false
