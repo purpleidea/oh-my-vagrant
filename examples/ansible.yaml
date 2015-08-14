@@ -5,7 +5,7 @@
 :cpus: ''
 :memory: ''
 :disks: 0
-:disksize: '40G' 
+:disksize: '40G'
 :boxurlprefix: ''
 :sync: rsync
 :folder: ''
