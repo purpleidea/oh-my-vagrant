@@ -1428,14 +1428,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			vm.vm.provider :libvirt do |libvirt|
-				if vm_disks.to_i !=0
-				(	1..vm_disks).each do |j|	# if disks is 0, this passes :)
-						libvirt.storage :file,
-							#:path => '',		# auto!
-							#:device => 'vdb',	# auto!
-							:size => vm_disksize,
-							:type => 'qcow2'
-				end
+				(0..vm_disks.to_i-1).each do |j|	# if disks is 0, this passes :)
+					libvirt.storage :file,
+						#:path => '',		# auto!
+						#:device => 'vdb',	# auto!
+						:size => vm_disksize,
+						:type => 'qcow2'
 
 				if vm_cpus.to_i != 0	# handles '', nil, & 0
 					libvirt.cpus = vm_cpus
