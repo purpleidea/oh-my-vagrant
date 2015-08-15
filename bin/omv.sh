@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # This is: Oh My Vagrant!
 # Copyright (C) 2012-2015+ James Shubin
