@@ -41,7 +41,7 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * [https://github.com/purpleidea/vagrant-hostmanager/](vagrant-hostmanager)
   * you need the feat/oh-my-vagrant patches for this to work properly
   * to install them, run the script from: [extras/patch-hostmanager.sh](extras/patch-hostmanager.sh)
-* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (required, built-in)
+* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (optional, built-in)
 * [puppet-module-data](https://github.com/ripienaar/puppet-module-data/) (optional, puppet >= 3.0.0, built-in)
 * my [puppet-puppet](https://github.com/purpleidea/puppet-puppet) module (optional, built-in)
 * my [puppet-yum](https://github.com/purpleidea/puppet-yum) module (optional, built-in)
