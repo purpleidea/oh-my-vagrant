@@ -69,7 +69,7 @@ if [ "$1" = 'init' ]; then
 	if [ "$2" != '' ]; then
 		mkdir -p "$projectdir/$2"
 		ln -s "$2/omv.yaml" 'omv.yaml'	# relative, not absolute symlink!
-		args+=("--omv-folder=$2")
+		args=("--omv-folder=$2")
 		args+=('status')
 	fi
 fi
