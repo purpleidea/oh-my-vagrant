@@ -1434,6 +1434,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						#:device => 'vdb',	# auto!
 						:size => vm_disksize,
 						:type => 'qcow2'
+				end
 
 				if vm_cpus.to_i != 0	# handles '', nil, & 0
 					libvirt.cpus = vm_cpus
