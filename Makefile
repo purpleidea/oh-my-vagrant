@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: all version docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr
+.PHONY: all version docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr test
 .SILENT:
 
 # version of the program
@@ -174,5 +174,10 @@ upload-rpms: rpmbuild/RPMS/ rpmbuild/RPMS/SHA256SUMS rpmbuild/RPMS/SHA256SUMS.as
 #
 copr: upload-srpms
 	./extras/copr-build.py https://$(SERVER)/$(REMOTE_PATH)/SRPMS/$(SRPM_BASE)
+
+#
+#	test
+#
+	./test.sh
 
 # vim: ts=8
