@@ -585,7 +585,7 @@ password = '' if password.nil?
 # networking
 network_obj = IPAddr.new network
 range = network_obj.to_range.to_a
-cidr = (32-(Math.log(range.length)/Math.log(2))).to_i
+#cidr = (32-(Math.log(range.length)/Math.log(2))).to_i
 offset = 100		# start hosts after here
 # remove reserved values
 range[0] = '__reserved_network_addr'	# network
@@ -908,7 +908,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#
 	#	vms mainloop to define all the machines
 	#
-	vms.each_with_index do |x, i|
+	vms.each do |x|
 		h = x[:name]
 		ip = x.fetch(:ip) # get value
 		vm_image = x.fetch(:image, image)	# get value
@@ -932,7 +932,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 		# sanity check the user-supplied IP addresses and gracefully fail
 		# puppet server is special, so we skip it here
-		if h != 'puppet' then
+		if h != 'puppet'
 			error_check = range.include? IPAddr.new ip
 			message = "#{namespace}:#{h}: ERROR: #{ip} is not in the valid range of IPs: #{range[3].to_s}..#{range[-2].to_s}"
 			message += "\nConsider changing 'network:' parameter in omv.yaml, or use the correct IP address from the range above!"
@@ -1135,11 +1135,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			# TODO: remove this chunk?
 			# ensure the $namespace module is present for provisioning...
-			if (puppet and vm_puppet and h == 'puppet') and (provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?('puppet')))
-				cwd = `pwd`
-				mod = File.join(projectdir, 'puppet', 'modules')
-				#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
-			end
+			#if (puppet and vm_puppet and h == 'puppet') and (provision.is_a?(TrueClass) or (provision.is_a?(Array) and provision.include?('puppet')))
+			#	cwd = `pwd`
+			#	mod = File.join(projectdir, 'puppet', 'modules')
+			#	#`cd #{mod} && make MODULENAME=#{namespace} #{namespace} &> /dev/null; cd #{cwd}`
+			#end
 
 			#
 			#	docker (in vm)
@@ -1212,7 +1212,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				ktemplates = {}
 				Dir.glob(File.join(kubernetes_templates, "#{ktemplates_host}/")+'*').each do |ktemplate|
 					kbdir = File.basename(ktemplate)
-					ktemplates[kbdir] = open(ktemplate, 'r') {|f| f.read}
+					ktemplates[kbdir] = open(ktemplate, 'r') {|ktf| ktf.read}
 				end
 
 				kubernetes_ostruct = OpenStruct.new({
@@ -1400,16 +1400,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			#
 			if ansible_groups != {}
 				vm_playbook.each do |pb|
-					vm.vm.provision 'ansible' do |ansible|
+					vm.vm.provision 'ansible' do |a|
 						# NOTE: this seems to need an absolute path spec
-						ansible.playbook = File.join(projectdir, folder+'ansible/modules/'+pb)
+						a.playbook = File.join(projectdir, folder+'ansible/modules/'+pb)
 						# reverse the mapping, so that the groups enumerate their hosts
-						ansible.groups = Hash[ansible_groups.values.flatten.uniq.map { |i| [i, ansible_groups.select{|_,v| not(v.nil?) and v.include?(i) }.keys ]}]
-						ansible.host_key_checking = false
-						ansible.limit = 'all'
+						a.groups = Hash[ansible_groups.values.flatten.uniq.map { |ai| [ai, ansible_groups.select{|_,av| not(av.nil?) and av.include?(ai) }.keys ]}]
+						a.host_key_checking = false
+						a.limit = 'all'
 						ansible_sudo = vm_ansible_extras.fetch(:sudo, nil)
 						if ansible_sudo.is_a?(TrueClass) or ansible_sudo.is_a?(FalseClass)
-							ansible.sudo = ansible_sudo
+							a.sudo = ansible_sudo
 						end
 						ansible_extra_vars = vm_ansible_extras.fetch(:extra_vars, {})
 						ansible_extra_vars_hash = {}
@@ -1422,13 +1422,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						if not ansible_extra_vars_hash.has_key?('ansible_ssh_user')
 							ansible_extra_vars_hash['ansible_ssh_user'] = 'root'
 						end
-						ansible.extra_vars = ansible_extra_vars_hash
+						a.extra_vars = ansible_extra_vars_hash
 					end
 				end
 			end
 
 			vm.vm.provider :libvirt do |libvirt|
-				(0..vm_disks.to_i-1).each do |j|	# if disks is 0, this passes :)
+				(0..vm_disks.to_i-1).each do	# if disks is 0, this passes :)
 					libvirt.storage :file,
 						#:path => '',		# auto!
 						#:device => 'vdb',	# auto!
