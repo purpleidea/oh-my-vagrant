@@ -51,9 +51,7 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 Note: If you are using VirtualBox as hypervisor, there is no need to depend on vagrant-libvirt.
 
 ## Patches:
-This code may be a work in progress. The interfaces may change without notice.
-Patches are welcome, but please be patient. They are best received by email.
-Please ping me if you have big changes in mind, before you write a giant patch.
+We'd love to have your patch! Please send it by email, or as a pull request.
 
 ##
 
