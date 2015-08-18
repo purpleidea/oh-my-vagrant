@@ -1,0 +1,16 @@
+language: ruby
+rvm: 2.0.0
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.net#ohmyvagrant"
+    template:
+      - "%{repository} (%{commit}: %{author}): %{message}"
+      - "More info : %{build_url}"
+    on_success: always
+    on_failure: always
+    use_notice: false
+    skip_join: false
+  email:
+    - travis-ci@shubin.ca
+script: 'make test'
