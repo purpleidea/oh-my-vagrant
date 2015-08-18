@@ -178,6 +178,7 @@ copr: upload-srpms
 #
 #	test
 #
+test:
 	./test.sh
 
 # vim: ts=8
