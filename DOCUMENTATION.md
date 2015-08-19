@@ -311,7 +311,8 @@ Currently undocumented.
 Currently undocumented.
 
 ####`sync`
-Currently undocumented.
+This configures the protocol that will be used to share files between the host machine and the
+guests. You may set this to "rsync", "nfs", or "nfs4". "rsync" is the default.
 
 ####`folder`
 Currently undocumented.

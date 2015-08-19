@@ -652,7 +652,7 @@ end
 
 # XXX: workaround for: https://github.com/mitchellh/vagrant/issues/2447
 # only run on 'vagrant init' or if it's the first time running vagrant
-if sync == 'nfs' and ((ARGV.length > 0 and ARGV[0] == 'init') or not(File.exist?(f)))
+if sync.start_with?('nfs') and ((ARGV.length > 0 and ARGV[0] == 'init') or not(File.exist?(f)))
 	`sudo systemctl restart nfs-server`
 	`firewall-cmd --permanent --zone public --add-service mountd`
 	`firewall-cmd --permanent --zone public --add-service rpc-bind`
@@ -815,12 +815,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		if not ARGV.include?('--no-parallel')	# when running in parallel,
 			config.cache.scope = :machine	# use the per machine cache
 		end
-		if sync == 'nfs'	# TODO: support other sync types here...
+		if sync.start_with?('nfs')	# TODO: support other sync types here...
 			config.cache.enable_nfs = true	# sets nfs => true on the synced_folder
-			# the nolock option is required, otherwise the NFSv3 client will try to
-			# access the NLM sideband protocol to lock files needed for /var/cache/
-			# all of this can be avoided by using NFSv4 everywhere. die NFSv3, die!
-			config.cache.mount_options = ['rw', 'vers=3', 'tcp', 'nolock']
+			if sync == 'nfs'
+				# the nolock option is required, otherwise the NFSv3 client will try to
+				# access the NLM sideband protocol to lock files needed for /var/cache/
+				# all of this can be avoided by using NFSv4 everywhere. die NFSv3, die!
+				config.cache.mount_options = ['rw', 'vers=3', 'tcp', 'nolock']
+			elsif sync == 'nfs4'
+				config.cache.mount_options = ['rw', 'vers=4', 'tcp']
+			end
 		end
 	end
 
@@ -970,7 +974,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
 				disabled = true
 			end
-			vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
+			if vm_sync == 'nfs4'
+				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled, type: 'nfs', nfs_version: 4, nfs_udp: false
+			else
+				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
+			end
 
 			if vm.vm.box.start_with? 'atomic-'
 				synced_folder = '/home/vagrant/sync'
