@@ -1089,7 +1089,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 				# update the hosts
 				if vm_update
-					vm.vm.provision 'shell', inline: 'yum -y update'
+					if vm.vm.box.start_with? 'atomic-'
+						vm.vm.provision 'shell', inline: 'atomic host upgrade'
+					else
+						vm.vm.provision 'shell', inline: 'yum -y update'
+					end
 				end
 
 				# atomic hosts lack the docker group which the
