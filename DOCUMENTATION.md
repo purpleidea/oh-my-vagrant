@@ -193,6 +193,22 @@ prefer a consistent (statically assigned) IP address across reboots, OMV adds a
 second interface which has this statically assigned address. It also provides
 DNS for this network interface via the `/etc/hosts` file.
 
+###I see unwanted entry in the `/etc/hosts` file on VM, why?
+
+Every VM created by OMV includes something similar in the `/etc/hosts` file:
+```
+[vagrant@omv1 ~]$ cat /etc/hosts
+...
+## vagrant-hostmanager-start
+192.168.124.100 omv1.example3.com   omv1
+192.168.124.3   omv.example3.com    omv
+## vagrant-hostmanager-end
+...
+```
+The `192.168.124.3   omv.example3.com    omv` line represents a virtual
+IPaddress reserved on every VM in the cluster. It's unused by default and can be
+used by developer for any purpose needed.
+
 ###Do you have any tricks for using Vagrant and Vagrant-Libvirt?
 
 I've written a bunch about Vagrant and Vagrant-Libvirt on my
