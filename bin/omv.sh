@@ -65,6 +65,18 @@ if [ "$1" = 'init' ]; then
 		fi
 	fi
 
+	vagrant plugin list | grep -qF 'vagrant-reload'
+	if [ $? -ne 0 ]; then
+		echo 'Oh-My-Vagrant needs to install a vagrant-reload plugin for the "reboot" option to work.'
+		read -p 'Is this ok [y/N]: ' -r answer
+		if [[ $answer =~ ^[Yy]$ ]]
+		then
+			vagrant plugin install vagrant-reload
+		else
+			echo 'Skipping.'
+		fi
+	fi
+
 	args=('status')
 	if [ "$2" != '' ]; then
 		mkdir -p "$projectdir/$2"
