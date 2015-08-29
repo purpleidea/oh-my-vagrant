@@ -358,7 +358,7 @@ Currently undocumented.
 ####`vms`
 By default, oh-my-vagrant will create [:count](#count) number of virtual
 machines, all with the same settings, and generated hostnames and IP addresses.
-Using `vms` array you can define different parameters for different VMs.
+Using the `:vms` array you can define different parameters for different VMs.
 Example:
 ```yaml
 :vms:
@@ -372,7 +372,7 @@ Example:
   :image: centos-7.1
 :count: 0
 ```
-Above configuration will create 2 virtual machines: first one will have 2
+The above configuration will create 2 virtual machines: first one will have 2
 CPUs and 1G of RAM assigned, as well as additional 10G hard disk, and will be
 based on the Fedora 21 image. The 2nd one will be created with the default
 values (1 CPU, 512MB of RAM), and will be based on centos-7.1 image.
