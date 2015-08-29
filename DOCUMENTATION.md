@@ -362,7 +362,13 @@ Example:
   :cpus: 2
 - :name: slave-vm
   :image: centos-7
+:count: 0
 ```
+Above configuration will create 2 virtual machines: first one will have 2
+CPUs and 1G of RAM assigned, as well as additional 10G hard disk, and will be
+based on the Fedora 21 image. The 2nd one will be created with the default
+values (1 CPU, 512MB of RAM), and will be based on centos-7 image.
+
 Have a look at [Ansible example](https://github.com/purpleidea/oh-my-vagrant/blob/master/examples/ansible.yaml)
 to get an idea about how the complete configuration looks like.
 
@@ -373,7 +379,19 @@ If you don't do this, oh-my-vagrant will always create `:count` extra VMs, which
 Currently undocumented.
 
 ####`count`
-Currently undocumented.
+Set this to the number of virtual machines you want oh-my-vagrant to create.
+Hostnames and IP addresses will be generated automatically, and fair defaults
+will be used for the VMs.
+Example:
+```yaml
+:namespace: testing-omv
+:count: 5
+```
+Above configuration will create 5 virtual machines: testing-omv1, testing-omv2
+... testing-omv5.
+
+See also [:vms](#vms) parameter documentation for information about how you can
+define various virtual machine parameters yourself.
 
 ####`username`
 Currently undocumented.
