@@ -1,6 +1,6 @@
 # This is: Oh My Vagrant!
-# Copyright (C) 2012-2015+ James Shubin
-# Written by James Shubin <james@shubin.ca>
+# Copyright (C) 2012-2015+ James Shubin and the Oh-My-Vagrant contributors
+# Written by James Shubin <james@shubin.ca> and the Oh-My-Vagrant contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by

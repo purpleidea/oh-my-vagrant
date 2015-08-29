@@ -2,8 +2,8 @@
 
 <!--
 This is: Oh My Vagrant!
-Copyright (C) 2012-2015+ James Shubin
-Written by James Shubin <james@shubin.ca>
+Copyright (C) 2012-2015+ James Shubin and the Oh-My-Vagrant contributors
+Written by James Shubin <james@shubin.ca> and the Oh-My-Vagrant contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 6. [Examples - Example configurations](#examples)
 7. [Limitations -  Vagrant versions, OS compatibility, etc...](#limitations)
 8. [Development - Background on module development and reporting bugs](#development)
-9. [Author - Author and contact information](#author)
+9. [Authors - Authors and contact information](#authors)
 
 ##Overview
 
@@ -497,9 +497,13 @@ You can follow along [on my technical blog](https://ttboj.wordpress.com/).
 
 To report any bugs, please file a ticket at: [https://github.com/purpleidea/oh-my-vagrant/issues](https://github.com/purpleidea/oh-my-vagrant/issues).
 
-##Author
+##Authors
 
-Copyright (C) 2012-2015+ James Shubin
+Copyright (C) 2012-2015+ James Shubin and the Oh-My-Vagrant contributors
+
+Please see the
+[AUTHORS](https://github.com/purpleidea/oh-my-vagrant/tree/master/AUTHORS) file
+for more information.
 
 * [github](https://github.com/purpleidea/)
 * [&#64;purpleidea](https://twitter.com/#!/purpleidea)
