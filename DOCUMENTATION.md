@@ -380,7 +380,14 @@ to get an idea about how the complete configuration looks like.
 If you don't do this, oh-my-vagrant will always create `:count` extra VMs, which is not you want probably.
 
 ####`namespace`
-Currently undocumented.
+Free-form string that will be used as:
+
+* Libvirt/VirtualBox virtual network name
+* prefix for virtual machines names generation, if [:vms](#vms) array is not
+  defined
+
+If you set this to the same string as an existing network name - make sure you
+also set [:network](#network) parameter correctly.
 
 ####`count`
 Set this to the number of virtual machines you want oh-my-vagrant to create.
