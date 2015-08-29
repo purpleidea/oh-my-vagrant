@@ -321,7 +321,11 @@ the corresponding call in the Vagrantfile.
 Currently undocumented.
 
 ####`network`
-Currently undocumented.
+Subnet (in CIDR notation) that will be used for virtual machines.
+If you're using Libvirt, make sure it does not clash with the existing virtual
+networks on your machine. If it does - you have to set [:namespace](#namespace)
+parameter to be the same as existing network name, otherwise things will not
+work.
 
 ####`image`
 Vagrant box name (excluding `.box` extension) that will be used to build a
