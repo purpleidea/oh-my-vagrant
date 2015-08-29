@@ -324,10 +324,14 @@ Currently undocumented.
 Currently undocumented.
 
 ####`image`
-Currently undocumented.
+Vagrant box name (excluding `.box` extension) that will be used to build a
+virtual machine.
+If it does not exist on the system - it will be downloaded from [:boxurlprefix](#boxurlprefix).
 
 ####`boxurlprefix`
-Currently undocumented.
+URL pointing to a location that contains Vagrant box files.
+It points to https://dl.fedoraproject.org/pub/alt/purpleidea/vagrant/ by
+default.
 
 ####`sync`
 Currently undocumented.
