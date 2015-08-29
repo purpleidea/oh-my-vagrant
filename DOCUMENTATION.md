@@ -369,19 +369,22 @@ Example:
   :memory: 1024
   :cpus: 2
 - :name: slave-vm
-  :image: centos-7
+  :image: centos-7.1
 :count: 0
 ```
 Above configuration will create 2 virtual machines: first one will have 2
 CPUs and 1G of RAM assigned, as well as additional 10G hard disk, and will be
 based on the Fedora 21 image. The 2nd one will be created with the default
-values (1 CPU, 512MB of RAM), and will be based on centos-7 image.
+values (1 CPU, 512MB of RAM), and will be based on centos-7.1 image.
 
 Have a look at [Ansible example](https://github.com/purpleidea/oh-my-vagrant/blob/master/examples/ansible.yaml)
 to get an idea about how the complete configuration looks like.
 
-**Note**: If you're using `:vms` to define custom VMs, you might want to set `:count` parameter to zero.
-If you don't do this, oh-my-vagrant will always create `:count` extra VMs, which is not you want probably.
+**Note**: If you're using `:vms` to define custom VMs, you might want to set
+`:count` parameter to zero.  If you don't do this, oh-my-vagrant will always
+create `:count` extra VMs, which you might want or not, depending on your setup.
+See [this comment](https://github.com/purpleidea/oh-my-vagrant/pull/122#issuecomment-136054512)
+for an example situation where this might be useful.
 
 ####`namespace`
 Free-form string that will be used as:
