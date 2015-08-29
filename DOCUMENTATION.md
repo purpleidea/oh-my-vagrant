@@ -348,7 +348,26 @@ Currently undocumented.
 Currently undocumented.
 
 ####`vms`
-Currently undocumented.
+By default, oh-my-vagrant will create [:count](#count) number of virtual
+machines, all with the same settings, and generated hostnames and IP addresses.
+Using `vms` array you can define different parameters for different VMs.
+Example:
+```yaml
+:vms:
+- :name: master-vm
+  :image: fedora-21
+  :disks: 1
+  :disksize: 10G
+  :memory: 1024
+  :cpus: 2
+- :name: slave-vm
+  :image: centos-7
+```
+Have a look at [Ansible example](https://github.com/purpleidea/oh-my-vagrant/blob/master/examples/ansible.yaml)
+to get an idea about how the complete configuration looks like.
+
+**Note**: If you're using `:vms` to define custom VMs, you might want to set `:count` parameter to zero.
+If you don't do this, oh-my-vagrant will always create `:count` extra VMs, which is not you want probably.
 
 ####`namespace`
 Currently undocumented.
