@@ -1,5 +1,7 @@
 # *Oh-My-Vagrant*: This is: Oh My Vagrant!
 
+![Oh My Vagrant!](https://raw.githubusercontent.com/purpleidea/oh-my-vagrant/master/art/omv.png)
+
 [![Build Status](https://secure.travis-ci.org/purpleidea/oh-my-vagrant.png)](http://travis-ci.org/purpleidea/oh-my-vagrant)
 
 ## Documentation:
