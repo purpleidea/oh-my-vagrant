@@ -335,7 +335,7 @@ while skip < ARGV.length
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
 
-		if v.is_a?(String) and v.include? ',' and v.split(',').length > 0
+		if v.is_a?(String) and v.split(',').length > 0
 			shell = v.split(',')
 		else
 			shell = []
@@ -1127,26 +1127,32 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			# TODO: support running first/last as a setting
 			if vm_shell.is_a?(Array)
 				vm_shell.each do |sf|
+
 					shell_once = false
 					if sf.is_a?(Hash)
 						shell_once = sf.fetch('once', shell_once) # get value
-						si = sf.fetch('script', nil)
-						if not(si.nil?)
-							if not(shell_once) or (shell_once and first_run)
-								vm.vm.provision 'shell', inline: "#{si}"
-							end
-							next
+					elsif sf.is_a?(String)	# auto-detect
+						sx = File.join(shell_basedir, sf)
+						if File.exists?(sx) and not(File.directory?(sx)) and File.executable?(sx)
+							sf = {'path'=> sf}
+						else
+							sf = {'script'=> sf}
 						end
-
-						sx = sf.fetch('path', '')
-					elsif sf.is_a?(String)
-						sx = sf
+					else
+						next
 					end
 
-					sx = File.join(shell_basedir, sx)
-					if File.exists?(sx) and not(File.directory?(sx)) and File.executable?(sx)
-						if not(shell_once) or (shell_once and first_run)
+					# do the running...
+					si = sf.fetch('script', nil)
+					sp = sf.fetch('path', nil)
+					if not(shell_once) or (shell_once and first_run)
+						if sp.nil?
+							vm.vm.provision 'shell', inline: "#{si}"
+						elsif si.nil?
+							sx = File.join(shell_basedir, sp)
 							vm.vm.provision 'shell', path: "#{sx}"
+						else
+							next	# optional
 						end
 					end
 				end

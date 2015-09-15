@@ -23,6 +23,7 @@
   once: false
 - script: echo hello world > /tmp/hello4
   once: true
+- echo hello again > /tmp/hello5
 :docker: []
 :kubernetes: false
 :ansible: []
