@@ -1,7 +1,4 @@
-For some example vagrant.yaml definitions, please see the Vagrantfile source.
-
-For a concrete example of a vagrant.yaml file in a module, you can see:
-	https://github.com/purpleidea/p4h/blob/master/vagrant.yaml
+These are a bunch of omv.yaml example definitions.
 
 Please submit additional examples as patches.
 

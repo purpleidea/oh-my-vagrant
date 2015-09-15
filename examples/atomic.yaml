@@ -5,7 +5,7 @@
 :cpus: ''
 :memory: ''
 :disks: 0
-:disksize: '40G'
+:disksize: 40G
 :boxurlprefix: ''
 :sync: rsync
 :folder: ''
@@ -27,6 +27,7 @@
 :poolid: true
 :repos: []
 :update: false
+:reboot: false
 :unsafe: false
 :nested: false
 :comment: simple atomic example
