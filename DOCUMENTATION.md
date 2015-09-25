@@ -332,6 +332,18 @@ Vagrant box name (excluding `.box` extension) that will be used to build a
 virtual machine.
 If it does not exist on the system - it will be downloaded from [:boxurlprefix](#boxurlprefix).
 
+####`cpus`
+Currently undocumented.
+
+####`memory`
+Currently undocumented.
+
+####`disks`
+Currently undocumented.
+
+####`disksize`
+Currently undocumented.
+
 ####`boxurlprefix`
 URL pointing to a location that contains Vagrant box files.
 It points to https://dl.fedoraproject.org/pub/alt/purpleidea/vagrant/ by
@@ -341,6 +353,9 @@ default.
 Currently undocumented.
 
 ####`folder`
+Currently undocumented.
+
+####`extern`
 Currently undocumented.
 
 ####`cd`
@@ -355,7 +370,22 @@ Currently undocumented.
 ####`classes`
 Currently undocumented.
 
+####`shell`
+Currently undocumented.
+
 ####`docker`
+Currently undocumented.
+
+####`kubernetes`
+Currently undocumented.
+
+####`ansible`
+Currently undocumented.
+
+####`playbook`
+Currently undocumented.
+
+####`ansible_extras`
 Currently undocumented.
 
 ####`cachier`
@@ -429,10 +459,27 @@ Currently undocumented.
 ####`repos`
 Currently undocumented.
 
+####`update`
+Currently undocumented.
+
+####`reboot`
+Currently undocumented.
+
 ####`unsafe`
 Set this to true if you want to use KVM's unsafe cache mode. If you do this, you
 will trade data integrity on your development environment's filesystem for a
 noticeable speed boost. See http://libvirt.org/formatdomain.html#elementsDisks
+
+####`nested`
+Currently undocumented.
+
+####`comment`
+A space to store a string comment of your choosing. This field is not currently
+used anywhere by Oh-My-Vagrant.
+
+####`reallyrm`
+You probably shouldn't play with this unless you've read and understand the
+source.
 
 ###Command line
 The command line arguments are currently undocumented. If you'd like to help
