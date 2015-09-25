@@ -14,6 +14,7 @@
   system: ansible
   repository: https://github.com/eparis/kubernetes-ansible
   directory: kubernetes
+:cd: ''
 :puppet: false
 :classes: []
 :shell: []

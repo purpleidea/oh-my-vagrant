@@ -18,6 +18,7 @@
   system: kubernetes
   repository: https://github.com/purpleidea/kube-simple1
   directory: kube-simple1
+:cd: ''
 :puppet: false
 :classes: []
 :shell: []

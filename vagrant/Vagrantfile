@@ -75,6 +75,7 @@ boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
 folder = ''			# default folder prefix
 extern = []			# default external module definitions
+cd = ''				# default directory to cd into if using vscreen
 puppet = false			# default use of puppet or not
 classes = []			# default list or hash of classes to include
 shell = []			# default list of shell scripts to run
@@ -205,6 +206,7 @@ if File.exist?(f)
 	sync = settings[:sync]
 	folder = settings[:folder] if not(load_folder)
 	extern = settings[:extern]
+	cd = settings[:cd]
 	puppet = settings[:puppet]
 	classes = settings[:classes]
 	shell = settings[:shell]
@@ -309,6 +311,12 @@ while skip < ARGV.length
 		else
 			extern = []
 		end
+
+	elsif ARGV[skip].start_with?(arg='--omv-cd=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		cd = v.to_s		# set cd arg
 
 	elsif ARGV[skip].start_with?(arg='--omv-puppet=')
 		v = ARGV.delete_at(skip).dup
@@ -560,6 +568,7 @@ settings = {
 	:sync => sync,
 	:folder => folder,
 	:extern => extern,
+	:cd => cd,
 	:puppet => puppet,
 	:classes => classes,
 	:shell => shell,
@@ -930,6 +939,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_memory = x.fetch(:memory, memory)	# get value
 		vm_disks = x.fetch(:disks, disks)	# get value
 		vm_disksize = x.fetch(:disksize, disksize)	# get value
+		vm_cd = x.fetch(:cd, cd)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
 		vm_puppet = x.fetch(:puppet, puppet)	# get value
@@ -1024,6 +1034,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					File.delete(fv)	# delete hosts token
 				end
 			end
+
+			# store the path to the cd directory for vscreen to see
+			cd_file = File.join(projectdir, '.vagrant', "#{h}.cd")
+			File.open(cd_file, 'w') {|cd_handle| cd_handle.write("#{vm_cd}\n")}
 
 			# should we clean this puppet client machine?
 			if puppet and vm_puppet and h != 'puppet' and snoop.include?(h)

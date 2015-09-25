@@ -40,6 +40,15 @@ function vsftp {
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
+	# if we find the omv.yaml file, it takes precendence for mtime lookups
+	if [ -e "$pwd/omv.yaml" ]; then
+		pfile="$pwd/omv.yaml"
+	elif [ -e "$pwd/Vagrantfile" ]; then
+		pfile="$pwd/Vagrantfile"
+	else
+		echo 'No vagrant definition found!' 1>&2 && return 2
+	fi
+
 	d="$pwd/.ssh"
 	f="$d/$1.config"
 	h="$1"
@@ -50,13 +59,25 @@ function vsftp {
 		h=${h:$p:$l}
 	fi
 
-	# if mtime of $f is > than 5 minutes (5 * 60 seconds), re-generate...
-	if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
+	cdfile="$pwd/.vagrant/$h.cd"
+
+	# if cd file is missing, or is older than the definition file, re-generate...
+	# or if mtime of $f is > than 5 minutes (5 * 60 seconds), re-generate...
+	if [ ! -e "$cdfile" ] || \
+	[ $(stat -c '%Y' "$pfile" 2> /dev/null) -gt $(stat -c '%Y' "$cdfile" 2> /dev/null) ] || \
+	[ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 		mkdir -p "$d"
 		# we cache the lookup because this command is slow...
 		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 	fi
-	[ -e "$f" ] && sftp -F "$f" "$1"
+
+	cdstr=''	# path to append to end of sftp
+	cddir="`cat $cdfile 2>/dev/null`"
+	if [ -e "$cdfile" ] && [ -n "$cddir" ]; then
+		cdstr=":$cddir"
+	fi
+
+	[ -e "$f" ] && sftp -F "$f" "$1""$cdstr"
 }
 
 # vagrant screen
@@ -77,6 +98,17 @@ function vscreen {
 		echo 'Vagrant project not found!' 1>&2 && return 2
 	fi
 
+	# if we find the omv.yaml file, it takes precendence for mtime lookups
+	if [ -e "$pwd/omv.yaml" ]; then
+		pfile="$pwd/omv.yaml"
+	elif [ -e "$pwd/Vagrantfile" ]; then
+		pfile="$pwd/Vagrantfile"
+	else
+		echo 'No vagrant definition found!' 1>&2 && return 2
+	fi
+
+	cmd='screen -xRR'
+
 	d="$pwd/.ssh"
 	f="$d/$1.config"
 	h="$1"
@@ -87,13 +119,24 @@ function vscreen {
 		h=${h:$p:$l}
 	fi
 
-	# if mtime of $f is > than 5 minutes (5 * 60 seconds), re-generate...
-	if [ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
+	cdfile="$pwd/.vagrant/$h.cd"
+
+	# if cd file is missing, or is older than the definition file, re-generate...
+	# or if mtime of $f is > than 5 minutes (5 * 60 seconds), re-generate...
+	if [ ! -e "$cdfile" ] || \
+	[ $(stat -c '%Y' "$pfile" 2> /dev/null) -gt $(stat -c '%Y' "$cdfile" 2> /dev/null) ] || \
+	[ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
 		mkdir -p "$d"
 		# we cache the lookup because this command is slow...
 		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
 	fi
-	[ -e "$f" ] && ssh -t -F "$f" "$1" 'screen -xRR'
+
+	cddir="`cat $cdfile 2>/dev/null`"
+	if [ -e "$cdfile" ] && [ -n "$cddir" ]; then
+		cmd="cd '$cddir' && $cmd"
+	fi
+
+	[ -e "$f" ] && ssh -t -F "$f" "$1" $cmd
 	if [ $? -eq 255 ]; then
 		# you probably want a shorter timeout if you see this often
 		echo 'Maybe cached connection was stale? Cleaning...'

@@ -10,6 +10,7 @@
 :sync: rsync
 :folder: ''
 :extern: []
+:cd: ''
 :puppet: false
 :classes: []
 :shell: []

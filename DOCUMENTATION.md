@@ -343,6 +343,12 @@ Currently undocumented.
 ####`folder`
 Currently undocumented.
 
+####`cd`
+If you set this to a string, the `cd` command will run with this arg after
+`vscreen` connects to your vm, but before the `screen` command runs. This will
+have the effect of putting you in your favourite working directory
+automatically. This also works when using `vsftp`, but not `vcssh`.
+
 ####`puppet`
 Currently undocumented.
 

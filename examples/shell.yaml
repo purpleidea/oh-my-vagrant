@@ -14,6 +14,7 @@
   system: shell
   repository: https://github.com/purpleidea/shell-simple1
   directory: shell-simple1
+:cd: ''
 :puppet: false
 :classes: []
 :shell:

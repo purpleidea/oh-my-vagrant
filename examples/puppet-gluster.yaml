@@ -26,6 +26,7 @@
   system: puppet
   repository: https://github.com/purpleidea/puppet-shorewall
   directory: shorewall
+:cd: ''
 :puppet: true
 :classes:
   '::gluster::simple':

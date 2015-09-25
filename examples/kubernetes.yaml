@@ -18,6 +18,7 @@
   system: kubernetes
   repository: ~/code/kubernetes-simple2
   directory: fakeapp2
+:cd: ''
 :puppet: false
 :classes: []
 :shell: []
