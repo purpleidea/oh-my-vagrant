@@ -9,6 +9,7 @@
 :boxurlprefix: ''
 :sync: rsync
 :syncdir: ''
+:syncsrc: ''
 :folder: ''
 :extern: []
 :cd: ''

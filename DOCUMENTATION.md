@@ -368,6 +368,15 @@ For example, if you have a project (a git repository perhaps) named `mgmt`, and
 you want to sync the files into `/vagrant/mgmt/`, then the special `/` path is
 the magic feature you're looking for.
 
+####`syncsrc`
+Set the sync source for your vm. When left with the empty string `''`, this
+defaults to the [`folder`](#folder) in your project directory. When
+[`folder`](#folder) is empty, obviously the project directory is used by itself.
+This option is particularly useful because you can pass it the `..` value, which
+will pick the parent directory. This is a common hack for projects which hide
+the _mess_ of their project inside the [`folder`](#folder) variable, but want
+the whole project to get synchronized into the machine.
+
 ####`folder`
 Currently undocumented.
 
