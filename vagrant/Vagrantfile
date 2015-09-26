@@ -950,6 +950,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_memory = x.fetch(:memory, memory)	# get value
 		vm_disks = x.fetch(:disks, disks)	# get value
 		vm_disksize = x.fetch(:disksize, disksize)	# get value
+		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_syncdir = x.fetch(:syncdir, syncdir)	# get value
 		vm_syncdir_folder = ''
 		if vm_syncdir == '/'	# automatic folder name
@@ -967,7 +968,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_repos = x.fetch(:repos, repos)	# get value
 		vm_playbook = x.fetch(:playbook, playbook)	# get value
 		vm_ansible_extras = x.fetch(:ansible_extras, ansible_extras)	# get value
-		vm_sync = x.fetch(:sync, sync)	# get value
 		vm_update = x.fetch(:update, update) # get value
 		vm_reboot = x.fetch(:reboot, reboot) # get value
 		vm_unsafe = x.fetch(:unsafe, unsafe) # get value
@@ -1016,21 +1016,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			disabled = false
 			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
 				disabled = true
-				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled
+				vm.vm.synced_folder '.', '/vagrant', disabled: true
 			else
 				synced_folder = vm_syncdir_folder.start_with?('/') ? vm_syncdir_folder : File.join(synced_folder, vm_syncdir_folder)
 				vm.vm.synced_folder "#{dot}", synced_folder, create: true, type: vm_sync	# nfs, rsync
 			end
 
 			if vm_syncdir_folder != '' and not(disabled)
-				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: true
+				vm.vm.synced_folder '.', '/vagrant', disabled: true
 			end
 
 			if vm.vm.box.start_with? 'atomic-'
 				synced_folder = '/home/vagrant/sync'
 				synced_folder = vm_syncdir_folder.start_with?('/') ? vm_syncdir_folder : File.join(synced_folder, vm_syncdir_folder)
 				if vm_sync != ''
-					vm.vm.synced_folder "#{dot}", synced_folder, create: true, type: sync
+					vm.vm.synced_folder "#{dot}", synced_folder, create: true, type: vm_sync
 				end
 			end
 
@@ -1453,7 +1453,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 						'vagrant_allow' => vms.each{|z| z[:ip] },
 						'vagrant_puppet_folder' => folder,
 					}
-					p.synced_folder_type = sync
+					p.synced_folder_type = vm_sync
 				end
 
 				# the puppetlabs RPM mistakenly starts the

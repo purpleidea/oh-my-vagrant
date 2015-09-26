@@ -350,7 +350,8 @@ It points to https://dl.fedoraproject.org/pub/alt/purpleidea/vagrant/ by
 default.
 
 ####`sync`
-Currently undocumented.
+Sync type to use. Valid types include `rsync` and `nfs` (version 3). Other
+types, including `nfsv4` and `9p`, will hopefully be supported in the future.
 
 ####`syncdir`
 This option sets where your project folder gets synced into the machine. If you
