@@ -8,6 +8,7 @@
 :disksize: 40G
 :boxurlprefix: ''
 :sync: rsync
+:syncdir: ''
 :folder: ''
 :extern:
 - type: git

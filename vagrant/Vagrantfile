@@ -73,6 +73,7 @@ disks = 0                       # default additional disks (default to none)
 disksize = '40G'                # default additional disk size (defaults to 20G)
 boxurlprefix = ''		# default url prefix (useful for private boxes)
 sync = 'rsync'			# default sync type
+syncdir = ''			# default directory to put project folder into
 folder = ''			# default folder prefix
 extern = []			# default external module definitions
 cd = ''				# default directory to cd into if using vscreen
@@ -165,6 +166,8 @@ if "#{ENV['VAGRANT_CWD']}" != ''	# if called by omv.sh, this is set...
 end
 #ENV['VAGRANT_DOTFILE_PATH'] = File.join(projectdir, '.vagrant/')
 
+basename = File.basename(projectdir)	# name of dir that vagrant project is in
+
 #
 #	ARGV parsing
 #
@@ -204,6 +207,7 @@ if File.exist?(f)
 	disksize = settings[:disksize]
 	boxurlprefix = settings[:boxurlprefix]
 	sync = settings[:sync]
+	syncdir = settings[:syncdir]
 	folder = settings[:folder] if not(load_folder)
 	extern = settings[:extern]
 	cd = settings[:cd]
@@ -294,6 +298,12 @@ while skip < ARGV.length
 		v.slice! arg
 
 		sync = v.to_s		# set sync type
+
+	elsif ARGV[skip].start_with?(arg='--omv-syncdir=')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+
+		syncdir = v.to_s		# set syncdir arg
 
 	elsif ARGV[skip].start_with?(arg='--omv-folder=')
 		v = ARGV.delete_at(skip).dup
@@ -566,6 +576,7 @@ settings = {
 	:disksize => disksize,
 	:boxurlprefix => boxurlprefix,
 	:sync => sync,
+	:syncdir => syncdir,
 	:folder => folder,
 	:extern => extern,
 	:cd => cd,
@@ -939,6 +950,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		vm_memory = x.fetch(:memory, memory)	# get value
 		vm_disks = x.fetch(:disks, disks)	# get value
 		vm_disksize = x.fetch(:disksize, disksize)	# get value
+		vm_syncdir = x.fetch(:syncdir, syncdir)	# get value
+		vm_syncdir_folder = ''
+		if vm_syncdir == '/'	# automatic folder name
+			vm_syncdir_folder = basename
+		elsif vm_syncdir != ''	# pick whatever they asked for
+			vm_syncdir_folder = vm_syncdir
+		end
 		vm_cd = x.fetch(:cd, cd)	# get value
 		vm_docker = x.fetch(:docker, docker)	# get value
 		vm_docker = array_values_to_array_of_hashes(vm_docker)
@@ -991,16 +1009,28 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			# sync type
+			# this section is a bit tricky, because if you want a
+			# different sync other than /vagrant (which you get by
+			# default), then you have to disable it, and then add
+			# what you want... cleanups that still work are welcome
 			disabled = false
 			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
 				disabled = true
+				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled
+			else
+				synced_folder = vm_syncdir_folder.start_with?('/') ? vm_syncdir_folder : File.join(synced_folder, vm_syncdir_folder)
+				vm.vm.synced_folder "#{dot}", synced_folder, create: true, type: vm_sync	# nfs, rsync
 			end
-			vm.vm.synced_folder "#{dot}", '/vagrant', disabled: disabled, type: vm_sync	# nfs, rsync
+
+			if vm_syncdir_folder != '' and not(disabled)
+				vm.vm.synced_folder "#{dot}", '/vagrant', disabled: true
+			end
 
 			if vm.vm.box.start_with? 'atomic-'
 				synced_folder = '/home/vagrant/sync'
+				synced_folder = vm_syncdir_folder.start_with?('/') ? vm_syncdir_folder : File.join(synced_folder, vm_syncdir_folder)
 				if vm_sync != ''
-					vm.vm.synced_folder "#{dot}", synced_folder, type: sync
+					vm.vm.synced_folder "#{dot}", synced_folder, create: true, type: sync
 				end
 			end
 
@@ -1036,6 +1066,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			end
 
 			# store the path to the cd directory for vscreen to see
+			if vm_cd == '$SYNCDIR' or vm_cd == '-'
+				vm_cd = synced_folder
+			end
 			cd_file = File.join(projectdir, '.vagrant', "#{h}.cd")
 			File.open(cd_file, 'w') {|cd_handle| cd_handle.write("#{vm_cd}\n")}
 

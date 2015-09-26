@@ -352,6 +352,21 @@ default.
 ####`sync`
 Currently undocumented.
 
+####`syncdir`
+This option sets where your project folder gets synced into the machine. If you
+pass an absolute path, that will be used, if you pass a relative path, then that
+will be appended to the default path for that environment. In general, you will
+get appended to `/vagrant/`, however on an atomic host, this default is
+`/home/vagrant/sync/`. If you specify an empty string (the default) then no
+special path will be appended, and your working directory will get synced into
+the default location as specified above. Lastly, if you specify the special
+path of `/`, then your project will be synced into a subfolder of the same name
+of your project folder, and located beneath the above default location.
+
+For example, if you have a project (a git repository perhaps) named `mgmt`, and
+you want to sync the files into `/vagrant/mgmt/`, then the special `/` path is
+the magic feature you're looking for.
+
 ####`folder`
 Currently undocumented.
 
@@ -362,7 +377,10 @@ Currently undocumented.
 If you set this to a string, the `cd` command will run with this arg after
 `vscreen` connects to your vm, but before the `screen` command runs. This will
 have the effect of putting you in your favourite working directory
-automatically. This also works when using `vsftp`, but not `vcssh`.
+automatically. This also works when using `vsftp`, but not `vcssh`. If you set
+the `cd` value to `$SYNCDIR` (a string literal) or to `-` (the dash) then these
+are magic variables which indicate you want to cd to whichever path the
+[`syncdir`](#syncdir) option resolves to.
 
 ####`puppet`
 Currently undocumented.
