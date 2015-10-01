@@ -578,6 +578,25 @@ You can follow along [on my technical blog](https://ttboj.wordpress.com/).
 
 To report any bugs, please file a ticket at: [https://github.com/purpleidea/oh-my-vagrant/issues](https://github.com/purpleidea/oh-my-vagrant/issues).
 
+###Hacking Guide
+
+####Mainstream mode entry point
+
+oh-my-vagrant has a command line for mainstream use and following steps will enable you to use it from the source code itself.
+
+
+```
+#Clone  the git repo
+$ git clone https://github.com/purpleidea/oh-my-vagrant.git
+
+$ cd oh-my-vagrant/
+
+#Run omv.sh
+$ bin/omv.sh --help
+
+```
+
+
 ##Authors
 
 Copyright (C) 2012-2015+ James Shubin and the Oh-My-Vagrant contributors
