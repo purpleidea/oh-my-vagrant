@@ -1,8 +1,10 @@
 TODO
 
-* Replace old style /etc/hosts with vagrant-hostmanager once it's all fixed up.
-* Find an elegant way to decide what to do to each docker container after pull.
-* Figure out what to do about DNS and networking issues in the containers.
+* Add nested virt test to see if host has it enabled
+** dustymabe+stribny will patch this
+*** http://dustymabe.com/2013/07/14/find-guest-ip-address-using-qemu-guest-agent/
+* Add automatic qemu agent + virtualbox agent installation
+** lala(virtualbox) + dustymabe(vagrant-libvirt) will work on this patch
 * Have a way to pass structured or non-string facts into the vms.
 ** Puppet could support a B64FACTER_name=... where the data is a base64 yaml.
 *** This would be useful anyways, but isn't the ideal approach for vagrant.
