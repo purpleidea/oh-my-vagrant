@@ -181,4 +181,10 @@ copr: upload-srpms
 test:
 	./test.sh
 
+#
+#	jenkins
+#
+jenkins: test
+	./vtest.sh
+
 # vim: ts=8
