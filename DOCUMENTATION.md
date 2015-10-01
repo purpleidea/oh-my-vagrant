@@ -578,6 +578,11 @@ You can follow along [on my technical blog](https://ttboj.wordpress.com/).
 
 To report any bugs, please file a ticket at: [https://github.com/purpleidea/oh-my-vagrant/issues](https://github.com/purpleidea/oh-my-vagrant/issues).
 
+###Hacking Guide
+
+####Mainstream mode entry point
+XXX: lala, how about you add your comments here?
+
 ##Authors
 
 Copyright (C) 2012-2015+ James Shubin and the Oh-My-Vagrant contributors
