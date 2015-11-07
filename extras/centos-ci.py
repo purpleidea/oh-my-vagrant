@@ -20,7 +20,7 @@ git_url = sys.argv[1]
 branch = 'master'
 if len(sys.argv) > 2: branch = sys.argv[2]
 folder = os.path.splitext(os.path.basename(__file__))[0]
-run = 'make test' # the omv vtest command is a good option too
+run = 'make vtest' # the omv vtest cmd is a good option to run from this target
 if len(sys.argv) > 3: run = ' '.join(sys.argv[3:])
 
 get_nodes_url = "%s/Node/get?key=%s&ver=%s&arch=%s&i_count=%s" % (url_base, apikey, ver, arch, count)
