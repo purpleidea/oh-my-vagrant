@@ -32,7 +32,7 @@ SOURCE = rpmbuild/SOURCES/oh-my-vagrant-$(VERSION).tar.bz2
 SRPM = rpmbuild/SRPMS/oh-my-vagrant-$(VERSION)-$(RELEASE).src.rpm
 SRPM_BASE = oh-my-vagrant-$(VERSION)-$(RELEASE).src.rpm
 RPM = rpmbuild/RPMS/oh-my-vagrant-$(VERSION)-$(RELEASE).rpm
-USERNAME := $(shell cat ~/.config/copr | grep username | awk -F '=' '{print $$2}' | tr -d ' ')
+USERNAME := $(shell cat ~/.config/copr 2>/dev/null | grep username | awk -F '=' '{print $$2}' | tr -d ' ')
 SERVER = 'dl.fedoraproject.org'
 REMOTE_PATH = 'pub/alt/$(USERNAME)/oh-my-vagrant'
 
