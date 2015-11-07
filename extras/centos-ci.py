@@ -11,7 +11,9 @@ import urllib
 import subprocess
 
 url_base = 'http://admin.ci.centos.org:8080'
-apikey = open('duffy.key', 'r').read().strip()
+apikey = os.environ.get('DUFFY_API_KEY')
+if apikey is None:
+	apikey = open('duffy.key', 'r').read().strip()
 ver = '7'
 arch = 'x86_64'
 count = 1
