@@ -36,12 +36,18 @@ omv = 'wget https://github.com/purpleidea/oh-my-vagrant/raw/master/extras/instal
 cmd = "%s '%s && %s'" % (ssh, yum, omv) # setup
 print cmd
 r = subprocess.call(cmd, shell=True)
+if r != 0:
+	# NOTE: we don't clean up the host here, so that it can be inspected!
+	print "Error configuring omv on: %s" % host
+	sys.exit(r)
 
 # the second ssh call will run with the omv /etc/profile.d/ script loaded
 git = "git clone --recursive %s %s && cd %s && git checkout %s" % (git_url, folder, folder, branch)
 cmd = "%s '%s && %s'" % (ssh, git, run) # run
 print cmd
 r = subprocess.call(cmd, shell=True)
+if r != 0:
+	print "Error running job on: %s" % host
 
 output = urllib.urlopen(done_nodes_url).read() # free host(s)
 if output != 'Done':
