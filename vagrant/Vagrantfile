@@ -369,6 +369,7 @@ while skip < ARGV.length
 		else
 			shell = []
 		end
+
 	elsif ARGV[skip].start_with?(arg='--omv-docker=')
 		v = ARGV.delete_at(skip).dup
 		v.slice! arg
