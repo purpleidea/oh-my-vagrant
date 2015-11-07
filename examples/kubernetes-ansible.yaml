@@ -50,5 +50,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: ''
 :reallyrm: false

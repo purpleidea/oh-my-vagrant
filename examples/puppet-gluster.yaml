@@ -61,5 +61,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: contrived puppet-gluster example
 :reallyrm: false

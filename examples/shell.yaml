@@ -44,5 +44,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: simple shell run example
 :reallyrm: false

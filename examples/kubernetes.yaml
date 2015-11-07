@@ -47,5 +47,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: fake kubernetes example
 :reallyrm: false

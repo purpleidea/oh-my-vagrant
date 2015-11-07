@@ -41,5 +41,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: sub folder simple docker file build example
 :reallyrm: false

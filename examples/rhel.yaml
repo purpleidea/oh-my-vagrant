@@ -33,5 +33,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: simple rhel example
 :reallyrm: false

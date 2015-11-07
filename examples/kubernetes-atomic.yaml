@@ -43,5 +43,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: 'simple kubernetes on atomic example without cached images'
 :reallyrm: false

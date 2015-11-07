@@ -37,5 +37,6 @@
 :reboot: false
 :unsafe: false
 :nested: false
+:tests: []
 :comment: simple docker build example
 :reallyrm: false

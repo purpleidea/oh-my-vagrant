@@ -347,3 +347,41 @@ function vansible {
 
 	ansible --private-key="$k" --inventory="$i" "$@"
 }
+
+# vagrant test (run tests from the `tests` omv.yaml variable)
+function vtest {
+	[ "$1" != '' ] && echo "Usage: vtest - vagrant test" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
+	wd=`pwd`		# save wd, then find the Vagrant project
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+		#echo "pwd is `pwd`"
+		cd ..
+	done
+	pwd=`pwd`
+	cd $wd
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+		echo 'Vagrant project not found!' 1>&2 && return 2
+	fi
+
+	# if we find the omv.yaml file, it takes precendence for mtime lookups
+	if [ -e "$pwd/omv.yaml" ]; then
+		pfile="$pwd/omv.yaml"
+	elif [ -e "$pwd/Vagrantfile" ]; then
+		pfile="$pwd/Vagrantfile"
+	else
+		echo 'No vagrant definition found!' 1>&2 && return 2
+	fi
+
+	$VAGRANT status &>/dev/null	# cause the tests file to be generated
+	if [ ! -e "$pwd/.vagrant/tests.sh" ]; then
+		echo 'No vagrant tests.sh file found!' 1>&2 && return 3
+	fi
+
+	"$pwd/.vagrant/tests.sh"	# run the tests
+	r=$?
+	$VAGRANT destroy	# clean up!
+	return $r
+}
