@@ -482,10 +482,49 @@ Currently undocumented.
 Currently undocumented.
 
 ####`poolid`
-Currently undocumented.
+
+Array of [Red Hat Subscription Manager pool(s)](https://access.redhat.com/documentation/en-US/Red_Hat_Subscription_Management/1/html-single/RHSM/#subscr-about-pools)
+to attach to a system.
+_Note:_ even if you want to supply only one pool ID, you still have to do it with
+YAML list notation, like this:
+
+```yaml
+:poolid:
+  - ff8080812bc382e3012bc3845ca000cb
+```
+
+If you want to pass `--auto` parameter to subscription-manager command, set
+`:poolid:` to any arbitrary value (`auto` is a good choice):
+
+```yaml
+:poolid: auto
+```
 
 ####`repos`
-Currently undocumented.
+
+Array of [Red Hat Subscription Manager repositories](https://access.redhat.com/documentation/en-US/Red_Hat_Subscription_Management/1/html-single/RHSM/#entitlements-and-yum)
+to add to a system.
+Prepending `#` sign in front of repository name will disable this repository.
+
+Usually it's desirable to disable all repositories from a pool, and then only
+enable the repositories that are really needed (to avoid conflicts and other
+related issues). To achieve this, `:repos:` array should look like this:
+```yaml
+:repos:
+  - '#*'
+  - repo1
+  - repo2
+  - ...
+```
+
+The above YAML represents the following sequence of commands:
+
+```bash
+subscription-manager repos --disable '*'
+subscription-manager repos --enable 'repo1'
+subscription-manager repos --enable 'repo2'
+subscription-manager repos --enable '...'
+```
 
 ####`update`
 Currently undocumented.
