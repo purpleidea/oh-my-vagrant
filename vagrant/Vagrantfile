@@ -1144,7 +1144,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 				# add missing root password where necessary
-				vm.vm.provision 'shell', inline: 'echo vagrant | passwd --stdin root'
+				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-' or vm.vm.box.start_with? 'fedora-'
+					vm.vm.provision 'shell', inline: 'echo vagrant | passwd --stdin root'
+				elsif vm.vm.box.start_with? 'debian-' or vm.vm.box.start_with? 'ubuntu-'
+					vm.vm.provision 'shell', inline: 'usermod -p $(echo vagrant | openssl passwd -1 -stdin) root'
+				end
 
 				# fix atomic hosts with missing authorized_keys
 				if vm.vm.box.start_with? 'atomic-'
@@ -1192,8 +1196,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				if vm_update
 					if vm.vm.box.start_with? 'atomic-'
 						vm.vm.provision 'shell', inline: 'atomic host upgrade'
-					else
+					elsif vm.vm.box.start_with? 'fedora-' or vm.vm.box.start_with? 'rhel-'
 						vm.vm.provision 'shell', inline: 'yum -y update'
+					elsif vm.vm.box.start_with? 'debian-' or vm.vm.box.start_with? 'ubuntu-'
+						vm.vm.provision 'shell', inline: 'apt-get -y dist-upgrade'
 					end
 				end
 
