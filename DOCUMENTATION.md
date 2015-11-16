@@ -485,8 +485,8 @@ Currently undocumented.
 
 Array of [Red Hat Subscription Manager pool(s)](https://access.redhat.com/documentation/en-US/Red_Hat_Subscription_Management/1/html-single/RHSM/#subscr-about-pools)
 to attach to a system.
-_Note:_ even if you want to supply only one pool ID, you still have to do it with
-YAML list notation, like this:
+_Note:_ even if you want to supply only one pool ID, you still have to do it
+with YAML list notation, like this:
 
 ```yaml
 :poolid:
