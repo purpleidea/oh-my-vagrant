@@ -10,20 +10,34 @@ import json
 import urllib
 import subprocess
 
+# static argv to be used if running script inline
+argv = [
+	#'https://github.com/purpleidea/oh-my-vagrant', # giturl
+	#'master',
+	#'make test',
+]
+argv.insert(0, '') # add a fake argv[0]
 url_base = 'http://admin.ci.centos.org:8080'
-apikey = os.environ.get('DUFFY_API_KEY')
-if apikey is None:
+apikey = '' # put api key here if running inline
+if apikey == '':
+	apikey = os.environ.get('DUFFY_API_KEY')
+if apikey is None or apikey == '':
 	apikey = open('duffy.key', 'r').read().strip()
 ver = '7'
 arch = 'x86_64'
 count = 1
 
-git_url = sys.argv[1]
+if len(argv) <= 1: argv = sys.argv # use system argv because ours is empty
+if len(argv) <= 1:
+	print 'Not enough arguments supplied!'
+	sys.exit(1)
+
+git_url = argv[1]
 branch = 'master'
-if len(sys.argv) > 2: branch = sys.argv[2]
+if len(argv) > 2: branch = argv[2]
 folder = os.path.splitext(os.path.basename(__file__))[0]
 run = 'make vtest' # the omv vtest cmd is a good option to run from this target
-if len(sys.argv) > 3: run = ' '.join(sys.argv[3:])
+if len(argv) > 3: run = ' '.join(argv[3:])
 
 get_nodes_url = "%s/Node/get?key=%s&ver=%s&arch=%s&i_count=%s" % (url_base, apikey, ver, arch, count)
 data = json.loads(urllib.urlopen(get_nodes_url).read()) # request host(s)
