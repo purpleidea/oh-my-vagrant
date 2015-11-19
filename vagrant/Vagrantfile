@@ -1047,13 +1047,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 			end
 
+			# family parsing
+			is_yum = (vm.vm.box.start_with? 'fedora-' or vm.vm.box.start_with? 'centos-' or vm.vm.box.start_with? 'rhel-')
+			is_apt = (vm.vm.box.start_with? 'debian-' or vm.vm.box.start_with? 'ubuntu-')
+			is_atomic = vm.vm.box.start_with? 'atomic-'
+			is_rhel = (vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-')
+			is_family_redhat = (is_yum or is_atomic)
+			is_family_debian = is_apt
+
 			# sync type
 			# this section is a bit tricky, because if you want a
 			# different sync other than /vagrant (which you get by
 			# default), then you have to disable it, and then add
 			# what you want... cleanups that still work are welcome
 			disabled = false
-			if vm.vm.box.start_with? 'atomic-' or vm_sync == ''
+			if is_atomic or vm_sync == ''
 				disabled = true
 				vm.vm.synced_folder '.', '/vagrant', disabled: true
 			else
@@ -1065,7 +1073,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				vm.vm.synced_folder '.', '/vagrant', disabled: true
 			end
 
-			if vm.vm.box.start_with? 'atomic-'
+			if is_atomic
 				synced_folder = '/home/vagrant/sync'
 				synced_folder = vm_syncdir_folder.start_with?('/') ? vm_syncdir_folder : File.join(synced_folder, vm_syncdir_folder)
 				if vm_sync != ''
@@ -1090,7 +1098,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 					exists = false
 				end
 			end
-			if not(exists) and not (vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-')
+			if not(exists) and not is_rhel
 				vm.vm.box_url = "#{default_boxurlprefix}/#{vm.vm.box}/#{vm.vm.box}.box"
 			end
 
@@ -1123,7 +1131,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 			# unsubscribe rhel machines on destroy
 			if destroy.is_a?(TrueClass) or (destroy.is_a?(Array) and destroy.include?(h))
-				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
+				if is_rhel
 					# check these to know if we registered!
 					if username != '' and password != ''
 						# ssh into itself and unregister
@@ -1144,19 +1152,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 				# add missing root password where necessary
-				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-' or vm.vm.box.start_with? 'fedora-'
-					vm.vm.provision 'shell', inline: 'echo vagrant | passwd --stdin root'
-				elsif vm.vm.box.start_with? 'debian-' or vm.vm.box.start_with? 'ubuntu-'
+				if is_family_debian
 					vm.vm.provision 'shell', inline: 'usermod -p $(echo vagrant | openssl passwd -1 -stdin) root'
+				elsif is_family_redhat
+					vm.vm.provision 'shell', inline: 'echo vagrant | passwd --stdin root'
 				end
 
 				# fix atomic hosts with missing authorized_keys
-				if vm.vm.box.start_with? 'atomic-'
+				if is_atomic
 					vm.vm.provision 'shell', inline: 'test -e /root/.ssh/ || cp -r /home/vagrant/.ssh/ /root/'
 				end
 
 				# subscribe rhel machines
-				if vm.vm.box.start_with? 'rhel-' or vm.vm.box.start_with? 'atomic-rhel-'
+				if is_rhel
 					if username != '' and password != ''
 						vm.vm.provision 'shell', inline: "subscription-manager register --username=#{username} --password=#{password}"
 
@@ -1194,12 +1202,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 				# update the hosts
 				if vm_update
-					if vm.vm.box.start_with? 'atomic-'
+					if is_atomic
 						vm.vm.provision 'shell', inline: 'atomic host upgrade'
-					elsif vm.vm.box.start_with? 'fedora-' or vm.vm.box.start_with? 'rhel-'
+					elsif is_yum
 						vm.vm.provision 'shell', inline: 'yum -y update'
-					elsif vm.vm.box.start_with? 'debian-' or vm.vm.box.start_with? 'ubuntu-'
-						vm.vm.provision 'shell', inline: 'apt-get -y dist-upgrade'
+					elsif is_apt
+						vm.vm.provision 'shell', inline: 'apt-get update && apt-get -y upgrade'
 					end
 				end
 
