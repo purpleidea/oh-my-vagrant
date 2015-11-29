@@ -39,9 +39,9 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 
 ## Dependencies:
 * vagrant (available in Fedora 21+)
-  * [https://github.com/pradels/vagrant-libvirt/](vagrant-libvirt) (available in Fedora 21+)
+  * [vagrant-libvirt](https://github.com/pradels/vagrant-libvirt/) (available in Fedora 21+)
   * in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
-* [https://github.com/purpleidea/vagrant-hostmanager/](vagrant-hostmanager)
+* [vagrant-hostmanager](https://github.com/purpleidea/vagrant-hostmanager/)
   * you need the feat/oh-my-vagrant patches for this to work properly
   * to install them, run the script from: [extras/patch-hostmanager.sh](extras/patch-hostmanager.sh)
 * [vagrant-reload](https://github.com/aidanns/vagrant-reload)
