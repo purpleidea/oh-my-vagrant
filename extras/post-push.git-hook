@@ -1,0 +1,27 @@
+#!/bin/bash
+# TODO: rename this to `post-push` and place in project/.git/hooks/
+# TODO: it needs the `git-pushx` script added (b/c git hates post-push hooks)
+# TODO: it also needs the alias: pushx = !git-pushx in your ~/.gitconfig
+
+# This is a git hook to trigger Jenkins builds automatically. It logins in if
+# your Jenkins instance requires password authentication, and then kicks the
+# special "Build Triggers" -> "Trigger builds remotely (e.g., from scripts)"
+# URL for you. You'll have to set an "Authentication Token" manually first.
+
+# notify the centos jenkins ci that we should run a build
+JENKINS_BASE='https://ci.centos.org'
+JENKINS_USERNAME='purpleidea'				# TODO: set this
+JENKINS_PASSWORD='hunter2'				# TODO: set this
+JENKINS_JOB='purpleidea-oh-my-vagrant'			# TODO: set this
+JENKINS_TOKEN='some-token-that-you-generate'		# TODO: set this
+JENKINS_CAUSE='started+from+git+hook' # a url safe comment to pass as a build reason
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = 'master' ] || [ "$1" = '--force' ]; then
+	# login first
+	wget -q -O - --save-cookies cookies.txt --post-data "j_username=${JENKINS_USERNAME}&j_password=${JENKINS_PASSWORD}&remember_me=on&Submit=log+in" "${JENKINS_BASE}/j_acegi_security_check" 1> /dev/null
+	# trigger the build
+	wget -q -O - --load-cookies cookies.txt "${JENKINS_BASE}/me/my-views/view/All/job/${JENKINS_JOB}/build?token=${JENKINS_TOKEN}&cause=${JENKINS_CAUSE}" 1> /dev/null
+	# clean up the crumbs
+	rm -rf cookies.txt
+fi
