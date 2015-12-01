@@ -16,7 +16,7 @@ JENKINS_JOB='purpleidea-oh-my-vagrant'			# TODO: set this
 JENKINS_TOKEN='some-token-that-you-generate'		# TODO: set this
 JENKINS_CAUSE='started+from+git+hook' # a url safe comment to pass as a build reason
 
-branch=$(git rev-parse --abbrev-ref HEAD)
+branch="$1"
 if [ "$branch" = 'master' ] || [ "$1" = '--force' ]; then
 	# login first
 	wget -q -O - --save-cookies cookies.txt --post-data "j_username=${JENKINS_USERNAME}&j_password=${JENKINS_PASSWORD}&remember_me=on&Submit=log+in" "${JENKINS_BASE}/j_acegi_security_check" 1> /dev/null
