@@ -238,6 +238,17 @@ an initial clone with the `--recursive` flag. Example:
 
 ```git clone --recursive https://github.com/purpleidea/oh-my-vagrant/```
 
+###Does this work on Windows?
+
+Almost all of the code is `vagrant` specific ruby code, therefore OMV should
+work on anything that vagrant works on. However, there is a bit of platform
+specific code added to OMV that is currently known to use POSIX file system
+semantics, and as a result likely won't work under Windows. This means you can
+either use OMV with fewer features on Windows, or help by patching it and
+testing it on that platform. So far, few have wanted to use or develop on that
+platform, with most preferring GNU/Linux and sometimes OSX, which are both
+fully functional at this time.
+
 ###Awesome work, but it's missing support for a feature and/or platform!
 
 Since this is an Open Source / Free Software project that I also give away for
