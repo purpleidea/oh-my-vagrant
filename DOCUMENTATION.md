@@ -602,6 +602,7 @@ This project is routinely tested on:
 
 It will probably work without incident or without major modification on:
 
+* Debian 7+
 * Fedora 20
 * CentOS 5.x/6.x/7.x
 * RHEL 5.x/6.x/7.x
@@ -609,7 +610,6 @@ It will probably work without incident or without major modification on:
 It has not been tested by the author (but should work) on:
 
 * Ubuntu 12.04+
-* Debian 7+
 
 It will most likely work on other GNU/Linux platforms, but testing on those
 platforms has been minimal due to lack of time and resources.

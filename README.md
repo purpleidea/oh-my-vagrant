@@ -24,7 +24,7 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
 * The current name is obviously a nod to the success of the 'oh-my-zsh' project, although I'm actually a bash user :)
 * It is an attempt to provide a general purpose environment to make it easier to get hacking on vagrant+puppet+docker things.
 * There are still some unresolved issues, but it can be useful as reference, or as a starting point for a hacker to customize.
-* I've published a number of articles about this environment:
+* There are a number of published articles about this environment:
   * [https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/](https://ttboj.wordpress.com/2014/09/03/introducing-oh-my-vagrant/)
   * [https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/08/sharing-dev-environments-with-oh-my-vagrant/)
   * [https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/](https://ttboj.wordpress.com/2015/04/20/docker-containers-in-oh-my-vagrant/)
@@ -32,13 +32,14 @@ Please look in the [examples/](examples/) folder for usage. If none exist, pleas
   * [https://ttboj.wordpress.com/2015/06/12/a-super-privileged-puppet-container/](https://ttboj.wordpress.com/2015/06/12/a-super-privileged-puppet-container/)
   * [https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/](https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/)
   * [https://ttboj.wordpress.com/2015/08/11/vagrant-and-oh-my-vagrant-on-rhel7/](https://ttboj.wordpress.com/2015/08/11/vagrant-and-oh-my-vagrant-on-rhel7/)
+  * [https://ghantoos.org/2015/12/20/how-to-setup-run-oh-my-vagrant-on-debian-with-libvirt-and-kvm/](https://ghantoos.org/2015/12/20/how-to-setup-run-oh-my-vagrant-on-debian-with-libvirt-and-kvm/)
 * There are some screencasts available:
   * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-extern-screencast.ogv)
   * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-docker-screencast.ogv)
   * [https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv](https://dl.fedoraproject.org/pub/alt/purpleidea/screencasts/oh-my-vagrant-kubernetes-screencast.ogv)
 
 ## Dependencies:
-* vagrant (available in Fedora 21+)
+* vagrant (available in Fedora 21+, Debian)
   * [vagrant-libvirt](https://github.com/pradels/vagrant-libvirt/) (available in Fedora 21+)
   * in the meantime please test: [https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/](https://copr.fedoraproject.org/coprs/jstribny/vagrant-f20/)
 * [vagrant-hostmanager](https://github.com/purpleidea/vagrant-hostmanager/)
