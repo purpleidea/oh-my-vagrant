@@ -1,0 +1,59 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: fedora-23
+:cpus: ''
+:memory: ''
+:disks: 0
+:disksize: 40G
+:boxurlprefix: ''
+:sync: rsync
+:syncdir: ''
+:syncsrc: ''
+:folder: ''
+:extern: []
+:cd: ''
+:puppet: false
+:classes: []
+:shell:
+- script: |
+    echo this is ceph-deploy on fedora-23
+    dnf install -y ceph-deploy
+    mkdir ceph-deploy
+    cd ceph-deploy
+    export CEPH_HOST=`hostname -f`
+    ceph-deploy new $CEPH_HOST
+    echo "osd crush chooseleaf type = 0" >> ceph.conf
+    echo "osd pool default size = 1" >> ceph.conf
+    ceph-deploy install --no-adjust-repos $CEPH_HOST
+    ceph-deploy mon create-initial
+    mkdir -p /srv/ceph/osd
+    ceph-deploy osd prepare $CEPH_HOST:/srv/ceph/osd
+    ceph-deploy osd activate $CEPH_HOST:/srv/ceph/osd
+    ceph status
+    ceph-deploy purgedata $CEPH_HOST
+    ceph-deploy purge $CEPH_HOST
+    ceph-deploy forgetkeys
+    rm -rf /srv/ceph/osd
+    echo you can now use ceph with the rbd command
+  once: true
+:docker: false
+:kubernetes: false
+:ansible: []
+:playbook: []
+:ansible_extras: {}
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 1
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:reboot: false
+:unsafe: false
+:nested: false
+:tests: []
+:comment: 'based on: https://www.berrange.com/posts/2015/12/21/ceph-single-node-deployment-on-fedora-23/'
+:reallyrm: false
