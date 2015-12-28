@@ -31,10 +31,10 @@
     ceph-deploy osd prepare $CEPH_HOST:/srv/ceph/osd
     ceph-deploy osd activate $CEPH_HOST:/srv/ceph/osd
     ceph status
-    ceph-deploy purgedata $CEPH_HOST
-    ceph-deploy purge $CEPH_HOST
-    ceph-deploy forgetkeys
-    rm -rf /srv/ceph/osd
+    #ceph-deploy purgedata $CEPH_HOST
+    #ceph-deploy purge $CEPH_HOST
+    #ceph-deploy forgetkeys
+    #rm -rf /srv/ceph/osd
     echo you can now use ceph with the rbd command
   once: true
 :docker: false
