@@ -3,6 +3,9 @@
 ![Oh My Vagrant!](https://raw.githubusercontent.com/purpleidea/oh-my-vagrant/master/art/omv.png)
 
 [![Build Status](https://secure.travis-ci.org/purpleidea/oh-my-vagrant.png)](http://travis-ci.org/purpleidea/oh-my-vagrant)
+[![Documentation](https://img.shields.io/docs/markdown.png)](DOCUMENTATION.md)
+[![IRC](https://img.shields.io/irc/%23ohmyvagrant.png)](https://webchat.freenode.net/?channels=#ohmyvagrant)
+[![Jenkins](https://img.shields.io/jenkins/status.png)](https://ci.centos.org/job/purpleidea-oh-my-vagrant/)
 
 ## Documentation:
 Please see: [DOCUMENTATION.md](DOCUMENTATION.md) or [PDF](https://pdfdoc-purpleidea.rhcloud.com/pdf/https://github.com/purpleidea/oh-my-vagrant/blob/master/DOCUMENTATION.md).
