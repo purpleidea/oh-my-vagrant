@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: all version docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr test
+.PHONY: all version docs rpm srpm spec tar upload upload-sources upload-srpms upload-rpms copr test vtest
 .SILENT:
 
 # version of the program
@@ -181,4 +181,9 @@ copr: upload-srpms
 test:
 	./test.sh
 
+#
+#	vtest
+#
+vtest:
+	true	# TODO: do a vup / vtest
 # vim: ts=8
