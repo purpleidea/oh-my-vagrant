@@ -460,6 +460,6 @@ function vtest {
 
 	"$pwd/.vagrant/tests.sh"	# run the tests
 	r=$?
-	$VAGRANT destroy	# clean up!
+	#$VAGRANT destroy	# clean up!
 	return $r
 }
