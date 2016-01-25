@@ -14,12 +14,90 @@ fi
 alias vs="$VAGRANT status"
 alias vp="$VAGRANT provision"
 alias vup="$VAGRANT up"
-alias vssh="$VAGRANT ssh"
 alias vrsync="$VAGRANT rsync"
 alias vdestroy="$VAGRANT destroy"
 alias vrm-rf="$VAGRANT --omv-reallyrmonce=true status"
 function vlog {
 	VAGRANT_LOG=info $VAGRANT "$@" 2> vagrant.log
+}
+
+# vagrant ssh (better than vagrant ssh)
+function vssh {
+	[ "$1" = '' ] || [ "$2" != '' -a "$2" != '-c' ] || [ "$2" = '-c' -a "$3" = '' ] && echo "Usage: vssh <vm-name> [-c COMMAND] - vagrant screen" 1>&2 && return 1
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
+	wd=`pwd`		# save wd, then find the Vagrant project
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+		#echo "pwd is `pwd`"
+		cd ..
+	done
+	pwd=`pwd`
+	cd $wd
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+		echo 'Vagrant project not found!' 1>&2 && return 2
+	fi
+
+	# if we find the omv.yaml file, it takes precendence for mtime lookups
+	if [ -e "$pwd/omv.yaml" ]; then
+		pfile="$pwd/omv.yaml"
+	elif [ -e "$pwd/Vagrantfile" ]; then
+		pfile="$pwd/Vagrantfile"
+	else
+		echo 'No vagrant definition found!' 1>&2 && return 2
+	fi
+
+	host="$1"	# save variables
+	cmd=''
+	if [ "$2" = '-c' -a "$3" != '' ]; then
+		shift 2
+		cmd="$@"	# join $3...last
+	fi
+
+	d="$pwd/.ssh"
+	f="$d/$host.config"
+	h="$host"
+	# hostname extraction from user@host pattern
+	p=`expr index "$host" '@'`
+	if [ $p -gt 0 ]; then
+		let "l = ${#h} - $p"
+		h=${h:$p:$l}
+	fi
+
+	cdfile="$pwd/.vagrant/$h.cd"
+
+	# if cd file is missing, or is older than the definition file, re-generate...
+	# or if mtime of $f is > than 5 minutes (5 * 60 seconds), re-generate...
+	if [ ! -e "$cdfile" ] || \
+	[ $(stat -c '%Y' "$pfile" 2> /dev/null) -gt $(stat -c '%Y' "$cdfile" 2> /dev/null) ] || \
+	[ `date -d "now - $(stat -c '%Y' "$f" 2> /dev/null) seconds" +%s` -gt 300 ]; then
+		mkdir -p "$d"
+		# we cache the lookup because this command is slow...
+		$VAGRANT ssh-config "$h" > "$f" || rm "$f"
+	fi
+
+	cddir="`cat $cdfile 2>/dev/null`"
+	if [ -e "$cdfile" ] && [ -n "$cddir" ]; then
+		# switch into the cd dir, and then run that users shell
+		_cmd="cd '$cddir' && exec $(getent passwd `whoami` | awk -F ':' '{print $7}')"
+		if [ "$cmd" != '' ]; then
+			_cmd="$_cmd -c '$cmd'"	# add on the -c to bash
+		fi
+		cmd="$_cmd"
+		unset _cmd
+	fi
+
+	[ -e "$f" ] && ssh -t -F "$f" "$host" "$cmd"
+	e=$?
+	if [ $e -eq 255 ]; then
+		# you probably want a shorter timeout if you see this often
+		echo 'Maybe cached connection was stale? Cleaning...'
+		rm -f "$f"	# clean stale ssh connection
+		# TODO: recurse up to one time?
+	else
+		return $e
+	fi
 }
 
 # vagrant sftp
