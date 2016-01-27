@@ -512,11 +512,11 @@ function vtest+ {
 	count=0
 	failures=""
 	# loop through tests
-	while read i; do
+	while read -r -u "$fd" i; do	# http://mywiki.wooledge.org/BashFAQ/089
 		count=`expr $count + 1`
 		echo "$i" | grep -q '^#' && continue	# ignore comments
 		#export _TMPDIR='/tmp/oh-my-vagrant/'	# we can add to env like this
-		out=$($i 2>&1)	# run and capture stdout & stderr
+		out="$($i 2>&1)"	# run and capture stdout & stderr
 		e=$?	# save exit code
 		if [ $e -ne 0 ]; then
 			# store failures...
@@ -537,7 +537,7 @@ function vtest+ {
 		else
 			echo -e "ok\t$i\t(line: $count)"	# pass
 		fi
-	done < "$pwd/.vagrant/tests.sh"	# send in the test file line by line
+	done {fd}< "$pwd/.vagrant/tests.sh"	# send in the test file line by line
 	cd $owd
 	# display errors
 	if [[ -n "${failures}" ]]; then
