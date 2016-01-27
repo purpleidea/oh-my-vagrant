@@ -39,7 +39,7 @@
 :tests:
 - echo These tests should be run with vtest+
 - omv up
-- vssh root@omv1 -c 'test -e /tmp/hello1 -a -e /tmp/hello2'
+- vssh root@omv1 -c test -e /tmp/hello1 -a -e /tmp/hello2
 - omv destroy
 :comment: simple shell run example with test
 :reallyrm: false
