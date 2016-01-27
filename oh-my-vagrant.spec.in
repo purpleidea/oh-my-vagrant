@@ -2,7 +2,6 @@
 
 Name:		oh-my-vagrant
 Version:	__VERSION__
-#Release:	__RELEASE__%{?dist}	# use this to make dist specific builds
 Release:	__RELEASE__
 Summary:	An easy to use dev environment for using vagrant with puppet, docker and more!
 License:	AGPLv3+
