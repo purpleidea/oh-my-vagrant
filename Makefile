@@ -185,5 +185,6 @@ test:
 #	vtest
 #
 vtest:
-	true	# TODO: do a vup / vtest
+	./vtest.sh	# run vtest+
+
 # vim: ts=8

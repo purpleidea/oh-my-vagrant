@@ -1,0 +1,45 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: centos-7.1
+:cpus: ''
+:memory: ''
+:disks: 0
+:disksize: 40G
+:boxurlprefix: ''
+:sync: rsync
+:syncdir: ''
+:syncsrc: ''
+:folder: ''
+:extern: []
+:cd: ''
+:puppet: false
+:classes: []
+:shell:
+- script: echo hello world > /tmp/hello1
+  once: true
+- echo hello again > /tmp/hello2
+:docker: []
+:kubernetes: false
+:ansible: []
+:playbook: []
+:ansible_extras: {}
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 1
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:reboot: false
+:unsafe: false
+:nested: false
+:tests:
+- echo These tests should be run with vtest+
+- omv up
+- vssh root@omv1 -c 'test -e /tmp/hello1 -a -e /tmp/hello2'
+- omv destroy
+:comment: simple shell run example with test
+:reallyrm: false

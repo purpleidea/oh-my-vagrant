@@ -463,3 +463,88 @@ function vtest {
 	#$VAGRANT destroy	# clean up!
 	return $r
 }
+
+# vagrant test+ (run fancy tests from the `tests` omv.yaml variable)
+function vtest+ {
+	[ "$2" != '' ] && echo "Usage: vtest+ [omv.yaml] - vagrant test plus" 1>&2 && return 1
+	owd=`pwd`	# original wd
+	if [ "$1" != '' ]; then
+		[[ ! "$1" == *'.yaml' ]] && echo "File: '$1' must be a .yaml file!" 1>&2 && return 1
+		[ ! -e "$1" ] && echo "File: '$1' does not exist!" 1>&2 && return 1
+		d=`mktemp --tmpdir -d vtest.XXX`
+		cp "$1" "$d"/omv.yaml
+		cd "$d"
+		mkdir '.vagrant'
+	fi
+	vfile='Vagrantfile'
+	if [[ "$VAGRANT" == omv* ]]; then
+		vfile='omv.yaml'
+	fi
+	wd=`pwd`		# save wd, then find the Vagrant project
+	while [ "`pwd`" != '/' ] && [ ! -e "`pwd`/$vfile" ] && [ ! -d "`pwd`/.vagrant/" ]; do
+		#echo "pwd is `pwd`"
+		cd ..
+	done
+	pwd=`pwd`
+	cd $wd
+	if [ ! -e "$pwd/$vfile" ] || [ ! -d "$pwd/.vagrant/" ]; then
+		cd $owd
+		echo 'Vagrant project not found!' 1>&2 && return 2
+	fi
+
+	# if we find the omv.yaml file, it takes precendence for mtime lookups
+	if [ -e "$pwd/omv.yaml" ]; then
+		pfile="$pwd/omv.yaml"
+	elif [ -e "$pwd/Vagrantfile" ]; then
+		pfile="$pwd/Vagrantfile"
+	else
+		cd $owd
+		echo 'No vagrant definition found!' 1>&2 && return 2
+	fi
+
+	$VAGRANT status &>/dev/null	# cause the tests file to be generated
+	if [ ! -e "$pwd/.vagrant/tests.sh" ]; then
+		cd $owd
+		echo 'No vagrant tests.sh file found!' 1>&2 && return 3
+	fi
+
+	LINE=$(printf '=%.0s' `seq -s ' ' $(tput cols)`)	# a terminal width string
+	count=0
+	failures=""
+	# loop through tests
+	while read i; do
+		count=`expr $count + 1`
+		echo "$i" | grep -q '^#' && continue	# ignore comments
+		#export _TMPDIR='/tmp/oh-my-vagrant/'	# we can add to env like this
+		out=$($i 2>&1)	# run and capture stdout & stderr
+		e=$?	# save exit code
+		if [ $e -ne 0 ]; then
+			# store failures...
+			failures=$(
+				# prepend previous failures if any
+				[ -n "${failures}" ] && echo "$failures" && echo "$LINE"
+				echo "Lineno: $count"
+				echo "Script: $i"
+				# if we see 124, it might be the exit value of timeout!
+				[ $e -eq 124 ] && echo "Exited: $e (timeout?)" || echo "Exited: $e"
+				if [ "$out" = "" ]; then
+					echo "Output: (empty!)"
+				else
+					echo "Output:"
+					echo "$out"
+				fi
+			)
+		else
+			echo -e "ok\t$i\t(line: $count)"	# pass
+		fi
+	done < "$pwd/.vagrant/tests.sh"	# send in the test file line by line
+	cd $owd
+	# display errors
+	if [[ -n "${failures}" ]]; then
+		echo 'FAIL'
+		echo 'The following tests failed:'
+		echo "${failures}"
+		return 1
+	fi
+	return 0
+}
