@@ -16,12 +16,35 @@ JENKINS_JOB='purpleidea-oh-my-vagrant'			# TODO: set this
 JENKINS_TOKEN='some-token-that-you-generate'		# TODO: set this
 JENKINS_CAUSE='started+from+git+hook' # a url safe comment to pass as a build reason
 
+echo 'Running post-push hook...'
 branch="$1"
 if [ "$branch" = 'master' ] || [ "$1" = '--force' ]; then
 	# login first
 	wget -q -O - --save-cookies cookies.txt --post-data "j_username=${JENKINS_USERNAME}&j_password=${JENKINS_PASSWORD}&remember_me=on&Submit=log+in" "${JENKINS_BASE}/j_acegi_security_check" 1> /dev/null
 	# trigger the build
 	wget -q -O - --load-cookies cookies.txt "${JENKINS_BASE}/me/my-views/view/All/job/${JENKINS_JOB}/build?token=${JENKINS_TOKEN}&cause=${JENKINS_CAUSE}" 1> /dev/null
+	# TODO: get the build id and wait for that specifically
+	sleep 10s	# give the build time to start
+	# wait for result from build
+	while true; do
+		r=`wget -q -O - --load-cookies cookies.txt "${JENKINS_BASE}/job/${JENKINS_JOB}/lastBuild/api/json" | python -c 'import json,sys;obj=json.load(sys.stdin);print str(obj.get("result", "pending")) + obj.get("displayName", "")'`
+		split=(${r//#/ })
+		r=${split[0]}
+		b=${split[1]}
+		if [ "$r" = 'pending' ] || [ "$r" = 'None' ]; then	# build not ready yet
+			echo "Build #${b} is pending..."
+			sleep 10s
+		elif [ "$r" = 'SUCCESS' ]; then
+			e=0
+			break
+		else
+			e=1
+			break
+		fi
+	done
+	echo "Build #${b}: $r"
 	# clean up the crumbs
 	rm -rf cookies.txt
+else
+	echo 'Skipping post-push hook.'
 fi
