@@ -3,3 +3,5 @@ screencasts/
 old/
 tmp/
 rpmbuild/
+jenkins_jobs.ini
+get-xml-jenkins-job.sh
