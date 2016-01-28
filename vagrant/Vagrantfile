@@ -740,6 +740,7 @@ ansible_basedir = File.join(projectdir, folder, 'ansible/', 'modules/')
 docker_basedir = File.join(projectdir, folder, 'docker/')
 kubernetes_basedir = File.join(projectdir, folder, 'kubernetes/', 'applications/')
 ktemplates_basedir = File.join(projectdir, folder, 'kubernetes/', 'templates/')
+other_basedir = File.join(projectdir, folder)	# this is the root dir...
 
 if create_directories
 	# mkdir in case these folders are missing
@@ -750,6 +751,7 @@ if create_directories
 	mkdirp += " #{docker_basedir}"
 	mkdirp += " #{kubernetes_basedir}"
 	mkdirp += " #{ktemplates_basedir}"
+	mkdirp += " #{other_basedir}"
 	`#{mkdirp}`
 end
 
@@ -760,6 +762,7 @@ native += `cd "#{ansible_basedir}" && (git status &> /dev/null) && git ls-files`
 native += `cd "#{docker_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 native += `cd "#{kubernetes_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 native += `cd "#{ktemplates_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
+native += `cd "#{other_basedir}" && (git status &> /dev/null) && git ls-files`.strip.split("\n")
 
 if extern.length > 0
 	extern.each do |i|
@@ -778,8 +781,8 @@ if extern.length > 0
 		elsif s == 'ktemplates'
 			basedir = ktemplates_basedir
 		else
-			$stderr.puts "Can't process extern system: '#{s}'."
-			next
+			# NOTE: this one puts code in the root vagrant dir
+			basedir = other_basedir
 		end
 		if t == 'git'
 			repository = i.fetch('repository', nil)
