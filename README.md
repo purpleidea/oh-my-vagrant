@@ -6,6 +6,7 @@
 [![Documentation](https://img.shields.io/docs/markdown.png)](DOCUMENTATION.md)
 [![IRC](https://img.shields.io/irc/%23ohmyvagrant.png)](https://webchat.freenode.net/?channels=#ohmyvagrant)
 [![Jenkins](https://img.shields.io/jenkins/status.png)](https://ci.centos.org/job/purpleidea-oh-my-vagrant/)
+[![COPR](https://img.shields.io/copr/builds.png)](https://copr.fedoraproject.org/coprs/purpleidea/oh-my-vagrant/)
 
 ## Documentation:
 Please see: [DOCUMENTATION.md](DOCUMENTATION.md) or [PDF](https://pdfdoc-purpleidea.rhcloud.com/pdf/https://github.com/purpleidea/oh-my-vagrant/blob/master/DOCUMENTATION.md).
