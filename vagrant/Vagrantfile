@@ -1565,7 +1565,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 				if vm_cpus.to_i != 0	# handles '', nil, & 0
-					libvirt.cpus = vm_cpus
+					libvirt.cpus = vm_cpus.to_i
 
 				# make puppet server a bit fatter by default :P
 				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
@@ -1573,7 +1573,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				end
 
 				if vm_memory.to_i != 0
-					libvirt.memory = vm_memory
+					libvirt.memory = vm_memory.to_i
 
 				# make puppet server a bit fatter by default :P
 				elsif (puppet and vm_puppet and h == 'puppet') or vm_nested
