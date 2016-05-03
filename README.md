@@ -8,6 +8,16 @@
 [![Jenkins](https://img.shields.io/jenkins/status.png)](https://ci.centos.org/job/purpleidea-oh-my-vagrant/)
 [![COPR](https://img.shields.io/copr/builds.png)](https://copr.fedoraproject.org/coprs/purpleidea/oh-my-vagrant/)
 
+## Status:
+This project was always meant to be a useful tool for its author. Others found
+it helpful, and I was happy to share and help improve it. From my perspective,
+it's now mostly feature complete, and since I've been focusing most of my time
+on [mgmt](https://github.com/purpleidea/mgmt/), there aren't any major planned
+changes coming. As a result please use, share and enjoy it, but development is
+going to be limited to what the community provides. We have other maintainers,
+so that I'm not a bottleneck on any patch reviews or merges! Happy hacking! --
+[purpleidea](https://twitter.com/purpleidea)
+
 ## Documentation:
 Please see: [DOCUMENTATION.md](DOCUMENTATION.md) or [PDF](https://pdfdoc-purpleidea.rhcloud.com/pdf/https://github.com/purpleidea/oh-my-vagrant/blob/master/DOCUMENTATION.md).
 
