@@ -4,7 +4,7 @@
 
 [![Build Status](https://secure.travis-ci.org/purpleidea/oh-my-vagrant.png?branch=master)](http://travis-ci.org/purpleidea/oh-my-vagrant)
 [![Documentation](https://img.shields.io/docs/markdown.png)](DOCUMENTATION.md)
-[![IRC](https://img.shields.io/irc/%23ohmyvagrant.png)](https://webchat.freenode.net/?channels=#ohmyvagrant)
+[![IRC](https://img.shields.io/irc/%23vagrant.png)](https://webchat.freenode.net/?channels=#vagrant)
 [![Jenkins](https://img.shields.io/jenkins/status.png)](https://ci.centos.org/job/purpleidea-oh-my-vagrant/)
 [![COPR](https://img.shields.io/copr/builds.png)](https://copr.fedoraproject.org/coprs/purpleidea/oh-my-vagrant/)
 
@@ -12,7 +12,7 @@
 Please see: [DOCUMENTATION.md](DOCUMENTATION.md) or [PDF](https://pdfdoc-purpleidea.rhcloud.com/pdf/https://github.com/purpleidea/oh-my-vagrant/blob/master/DOCUMENTATION.md).
 
 ## Questions:
-Come join us in [#ohmyvagrant](https://webchat.freenode.net/?channels=#ohmyvagrant) on Freenode!
+Come join us in [#vagrant](https://webchat.freenode.net/?channels=#vagrant) on Freenode!
 
 ## Installation:
 Please read the [INSTALL](INSTALL) file for instructions on getting this installed.
