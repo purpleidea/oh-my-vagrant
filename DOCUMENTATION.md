@@ -102,6 +102,12 @@ To initialize a new OMV environment, you can run:
 $ omv init
 ```
 
+If you have cloned the git repo and want to use omv command line:
+
+```
+$ oh-my-vagrant/bin/omv.sh init
+```
+
 to automatically create an `omv.yaml` file. If you supply a path as an argument
 to the init verb, then all OMV project specific files will be stored in this
 sub directory, to avoid cluttering up your project root directory.
