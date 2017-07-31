@@ -103,6 +103,14 @@ unsafe = false			# true will trade data safety for performance gains
 nested = false			# should we allow vm nesting
 tests = []			# default list of tests to run
 comment = ''			# store a comment field in the omv.yaml file
+#libvirt-specific provisioner settings
+libvirt_settings = {
+	'graphics_type' => 'spice',
+	'video_type' => 'qxl',
+	'connect_via_ssh' => false,
+	'username' => 'root',
+	'storage_pool_name' => 'default',
+}	# libvirt-specific provisioner settings
 
 def array_values_to_array_of_hashes(l)
 	result = l
@@ -226,6 +234,9 @@ if File.exist?(f)
 	cachier = settings[:cachier]
 	if settings[:vms].is_a?(Array)
 		vms = settings[:vms]
+	end
+	if settings[:libvirt].is_a?(Hash)
+		libvirt_settings.merge(settings[:libvirt])
 	end
 	namespace = settings[:namespace]
 	count = settings[:count]
@@ -582,6 +593,15 @@ while skip < ARGV.length
 			really_use_rm_once = false
 		end
 
+	elsif ARGV[skip].start_with?(arg='--omv-libvirt-')
+		v = ARGV.delete_at(skip).dup
+		v.slice! arg
+        v.tr! '-','_'
+        option, value = v.split('=')
+        if libvirt_settings.keys.include?(option)
+            libvirt_settings[option] = value
+        end
+
 	else	# skip over "official" vagrant args
 		skip = skip + 1
 	end
@@ -626,6 +646,7 @@ settings = {
 	:tests => tests,
 	:comment => comment,
 	:reallyrm => really_use_rm.nil?? 'nil' : really_use_rm,
+	:libvirt => libvirt_settings,
 }
 File.open(f, 'w') do |file|
 	file.write settings.to_yaml
@@ -1625,14 +1646,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#	libvirt
 	#
 	config.vm.provider :libvirt do |libvirt|
-		libvirt.driver = 'kvm'	# needed for kvm performance benefits !
-		libvirt.graphics_type = 'spice'
-		libvirt.video_type = 'qxl'
+		libvirt.driver = libvirt_settings['driver']	# needed for kvm performance benefits !
+		libvirt.graphics_type = libvirt_settings['graphics_type']
+		libvirt.video_type = libvirt_settings['video_type']
 		# leave out to connect directly with qemu:///system
 		#libvirt.host = 'localhost'
 		libvirt.connect_via_ssh = false
 		libvirt.username = 'root'
-		libvirt.storage_pool_name = 'default'
+		libvirt.storage_pool_name = libvirt_settings['storage_pool_name']
 		#libvirt.default_network = 'default'	# XXX: this does nothing
 		libvirt.default_prefix = "#{namespace}"	# set a prefix for your vm's...
 	end
